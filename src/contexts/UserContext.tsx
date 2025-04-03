@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { toast } from "sonner";
@@ -38,7 +37,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
           // Fetch the user profile when auth state changes
           const { success, profile: userProfile } = await getUserProfile(currentUser.id);
           if (success && userProfile) {
-            setProfile(userProfile);
+            // Include email from the user object if it exists
+            setProfile({
+              ...userProfile,
+              email: currentUser.email || undefined
+            });
           } else {
             setProfile(null);
           }
@@ -81,7 +84,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       // Fetch user profile
       const profileResult = await getUserProfile(currentUser.id);
       if (profileResult.success && profileResult.profile) {
-        setProfile(profileResult.profile);
+        // Include email from the user object
+        setProfile({
+          ...profileResult.profile,
+          email: currentUser.email || undefined
+        });
       }
     }
   };
