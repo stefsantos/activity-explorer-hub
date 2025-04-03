@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
@@ -7,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
-import { submitReview, deleteReview } from '@/services/supabaseService';
+import { submitReviewDirect, deleteReviewDirect } from '@/services/reviewService';
 import { useUser } from '@/contexts/UserContext';
 
 type ReviewFormValues = {
@@ -57,7 +56,7 @@ const ReviewForm = ({ activityId, userReview, onSuccess }: ReviewFormProps) => {
     setIsSubmitting(true);
     
     try {
-      const result = await submitReview(activityId, rating, values.comment || undefined);
+      const result = await submitReviewDirect(activityId, rating, values.comment || undefined);
       
       if (result.success) {
         toast.success(userReview ? "Review updated successfully" : "Review submitted successfully");
@@ -81,7 +80,7 @@ const ReviewForm = ({ activityId, userReview, onSuccess }: ReviewFormProps) => {
       setIsDeleting(true);
       
       try {
-        const result = await deleteReview(userReview.id);
+        const result = await deleteReviewDirect(userReview.id);
         
         if (result.success) {
           toast.success("Review deleted successfully");
