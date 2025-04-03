@@ -234,7 +234,7 @@ const ActivityList = () => {
                     Any
                   </ToggleGroupItem>
                   <ToggleGroupItem value="short" className="text-xs rounded-full">
-                    Short (< 1hr)
+                    Short (&lt; 1hr)
                   </ToggleGroupItem>
                   <ToggleGroupItem value="medium" className="text-xs rounded-full">
                     Medium (1-3hrs)
