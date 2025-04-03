@@ -92,6 +92,7 @@ export const login = async ({ email, password }: LoginData) => {
 
 export const logout = async () => {
   try {
+    console.log("Executing supabase.auth.signOut()");
     const { error } = await supabase.auth.signOut();
     
     if (error) {
