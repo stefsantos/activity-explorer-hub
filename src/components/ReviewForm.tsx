@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
@@ -6,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
-import { submitReviewDirect, deleteReviewDirect } from '@/services/reviewService';
+import { submitReview as submitReviewDirect, deleteReview as deleteReviewDirect } from '@/services'; // Updated import path
 import { useUser } from '@/contexts/UserContext';
 
 type ReviewFormValues = {

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import ActivityCard from '@/components/ActivityCard';
 import Pagination from '@/components/Pagination';
@@ -30,7 +29,9 @@ import {
   ageRanges,
 } from '@/data/activities';
 import { useQuery } from '@tanstack/react-query';
-import { fetchActivities } from '@/services/supabaseService';
+import { 
+  fetchActivities 
+} from '@/services';
 
 const ActivityList = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -57,17 +58,14 @@ const ActivityList = () => {
   });
   const [ratingFilter, setRatingFilter] = useState(0);
 
-  // Fetch activities from Supabase
   const { data: activities = [], isLoading } = useQuery({
     queryKey: ['activities'],
     queryFn: fetchActivities
   });
 
   useEffect(() => {
-    // Filter activities based on selected filters
     let filtered = [...activities];
     
-    // Search query filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(activity => 
@@ -77,41 +75,35 @@ const ActivityList = () => {
       );
     }
 
-    // Category filter
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(activity => 
         activity.category && activity.category.toLowerCase() === categoryFilter.toLowerCase()
       );
     }
     
-    // Location filter
     if (locationFilter !== 'all' && locationFilter !== '') {
       filtered = filtered.filter(activity => 
         activity.location && activity.location.name.toLowerCase() === locationFilter.toLowerCase()
       );
     }
     
-    // Age range filtering
     filtered = filtered.filter(activity => {
       const minAge = activity.min_age || 0;
       const maxAge = activity.max_age || 18;
       return minAge <= ageRange[1] && maxAge >= ageRange[0];
     });
 
-    // Price range filtering
     filtered = filtered.filter(activity => {
       const price = activity.price || 0;
       return price >= priceRange[0] && price <= priceRange[1];
     });
 
-    // Rating filter
     if (ratingFilter > 0) {
       filtered = filtered.filter(activity => {
         return (activity.rating || 0) >= ratingFilter;
       });
     }
     
-    // Pagination
     const itemsPerPage = 12;
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
     setTotalPages(totalPages || 1);
@@ -162,7 +154,6 @@ const ActivityList = () => {
     setCurrentPage(1);
   };
 
-  // Helper function to get icon based on category name
   const getCategoryIcon = (category: string) => {
     const categoryColors: Record<string, string> = {
       "Sports": "bg-blue-500",
@@ -184,7 +175,6 @@ const ActivityList = () => {
       <Navbar />
       
       <main className="container mx-auto px-4 py-8">
-        {/* Search section */}
         <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
           <div className="relative">
             <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -198,9 +188,7 @@ const ActivityList = () => {
           </div>
         </div>
         
-        {/* Main content area with sidebar and results */}
         <div className="flex flex-col md:flex-row gap-6">
-          {/* Filter Sidebar */}
           <div className="w-full md:w-72 flex-shrink-0">
             <div className="bg-white p-5 rounded-lg shadow-sm sticky top-24">
               <div className="flex justify-between items-center mb-4">
@@ -226,7 +214,6 @@ const ActivityList = () => {
                 )}
               </div>
               
-              {/* Activity Type / Category */}
               <div className="mb-6">
                 <h3 className="text-md font-semibold mb-3">Activity Type</h3>
                 <div className="grid grid-cols-3 gap-3">
@@ -253,7 +240,6 @@ const ActivityList = () => {
                 </div>
               </div>
               
-              {/* Age Range Slider */}
               <div className="mb-6">
                 <h3 className="text-md font-semibold mb-3">Age Range</h3>
                 <div className="px-2">
@@ -273,7 +259,6 @@ const ActivityList = () => {
                 </div>
               </div>
               
-              {/* Price Range Slider */}
               <div className="mb-6">
                 <h3 className="text-md font-semibold mb-3">Price Range</h3>
                 <div className="px-2">
@@ -293,7 +278,6 @@ const ActivityList = () => {
                 </div>
               </div>
               
-              {/* Location */}
               <Collapsible className="mb-6">
                 <CollapsibleTrigger className="flex w-full justify-between items-center">
                   <h3 className="text-md font-semibold flex items-center">
@@ -312,7 +296,6 @@ const ActivityList = () => {
                 </CollapsibleContent>
               </Collapsible>
               
-              {/* Map */}
               <Collapsible className="mb-6">
                 <CollapsibleTrigger className="flex w-full justify-between items-center">
                   <h3 className="text-md font-semibold flex items-center">
@@ -331,7 +314,6 @@ const ActivityList = () => {
                 </CollapsibleContent>
               </Collapsible>
               
-              {/* Availability */}
               <Collapsible className="mb-6">
                 <CollapsibleTrigger className="flex w-full justify-between items-center">
                   <h3 className="text-md font-semibold flex items-center">
@@ -367,7 +349,6 @@ const ActivityList = () => {
                 </CollapsibleContent>
               </Collapsible>
               
-              {/* Duration */}
               <Collapsible className="mb-6">
                 <CollapsibleTrigger className="flex w-full justify-between items-center">
                   <h3 className="text-md font-semibold flex items-center">
@@ -402,7 +383,6 @@ const ActivityList = () => {
                 </CollapsibleContent>
               </Collapsible>
               
-              {/* Rating */}
               <Collapsible className="mb-6">
                 <CollapsibleTrigger className="flex w-full justify-between items-center">
                   <h3 className="text-md font-semibold flex items-center">
@@ -444,9 +424,7 @@ const ActivityList = () => {
             </div>
           </div>
           
-          {/* Activity Results */}
           <div className="flex-grow">
-            {/* Activity Grid */}
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {[...Array(12)].map((_, i) => (
@@ -487,7 +465,6 @@ const ActivityList = () => {
               </>
             )}
             
-            {/* Pagination */}
             {filteredActivities.length > 0 && (
               <Pagination 
                 currentPage={currentPage} 

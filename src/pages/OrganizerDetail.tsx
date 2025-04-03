@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -7,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import Navbar from '@/components/Navbar';
-import { fetchOrganizerById } from '@/services/supabaseService';
+import { fetchOrganizerById, OrganizerDetailType } from '@/services';
 import { useToast } from "@/hooks/use-toast";
 
 const OrganizerDetail = () => {
