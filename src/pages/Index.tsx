@@ -8,8 +8,9 @@ import Pagination from '@/components/Pagination';
 import Navbar from '@/components/Navbar';
 import { categories, locations, ageRanges } from '@/data/activities';
 import { Palette, Users, Mountain, BookOpen, Music, Utensils, HeartPulse, FlaskConical } from 'lucide-react';
-import { fetchFeaturedActivities, fetchPopularActivities, fetchActivities } from '@/services/supabaseService';
+import { fetchFeaturedActivities, fetchPopularActivities, fetchActivities } from '@/services';
 import { useQuery } from '@tanstack/react-query';
+
 const Index = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
@@ -18,7 +19,6 @@ const Index = () => {
   const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Fetch activities from Supabase
   const {
     data: allActivities = []
   } = useQuery({
@@ -37,8 +37,8 @@ const Index = () => {
     queryKey: ['popularActivities'],
     queryFn: () => fetchPopularActivities(4)
   });
+
   useEffect(() => {
-    // Filter activities based on selected filters
     let filtered = [...allActivities];
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(activity => activity.category.toLowerCase() === categoryFilter.toLowerCase());
@@ -47,7 +47,6 @@ const Index = () => {
       filtered = filtered.filter(activity => activity.location && activity.location.name.toLowerCase() === locationFilter.toLowerCase());
     }
 
-    // Age range filtering (using min_age and max_age)
     if (ageRangeFilter !== 'all' && ageRangeFilter !== '') {
       filtered = filtered.filter(activity => {
         if (ageRangeFilter === 'toddler') return activity.min_age === 0 && activity.max_age === 3;
@@ -56,12 +55,11 @@ const Index = () => {
         if (ageRangeFilter === 'teens') return activity.min_age === 13 && activity.max_age === 17;
         if (ageRangeFilter === 'youngAdults') return activity.min_age === 18 && activity.max_age === 25;
         if (ageRangeFilter === 'adults') return activity.min_age === 25;
-        if (ageRangeFilter === 'family') return true; // All ages
+        if (ageRangeFilter === 'family') return true;
         return true;
       });
     }
 
-    // Pagination
     const itemsPerPage = 6;
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
     setTotalPages(totalPages);
@@ -69,6 +67,7 @@ const Index = () => {
     const paginatedActivities = filtered.slice(startIndex, startIndex + itemsPerPage);
     setFilteredActivities(paginatedActivities);
   }, [allActivities, categoryFilter, locationFilter, ageRangeFilter, currentPage]);
+
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({
@@ -76,6 +75,7 @@ const Index = () => {
       behavior: 'smooth'
     });
   };
+
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'Arts & Crafts':
@@ -96,6 +96,7 @@ const Index = () => {
         return <Users size={24} />;
     }
   };
+
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'Arts & Crafts':
@@ -116,11 +117,11 @@ const Index = () => {
         return 'bg-kids-pink';
     }
   };
+
   return <div className="min-h-screen bg-gray-50">
       <Navbar />
       
       <main className="container mx-auto px-4 py-8">
-        {/* Hero Section with Main Heading */}
         <section className="mb-10 text-center relative">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">
             <span className="text-gray-800">The Largest Kids Activity</span>
@@ -130,12 +131,9 @@ const Index = () => {
             <span className="text-kids-orange">Philippines.</span>
           </h2>
           
-          
-          {/* Featured Carousel */}
           <FeaturedCarousel activities={featuredActivities} />
         </section>
         
-        {/* Popular Activities */}
         <section className="mb-12">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Our Most Popular Activities</h2>
@@ -152,7 +150,6 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Category Icons */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Explore by Category</h2>
           <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
@@ -168,7 +165,6 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Filter Section */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Find the Perfect Activity</h2>
           
@@ -183,7 +179,6 @@ const Index = () => {
         }} />
         </section>
         
-        {/* Activity List */}
         <section id="activity-list" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Activities Just For You</h2>
           
@@ -262,4 +257,5 @@ const Index = () => {
       </footer>
     </div>;
 };
+
 export default Index;

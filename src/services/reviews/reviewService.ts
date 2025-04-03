@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { getUserProfile } from "@/contexts/UserContext";
 
@@ -37,6 +36,7 @@ export async function submitReview(activityId: string, rating: number, comment?:
 
   const userId = session.session.user.id;
   
+  // Check if user already has a review for this activity
   const { data: existingReviews, error: checkError } = await supabase
     .rpc('check_user_review', { 
       user_id_param: userId, 
@@ -50,6 +50,7 @@ export async function submitReview(activityId: string, rating: number, comment?:
 
   let result;
   
+  // If user already has a review, update it
   if (existingReviews && Array.isArray(existingReviews) && existingReviews.length > 0) {
     const existingReviewId = existingReviews[0].id;
     
@@ -67,6 +68,7 @@ export async function submitReview(activityId: string, rating: number, comment?:
     
     result = { success: true, reviewId: existingReviewId };
   } else {
+    // Otherwise, insert a new review
     const { data, error } = await supabase
       .rpc('insert_user_review', {
         activity_id_param: activityId,

@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
-import { searchActivities } from '@/services/supabaseService';
+import { searchActivities } from '@/services';
 import { useDebounce } from '@/hooks/useDebounce';
 
 const SearchBox = () => {

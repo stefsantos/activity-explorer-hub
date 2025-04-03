@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import ActivityCard from '@/components/ActivityCard';
@@ -7,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Bookmark } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchActivities } from '@/services/supabaseService';
+import { fetchActivities } from '@/services';
 
 const SavedActivities = () => {
   const { isLoggedIn, bookmarkedActivities } = useUser();
