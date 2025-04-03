@@ -12,7 +12,7 @@ export interface SignUpData {
 }
 
 export interface LoginData {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -69,33 +69,11 @@ export const signUp = async (data: SignUpData) => {
   }
 };
 
-export const loginWithUsername = async ({ username, password }: LoginData) => {
+export const login = async ({ email, password }: LoginData) => {
   try {
-    // First, find the email associated with the username
-    const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('username', username)
-      .single();
-
-    if (profileError || !profileData) {
-      console.error('Error finding user:', profileError);
-      return { success: false, error: new Error('Username not found') };
-    }
-
-    // Get the user with the associated auth data
-    const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(
-      profileData.id
-    );
-
-    if (userError || !user) {
-      console.error('Error retrieving user data:', userError);
-      return { success: false, error: new Error('User not found') };
-    }
-
-    // Login with the retrieved email and provided password
+    // Login with email and password directly
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: user.email!,
+      email,
       password
     });
 
@@ -106,7 +84,7 @@ export const loginWithUsername = async ({ username, password }: LoginData) => {
 
     return { success: true, data };
   } catch (error) {
-    console.error('Error in loginWithUsername:', error);
+    console.error('Error in login:', error);
     return { success: false, error };
   }
 };

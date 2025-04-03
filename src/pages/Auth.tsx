@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { z } from "zod";
@@ -10,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/contexts/UserContext";
-import { signUp, loginWithUsername, LoginData } from "@/services/authService";
+import { signUp, login, LoginData } from "@/services/authService";
 import { Mail, User, Phone, Lock, UserCircle } from "lucide-react";
 
 const signupSchema = z.object({
@@ -27,7 +28,7 @@ const signupSchema = z.object({
 });
 
 const loginSchema = z.object({
-  username: z.string().min(3, "Username is required"),
+  email: z.string().email("Valid email is required"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -63,7 +64,7 @@ const Auth = () => {
   const loginForm = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     }
   });
@@ -90,7 +91,7 @@ const Auth = () => {
 
       toast.success("Signup successful! Please log in with your credentials.");
       setActiveTab("login");
-      loginForm.setValue("username", data.username);
+      loginForm.setValue("email", data.email);
     } catch (error) {
       console.error("Signup error:", error);
       toast.error("An unexpected error occurred. Please try again.");
@@ -103,11 +104,11 @@ const Auth = () => {
     setIsLoading(true);
     try {
       const loginData: LoginData = {
-        username: data.username,
+        email: data.email,
         password: data.password
       };
       
-      const result = await loginWithUsername(loginData);
+      const result = await login(loginData);
 
       if (!result.success) {
         const errorMessage = result.error instanceof Error 
@@ -158,14 +159,14 @@ const Auth = () => {
                 <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
                   <FormField
                     control={loginForm.control}
-                    name="username"
+                    name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Username</FormLabel>
+                        <FormLabel>Email</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <UserCircle className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                            <Input placeholder="Enter your username" className="pl-10" {...field} />
+                            <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <Input placeholder="Enter your email" className="pl-10" {...field} />
                           </div>
                         </FormControl>
                         <FormMessage />
