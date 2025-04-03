@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 export interface ActivityDetailType {
@@ -65,93 +66,57 @@ export interface ActivityDetailType {
 }
 
 export async function fetchActivities() {
-  console.log("Fetching all activities...");
-  try {
-    const { data, error } = await supabase
-      .from('activities')
-      .select(`
-        *,
-        location:location_id(id, name, address, latitude, longitude),
-        organizer:organizer_id(id, name, description)
-      `);
+  const { data, error } = await supabase
+    .from('activities')
+    .select(`
+      *,
+      location:location_id(id, name, address, latitude, longitude),
+      organizer:organizer_id(id, name, description)
+    `);
 
-    if (error) {
-      console.error('Error fetching activities:', error);
-      throw new Error(`Failed to fetch activities: ${error.message}`);
-    }
-
-    console.log("Fetched activities:", data?.length || 0);
-    
-    if (!data || data.length === 0) {
-      console.warn("No activities found in the database. This may indicate an empty table or connection issue.");
-    }
-    
-    return data || [];
-  } catch (e) {
-    console.error("Exception fetching activities:", e);
-    throw e;
+  if (error) {
+    console.error('Error fetching activities:', error);
+    return [];
   }
+
+  return data;
 }
 
 export async function fetchFeaturedActivities() {
-  console.log("Fetching featured activities...");
-  try {
-    const { data, error } = await supabase
-      .from('activities')
-      .select(`
-        *,
-        location:location_id(id, name, address, latitude, longitude),
-        organizer:organizer_id(id, name, description)
-      `)
-      .eq('featured', true);
+  const { data, error } = await supabase
+    .from('activities')
+    .select(`
+      *,
+      location:location_id(id, name, address, latitude, longitude),
+      organizer:organizer_id(id, name, description)
+    `)
+    .eq('featured', true);
 
-    if (error) {
-      console.error('Error fetching featured activities:', error);
-      throw new Error(`Failed to fetch featured activities: ${error.message}`);
-    }
-
-    console.log("Fetched featured activities:", data?.length || 0);
-    
-    if (!data || data.length === 0) {
-      console.warn("No featured activities found in the database.");
-    }
-    
-    return data || [];
-  } catch (e) {
-    console.error("Exception fetching featured activities:", e);
-    throw e;
+  if (error) {
+    console.error('Error fetching featured activities:', error);
+    return [];
   }
+
+  return data;
 }
 
 export async function fetchPopularActivities(limit = 4) {
-  console.log("Fetching popular activities...");
-  try {
-    const { data, error } = await supabase
-      .from('activities')
-      .select(`
-        *,
-        location:location_id(id, name, address, latitude, longitude),
-        organizer:organizer_id(id, name, description)
-      `)
-      .order('rating', { ascending: false })
-      .limit(limit);
+  const { data, error } = await supabase
+    .from('activities')
+    .select(`
+      *,
+      location:location_id(id, name, address, latitude, longitude),
+      organizer:organizer_id(id, name, description)
+    `)
+    .order('rating', { ascending: false })
+    .limit(limit);
 
-    if (error) {
-      console.error('Error fetching popular activities:', error);
-      throw new Error(`Failed to fetch popular activities: ${error.message}`);
-    }
-
-    console.log("Fetched popular activities:", data?.length || 0);
-    
-    if (!data || data.length === 0) {
-      console.warn("No popular activities found in the database.");
-    }
-    
-    return data || [];
-  } catch (e) {
-    console.error("Exception fetching popular activities:", e);
-    throw e;
+  if (error) {
+    console.error('Error fetching popular activities:', error);
+    return [];
   }
+
+  return data;
 }
 
 export async function fetchActivityById(id: string): Promise<ActivityDetailType | null> {
