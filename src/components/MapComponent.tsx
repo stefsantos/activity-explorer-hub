@@ -28,7 +28,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     if (!mapContainer.current) return;
 
     // Initialize map
-    mapboxgl.accessToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA';
+    mapboxgl.accessToken = 'pk.eyJ1Ijoic3RlZnNhbiIsImEiOiJjbHoxam4yYjkwMTFsMmpxMXAwanhnYjUwIn0.4ZrFH4gFhNA-iWsASTG97Q';
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
