@@ -1,7 +1,7 @@
 
-// Re-export functions from service modules for easy importing
+// Re-export all service functions here for easier imports
 export * from './activities/activityService';
+export * from './reviews/reviewService';
 export * from './organizers/organizerService';
 export * from './search/searchService';
-export * from './reviews/reviewService';
-export * from './types';
+export * from './bookingService';

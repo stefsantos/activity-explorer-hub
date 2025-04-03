@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ActivityCard from '@/components/ActivityCard';
 import Pagination from '@/components/Pagination';
 import Navbar from '@/components/Navbar';
+import MapPreview from '@/components/MapPreview';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from "@/components/ui/checkbox";
@@ -305,12 +306,7 @@ const ActivityList = () => {
                   <ChevronDown size={16} />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-3">
-                  <div className="h-32 bg-gray-100 rounded-lg mb-2 relative">
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs">
-                      Map preview
-                    </div>
-                  </div>
-                  <div className="text-xs text-center text-blue-500">View larger map</div>
+                  <MapPreview activities={activities} />
                 </CollapsibleContent>
               </Collapsible>
               

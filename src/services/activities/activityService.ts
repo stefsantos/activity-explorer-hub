@@ -87,9 +87,12 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
     userReview = await getUserReview(userId, id);
   }
 
-  // RPC call to get reviews with user details
+  // Fetch activity reviews directly
   const { data: reviewData, error: reviewError } = await supabase
-    .rpc('get_activity_reviews', { activity_id_param: id });
+    .from('activity_reviews')
+    .select('*')
+    .eq('activity_id', id)
+    .order('review_date', { ascending: false });
   
   if (reviewError) {
     console.error('Error fetching reviews:', reviewError);
