@@ -3,13 +3,13 @@ import React from 'react';
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useUser } from "@/contexts/UserContext";
 import { Calendar, Mail, Phone, User } from "lucide-react";
+import { createBooking } from "@/services/bookingService";
 
 const bookingFormSchema = z.object({
   first_name: z.string().min(2, "First name must be at least 2 characters"),
@@ -52,23 +52,23 @@ const BookingForm = ({
 
   const onSubmit = async (data: BookingFormValues) => {
     try {
-      // Insert the booking into the database
-      const { error } = await supabase
-        .from('activity_bookings')
-        .insert({
-          activity_id: activityId,
-          variant_id: variantId || null,
-          package_id: packageId || null,
-          user_id: isLoggedIn ? user?.id : null,
-          first_name: data.first_name,
-          last_name: data.last_name,
-          email: data.email,
-          phone: data.phone,
-          price: price
-        });
+      // Create booking using the service function
+      const bookingData = {
+        activity_id: activityId,
+        variant_id: variantId,
+        package_id: packageId,
+        user_id: isLoggedIn ? user?.id : null,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        phone: data.phone,
+        price: price
+      };
+      
+      const result = await createBooking(bookingData);
 
-      if (error) {
-        console.error('Error creating booking:', error);
+      if (!result.success) {
+        console.error('Error creating booking:', result.error);
         toast.error('Failed to create booking. Please try again.');
         return;
       }
