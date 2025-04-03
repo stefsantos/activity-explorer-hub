@@ -9,7 +9,311 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      activities: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          duration: string | null
+          featured: boolean | null
+          group_size: string | null
+          id: string
+          image: string
+          location_id: string | null
+          max_age: number | null
+          min_age: number | null
+          organizer_id: string | null
+          price: number
+          rating: number | null
+          review_count: number | null
+          schedule: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description: string
+          duration?: string | null
+          featured?: boolean | null
+          group_size?: string | null
+          id?: string
+          image: string
+          location_id?: string | null
+          max_age?: number | null
+          min_age?: number | null
+          organizer_id?: string | null
+          price: number
+          rating?: number | null
+          review_count?: number | null
+          schedule?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          duration?: string | null
+          featured?: boolean | null
+          group_size?: string | null
+          id?: string
+          image?: string
+          location_id?: string | null
+          max_age?: number | null
+          min_age?: number | null
+          organizer_id?: string | null
+          price?: number
+          rating?: number | null
+          review_count?: number | null
+          schedule?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activities_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "activity_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activities_organizer_id_fkey"
+            columns: ["organizer_id"]
+            isOneToOne: false
+            referencedRelation: "activity_organizers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activity_expectations: {
+        Row: {
+          activity_id: string
+          created_at: string
+          description: string
+          id: string
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string
+          description: string
+          id?: string
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_expectations_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activity_locations: {
+        Row: {
+          address: string
+          created_at: string
+          id: string
+          latitude: number
+          longitude: number
+          name: string
+        }
+        Insert: {
+          address: string
+          created_at?: string
+          id?: string
+          latitude: number
+          longitude: number
+          name: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          id?: string
+          latitude?: number
+          longitude?: number
+          name?: string
+        }
+        Relationships: []
+      }
+      activity_organizers: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      activity_packages: {
+        Row: {
+          activity_id: string
+          created_at: string
+          description: string | null
+          id: string
+          max_participants: number | null
+          name: string
+          price: number
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_participants?: number | null
+          name: string
+          price: number
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_participants?: number | null
+          name?: string
+          price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_packages_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activity_requirements: {
+        Row: {
+          activity_id: string
+          created_at: string
+          description: string
+          id: string
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string
+          description: string
+          id?: string
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_requirements_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activity_reviews: {
+        Row: {
+          activity_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          review_date: string
+          reviewer_name: string
+        }
+        Insert: {
+          activity_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          review_date?: string
+          reviewer_name: string
+        }
+        Update: {
+          activity_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          review_date?: string
+          reviewer_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_reviews_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      activity_variants: {
+        Row: {
+          activity_id: string
+          created_at: string
+          description: string | null
+          id: string
+          location_id: string | null
+          name: string
+          price_adjustment: number | null
+        }
+        Insert: {
+          activity_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          location_id?: string | null
+          name: string
+          price_adjustment?: number | null
+        }
+        Update: {
+          activity_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          location_id?: string | null
+          name?: string
+          price_adjustment?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_variants_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_variants_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "activity_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
