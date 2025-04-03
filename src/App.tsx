@@ -12,26 +12,35 @@ import SavedActivities from "./pages/SavedActivities";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import { toast } from "sonner";
+import { checkAndSeedActivities } from "./utils/seedData";
 
+// Initialize the query client with updated configuration
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 2,
       refetchOnWindowFocus: false,
       staleTime: 60000, // 1 minute
-      onError: (error) => {
-        console.error("Query error:", error);
-        toast.error("Error loading data. Please try again.");
+      meta: {
+        onError: (error: Error) => {
+          console.error("Query error:", error);
+          toast.error("Error loading data. Please try again.");
+        },
       },
     },
     mutations: {
-      onError: (error) => {
-        console.error("Mutation error:", error);
-        toast.error("Operation failed. Please try again.");
+      meta: {
+        onError: (error: Error) => {
+          console.error("Mutation error:", error);
+          toast.error("Operation failed. Please try again.");
+        },
       },
     },
   },
 });
+
+// Call seed function when app loads
+checkAndSeedActivities();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
