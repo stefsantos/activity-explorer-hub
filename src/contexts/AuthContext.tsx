@@ -25,10 +25,12 @@ export interface UserProfile {
   id: string;
   first_name: string;
   last_name: string;
-  email: string;
   phone: string;
+  username: string;
   created_at?: string;
   updated_at?: string;
+  // We'll use the email from the auth.users table
+  email?: string;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -88,7 +90,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      setProfile(data);
+      // Add the email from the user object to the profile data
+      if (data) {
+        setProfile({
+          ...data,
+          email: user?.email || ''
+        });
+      }
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
@@ -159,9 +167,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     
     try {
+      // Remove email from updates as it's not in the profiles table
+      const { email, ...profileUpdates } = updates;
+      
       const { data, error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update(profileUpdates)
         .eq('id', user.id)
         .select()
         .single();
@@ -170,7 +181,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: error.message };
       }
       
-      setProfile(data);
+      // Add the email from the user object to the updated profile data
+      if (data) {
+        setProfile({
+          ...data,
+          email: user?.email || ''
+        });
+      }
+      
       toast.success('Profile updated successfully');
       return { success: true };
     } catch (error) {
