@@ -94,3 +94,24 @@ export interface OrganizerDetailType {
     review_count: number | null;
   }[];
 }
+
+export interface Activity {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  image: string;
+  price: number;
+  min_age: number | null;
+  max_age: number | null;
+  duration: string | null;
+  rating: number | null;
+  review_count: number | null;
+  location: {
+    id: string;
+    name: string;
+    address: string;
+    latitude: number;
+    longitude: number;
+  } | null;
+}
