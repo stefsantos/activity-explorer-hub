@@ -77,6 +77,25 @@ export interface UserReviewType {
   activity_id: string;
 }
 
+export interface OrganizerDetailType {
+  id: string;
+  name: string;
+  description: string | null;
+  created_at: string;
+  activities: {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    image: string;
+    price: number;
+    min_age: number | null;
+    max_age: number | null;
+    rating: number | null;
+    review_count: number | null;
+  }[];
+}
+
 export async function fetchActivities() {
   const { data, error } = await supabase
     .from('activities')
@@ -227,6 +246,48 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
     requirements: requirements || [],
     expectations: expectations || [],
     userReview
+  };
+}
+
+export async function fetchOrganizerById(id: string): Promise<OrganizerDetailType | null> {
+  const { data: organizer, error: organizerError } = await supabase
+    .from('activity_organizers')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (organizerError) {
+    console.error('Error fetching organizer:', organizerError);
+    return null;
+  }
+
+  const { data: activities, error: activitiesError } = await supabase
+    .from('activities')
+    .select(`
+      id,
+      title,
+      description,
+      category,
+      image,
+      price,
+      min_age,
+      max_age,
+      rating,
+      review_count
+    `)
+    .eq('organizer_id', id);
+
+  if (activitiesError) {
+    console.error('Error fetching organizer activities:', activitiesError);
+    return {
+      ...organizer,
+      activities: []
+    };
+  }
+
+  return {
+    ...organizer,
+    activities: activities || []
   };
 }
 
