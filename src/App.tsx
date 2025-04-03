@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,37 +20,39 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <Routes>
-            {/* Auth routes */}
-            <Route path="/auth" element={<AuthLayout />}>
-              <Route path="login" element={<Login />} />
-              <Route path="signup" element={<SignUp />} />
-            </Route>
-            
-            {/* Public routes */}
-            <Route path="/" element={<Index />} />
-            <Route path="/activities" element={<ActivityList />} />
-            <Route path="/activity/:id" element={<ActivityDetail />} />
-            
-            {/* Protected routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/saved" element={<SavedActivities />} />
-              <Route path="/profile" element={<Profile />} />
-            </Route>
-            
-            {/* Catch all */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </TooltipProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <TooltipProvider>
+            <Routes>
+              {/* Auth routes */}
+              <Route path="/auth" element={<AuthLayout />}>
+                <Route path="login" element={<Login />} />
+                <Route path="signup" element={<SignUp />} />
+              </Route>
+              
+              {/* Public routes */}
+              <Route path="/" element={<Index />} />
+              <Route path="/activities" element={<ActivityList />} />
+              <Route path="/activity/:id" element={<ActivityDetail />} />
+              
+              {/* Protected routes */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/saved" element={<SavedActivities />} />
+                <Route path="/profile" element={<Profile />} />
+              </Route>
+              
+              {/* Catch all */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <Toaster />
+            <Sonner />
+          </TooltipProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;

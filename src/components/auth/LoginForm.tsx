@@ -28,7 +28,11 @@ const LoginForm = () => {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    const { error } = await login(values);
+    const { error } = await login({
+      email: values.email,
+      password: values.password,
+    });
+    
     if (error) {
       form.setError('root', { 
         message: error.message || 'Failed to log in. Please check your credentials and try again.'
