@@ -1,10 +1,19 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, UserCircle } from 'lucide-react';
+import { Menu, X, LogOut, UserCircle, User, Bookmark } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser } from "@/contexts/UserContext";
 import SearchBox from './SearchBox';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const Navbar = () => {
   const { isLoggedIn, logout, profile } = useUser();
@@ -16,17 +25,21 @@ const Navbar = () => {
     return location.pathname === path;
   };
 
-  const handleAuthClick = () => {
-    if (isLoggedIn) {
-      // Show dropdown with logout option
-    } else {
-      navigate('/auth');
-    }
-  };
-
   const handleLogout = async () => {
     await logout();
     navigate('/');
+  };
+
+  const getInitials = () => {
+    if (!profile) return "U";
+    
+    if (profile.first_name && profile.last_name) {
+      return `${profile.first_name[0]}${profile.last_name[0]}`.toUpperCase();
+    } else if (profile.username) {
+      return profile.username[0].toUpperCase();
+    }
+    
+    return "U";
   };
 
   return (
@@ -58,21 +71,37 @@ const Navbar = () => {
             <Link to="/activities" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/activities') ? 'text-kids-blue' : 'text-gray-600 hover:text-kids-blue'}`}>
               Activities
             </Link>
-            {isLoggedIn && (
-              <Link to="/saved" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/saved') ? 'text-kids-blue' : 'text-gray-600 hover:text-kids-blue'}`}>
-                Saved
-              </Link>
-            )}
+            
             {isLoggedIn ? (
-              <div className="flex items-center ml-2">
-                <div className="mr-2 text-sm font-medium text-gray-700">
-                  {profile ? `Hi, ${profile.username}` : 'Welcome'}
-                </div>
-                <Button onClick={handleLogout} variant="outline" className="flex items-center gap-1">
-                  <LogOut size={16} />
-                  <span>Logout</span>
-                </Button>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full ml-2" aria-label="Profile">
+                    <Avatar className="h-8 w-8 bg-pink-100">
+                      <AvatarFallback className="bg-pink-100 text-gray-700">{getInitials()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuLabel>
+                    <p className="font-semibold">{profile?.username || "User"}</p>
+                    <p className="text-xs text-gray-500 mt-1">{profile?.email}</p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/profile')}>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>My Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/saved')}>
+                    <Bookmark className="mr-2 h-4 w-4" />
+                    <span>Saved Activities</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer text-red-500" onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Button onClick={() => navigate('/auth')} className="ml-2 bg-kids-blue hover:bg-kids-blue/90 flex items-center gap-1">
                 <UserCircle size={16} />
@@ -83,9 +112,40 @@ const Navbar = () => {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
+            {isLoggedIn ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full" aria-label="Profile">
+                    <Avatar className="h-8 w-8 bg-pink-100">
+                      <AvatarFallback className="bg-pink-100 text-gray-700">{getInitials()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuLabel>
+                    <p className="font-semibold">{profile?.username || "User"}</p>
+                    <p className="text-xs text-gray-500 mt-1">{profile?.email}</p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/profile')}>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>My Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/saved')}>
+                    <Bookmark className="mr-2 h-4 w-4" />
+                    <span>Saved Activities</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="cursor-pointer text-red-500" onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : null}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-gray-600 hover:text-gray-900 focus:outline-none"
+              className="text-gray-600 hover:text-gray-900 focus:outline-none ml-2"
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
             >
               {isMenuOpen ? (
@@ -123,29 +183,14 @@ const Navbar = () => {
               {isLoggedIn && (
                 <Link 
                   to="/saved" 
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/saved') ? 'text-kids-blue bg-kids-blue/5' : 'text-gray-700 hover:bg-gray-50'}`}
+                  className={`flex items-center px-3 py-2 rounded-md text-base font-medium ${isActive('/saved') ? 'text-kids-blue bg-kids-blue/5' : 'text-gray-700 hover:bg-gray-50'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Saved
+                  <Bookmark className="h-5 w-5 mr-2" />
+                  Saved Activities
                 </Link>
               )}
-              {isLoggedIn ? (
-                <>
-                  <div className="block px-3 py-2 rounded-md text-base font-medium text-gray-700">
-                    {profile ? `Hi, ${profile.username}` : 'Welcome'}
-                  </div>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setIsMenuOpen(false);
-                    }}
-                    className="flex w-full items-center text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    <LogOut className="h-5 w-5 mr-2" />
-                    Logout
-                  </button>
-                </>
-              ) : (
+              {!isLoggedIn && (
                 <button
                   onClick={() => {
                     navigate('/auth');
@@ -155,6 +200,18 @@ const Navbar = () => {
                 >
                   <UserCircle className="h-5 w-5 mr-2" />
                   Login
+                </button>
+              )}
+              {isLoggedIn && (
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex w-full items-center text-left px-3 py-2 rounded-md text-base font-medium text-red-500 hover:bg-red-50"
+                >
+                  <LogOut className="h-5 w-5 mr-2" />
+                  Logout
                 </button>
               )}
             </div>
