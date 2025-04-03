@@ -16,6 +16,16 @@ export interface LoginData {
   password: string;
 }
 
+export interface Profile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+  phone: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export const signUp = async (data: SignUpData) => {
   try {
     // First check if the username already exists
@@ -73,19 +83,19 @@ export const loginWithUsername = async ({ username, password }: LoginData) => {
       return { success: false, error: new Error('Username not found') };
     }
 
-    // Then get the email from auth.users
-    const { data: userData, error: userError } = await supabase.auth.admin.getUserById(
+    // Get the user with the associated auth data
+    const { data: { user }, error: userError } = await supabase.auth.admin.getUserById(
       profileData.id
     );
 
-    if (userError || !userData?.user) {
+    if (userError || !user) {
       console.error('Error retrieving user data:', userError);
       return { success: false, error: new Error('User not found') };
     }
 
     // Login with the retrieved email and provided password
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: userData.user.email!,
+      email: user.email!,
       password
     });
 
@@ -137,7 +147,7 @@ export const getCurrentUser = async () => {
   }
 };
 
-export const getUserProfile = async (userId: string) => {
+export const getUserProfile = async (userId: string): Promise<{ success: boolean; profile?: Profile; error?: any }> => {
   try {
     const { data, error } = await supabase
       .from('profiles')
@@ -150,7 +160,7 @@ export const getUserProfile = async (userId: string) => {
       return { success: false, error };
     }
     
-    return { success: true, profile: data };
+    return { success: true, profile: data as Profile };
   } catch (error) {
     console.error('Error in getUserProfile:', error);
     return { success: false, error };

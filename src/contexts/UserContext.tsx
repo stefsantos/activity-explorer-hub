@@ -3,15 +3,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { User } from '@supabase/supabase-js';
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { getCurrentUser, getUserProfile, logout as authLogout } from '@/services/authService';
-
-type Profile = {
-  id: string;
-  first_name: string;
-  last_name: string;
-  username: string;
-  phone: string;
-};
+import { getCurrentUser, getUserProfile, logout as authLogout, Profile } from '@/services/authService';
 
 type UserContextType = {
   user: User | null;
@@ -44,9 +36,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         
         if (currentUser) {
           // Fetch the user profile when auth state changes
-          const { success, profile } = await getUserProfile(currentUser.id);
-          if (success && profile) {
-            setProfile(profile);
+          const { success, profile: userProfile } = await getUserProfile(currentUser.id);
+          if (success && userProfile) {
+            setProfile(userProfile);
+          } else {
+            setProfile(null);
           }
         } else {
           setProfile(null);

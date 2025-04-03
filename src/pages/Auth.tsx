@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { z } from "zod";
@@ -11,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/contexts/UserContext";
-import { signUp, loginWithUsername } from "@/services/authService";
+import { signUp, loginWithUsername, LoginData } from "@/services/authService";
 import { Mail, User, Phone, Lock, UserCircle } from "lucide-react";
 
 const signupSchema = z.object({
@@ -103,7 +102,12 @@ const Auth = () => {
   const handleLogin = async (data: LoginValues) => {
     setIsLoading(true);
     try {
-      const result = await loginWithUsername(data);
+      const loginData: LoginData = {
+        username: data.username,
+        password: data.password
+      };
+      
+      const result = await loginWithUsername(loginData);
 
       if (!result.success) {
         const errorMessage = result.error instanceof Error 
