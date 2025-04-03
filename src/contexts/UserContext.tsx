@@ -20,7 +20,7 @@ type UserContextType = {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [bookmarkedActivities, setBookmarkedActivities] = useState<string[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
