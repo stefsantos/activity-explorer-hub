@@ -1,6 +1,7 @@
+
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { toast } from "sonner";
-import { supabase } from './supabase'; // Assuming supabase is imported from a file named 'supabase'
+import { supabase } from '@/integrations/supabase/client'; // Updated import path
 
 type User = {
   id: string;

@@ -224,7 +224,7 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
         activity_id_param: id 
       });
 
-    if (!userReviewError && userReviewData && userReviewData.length > 0) {
+    if (!userReviewError && userReviewData && Array.isArray(userReviewData) && userReviewData.length > 0) {
       userReview = {
         id: userReviewData[0].id,
         rating: userReviewData[0].rating,
@@ -335,7 +335,7 @@ export async function submitReview(activityId: string, rating: number, comment?:
 
   let result;
   
-  if (existingReviews && existingReviews.length > 0) {
+  if (existingReviews && Array.isArray(existingReviews) && existingReviews.length > 0) {
     const existingReviewId = existingReviews[0].id;
     
     const { data, error } = await supabase
@@ -365,7 +365,7 @@ export async function submitReview(activityId: string, rating: number, comment?:
       return { success: false, error: 'Error submitting review' };
     }
     
-    if (data && data.length > 0) {
+    if (data && Array.isArray(data) && data.length > 0) {
       result = { success: true, reviewId: data[0].id };
     } else {
       result = { success: true };

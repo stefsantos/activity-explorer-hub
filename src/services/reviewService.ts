@@ -1,9 +1,10 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { getUserProfile } from "@/contexts/UserContext";
 
 // Function to get a user's review for a specific activity
 export async function getUserReview(userId: string, activityId: string) {
-  // We need to use the RPC function because direct table access doesn't match the types
+  // Use the RPC function to get user reviews
   const { data, error } = await supabase
     .rpc('get_user_review', {
       user_id_param: userId,
@@ -16,7 +17,7 @@ export async function getUserReview(userId: string, activityId: string) {
   }
   
   // Format the result for compatibility
-  if (data && data.length > 0) {
+  if (data && Array.isArray(data) && data.length > 0) {
     return {
       id: data[0].id,
       rating: data[0].rating,
@@ -56,10 +57,10 @@ export async function submitReviewDirect(
   let result;
   
   // If a review already exists, update it
-  if (existingReview && existingReview.length > 0) {
+  if (existingReview && Array.isArray(existingReview) && existingReview.length > 0) {
     const existingReviewId = existingReview[0].id;
     
-    const { data, error } = await supabase
+    const { error } = await supabase
       .rpc('update_user_review', {
         review_id_param: existingReviewId,
         rating_param: rating,
