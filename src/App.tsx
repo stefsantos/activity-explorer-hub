@@ -3,7 +3,7 @@ import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { UserProvider } from "@/contexts/UserContext";
 import Index from "./pages/Index";
 import ActivityList from "./pages/ActivityList";
@@ -26,6 +26,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/activities" element={<ActivityList />} />
             <Route path="/activity/:id" element={<ActivityDetail />} />
+            <Route path="/activities/:id" element={<ActivityDetail />} />
             <Route path="/organizer/:id" element={<OrganizerDetail />} />
             <Route path="/saved" element={<SavedActivities />} />
             <Route path="*" element={<NotFound />} />

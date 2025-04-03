@@ -161,7 +161,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
             e.stopPropagation();
             
             // Navigate to activity detail page
-            navigate(`/activities/${activity.id}`);
+            navigate(`/activity/${activity.id}`);
           });
           
           // Show popup on hover
@@ -189,7 +189,8 @@ const MapComponent: React.FC<MapComponentProps> = ({
                 const viewBtn = popupElement.querySelector('.view-btn');
                 if (viewBtn) {
                   viewBtn.addEventListener('click', () => {
-                    navigate(`/activities/${activity.id}`);
+                    // Fix the navigation path to match the route in App.tsx
+                    navigate(`/activity/${activity.id}`);
                   });
                 }
                 
