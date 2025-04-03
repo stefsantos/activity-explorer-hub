@@ -12,8 +12,18 @@ export interface SignUpData {
 }
 
 export interface LoginData {
-  username: string;
+  email: string;
   password: string;
+}
+
+export interface Profile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+  phone: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const signUp = async (data: SignUpData) => {
@@ -59,33 +69,11 @@ export const signUp = async (data: SignUpData) => {
   }
 };
 
-export const loginWithUsername = async ({ username, password }: LoginData) => {
+export const login = async ({ email, password }: LoginData) => {
   try {
-    // First, find the email associated with the username
-    const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('username', username)
-      .single();
-
-    if (profileError || !profileData) {
-      console.error('Error finding user:', profileError);
-      return { success: false, error: new Error('Username not found') };
-    }
-
-    // Then get the email from auth.users
-    const { data: userData, error: userError } = await supabase.auth.admin.getUserById(
-      profileData.id
-    );
-
-    if (userError || !userData?.user) {
-      console.error('Error retrieving user data:', userError);
-      return { success: false, error: new Error('User not found') };
-    }
-
-    // Login with the retrieved email and provided password
+    // Login with email and password directly
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: userData.user.email!,
+      email,
       password
     });
 
@@ -96,7 +84,7 @@ export const loginWithUsername = async ({ username, password }: LoginData) => {
 
     return { success: true, data };
   } catch (error) {
-    console.error('Error in loginWithUsername:', error);
+    console.error('Error in login:', error);
     return { success: false, error };
   }
 };
@@ -137,7 +125,7 @@ export const getCurrentUser = async () => {
   }
 };
 
-export const getUserProfile = async (userId: string) => {
+export const getUserProfile = async (userId: string): Promise<{ success: boolean; profile?: Profile; error?: any }> => {
   try {
     const { data, error } = await supabase
       .from('profiles')
@@ -150,7 +138,7 @@ export const getUserProfile = async (userId: string) => {
       return { success: false, error };
     }
     
-    return { success: true, profile: data };
+    return { success: true, profile: data as Profile };
   } catch (error) {
     console.error('Error in getUserProfile:', error);
     return { success: false, error };
