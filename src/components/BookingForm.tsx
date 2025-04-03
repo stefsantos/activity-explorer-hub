@@ -39,14 +39,14 @@ const BookingForm = ({
   onSuccess,
   onLogin
 }: BookingFormProps) => {
-  const { isLoggedIn, user } = useUser();
+  const { isLoggedIn, user, profile } = useUser();
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
-      first_name: user?.name ? user.name.split(' ')[0] : "",
-      last_name: user?.name ? user.name.split(' ').slice(1).join(' ') : "",
+      first_name: profile?.first_name || "",
+      last_name: profile?.last_name || "",
       email: user?.email || "",
-      phone: ""
+      phone: profile?.phone || ""
     }
   });
 

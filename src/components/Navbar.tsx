@@ -1,18 +1,32 @@
 
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, LogOut, UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser } from "@/contexts/UserContext";
 import SearchBox from './SearchBox';
 
 const Navbar = () => {
-  const { isLoggedIn, login, logout } = useUser();
+  const { isLoggedIn, logout, profile } = useUser();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = (path: string) => {
     return location.pathname === path;
+  };
+
+  const handleAuthClick = () => {
+    if (isLoggedIn) {
+      // Show dropdown with logout option
+    } else {
+      navigate('/auth');
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
   };
 
   return (
@@ -50,12 +64,19 @@ const Navbar = () => {
               </Link>
             )}
             {isLoggedIn ? (
-              <Button onClick={logout} variant="outline" className="ml-2">
-                Logout
-              </Button>
+              <div className="flex items-center ml-2">
+                <div className="mr-2 text-sm font-medium text-gray-700">
+                  {profile ? `Hi, ${profile.username}` : 'Welcome'}
+                </div>
+                <Button onClick={handleLogout} variant="outline" className="flex items-center gap-1">
+                  <LogOut size={16} />
+                  <span>Logout</span>
+                </Button>
+              </div>
             ) : (
-              <Button onClick={login} className="ml-2 bg-kids-blue hover:bg-kids-blue/90">
-                Login
+              <Button onClick={() => navigate('/auth')} className="ml-2 bg-kids-blue hover:bg-kids-blue/90 flex items-center gap-1">
+                <UserCircle size={16} />
+                <span>Login</span>
               </Button>
             )}
           </div>
@@ -109,23 +130,30 @@ const Navbar = () => {
                 </Link>
               )}
               {isLoggedIn ? (
-                <button
-                  onClick={() => {
-                    logout();
-                    setIsMenuOpen(false);
-                  }}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Logout
-                </button>
+                <>
+                  <div className="block px-3 py-2 rounded-md text-base font-medium text-gray-700">
+                    {profile ? `Hi, ${profile.username}` : 'Welcome'}
+                  </div>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex w-full items-center text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    <LogOut className="h-5 w-5 mr-2" />
+                    Logout
+                  </button>
+                </>
               ) : (
                 <button
                   onClick={() => {
-                    login();
+                    navigate('/auth');
                     setIsMenuOpen(false);
                   }}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-kids-blue hover:bg-kids-blue/5"
+                  className="flex w-full items-center text-left px-3 py-2 rounded-md text-base font-medium text-kids-blue hover:bg-kids-blue/5"
                 >
+                  <UserCircle className="h-5 w-5 mr-2" />
                   Login
                 </button>
               )}
