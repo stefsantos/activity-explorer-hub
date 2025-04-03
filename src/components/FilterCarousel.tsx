@@ -39,12 +39,12 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
   return (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-2">
-        <h3 className="text-lg font-semibold">{title}</h3>
+        <h3 className="text-lg font-bold text-gray-800">{title}</h3>
         <div className="flex space-x-2">
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 rounded-full border-kids-blue text-kids-blue hover:bg-kids-blue hover:text-white"
             onClick={() => scroll('left')}
           >
             <ChevronLeft className="h-4 w-4" />
@@ -52,7 +52,7 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
           <Button
             variant="outline"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 rounded-full border-kids-blue text-kids-blue hover:bg-kids-blue hover:text-white"
             onClick={() => scroll('right')}
           >
             <ChevronRight className="h-4 w-4" />
@@ -61,15 +61,17 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
       </div>
       
       <div 
-        className="relative flex overflow-x-auto pb-2 filter-scroll" 
+        className="relative flex overflow-x-auto pb-4 filter-scroll" 
         ref={scrollRef}
       >
         <Button
           variant={selectedOption === 'all' ? 'default' : 'outline'}
           size="sm"
           className={cn(
-            "flex-shrink-0 mr-2",
-            selectedOption === 'all' ? 'bg-brand-500' : ''
+            "flex-shrink-0 mr-2 rounded-full px-4",
+            selectedOption === 'all' 
+              ? 'bg-kids-teal text-white hover:bg-kids-teal/90' 
+              : 'border-kids-teal text-kids-teal hover:bg-kids-teal hover:text-white'
           )}
           onClick={() => onChange('all')}
         >
@@ -82,8 +84,10 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
             variant={selectedOption === option.id ? 'default' : 'outline'}
             size="sm"
             className={cn(
-              "flex-shrink-0 mr-2 whitespace-nowrap",
-              selectedOption === option.id ? 'bg-brand-500' : ''
+              "flex-shrink-0 mr-2 whitespace-nowrap rounded-full px-4",
+              selectedOption === option.id 
+                ? 'bg-kids-teal text-white hover:bg-kids-teal/90' 
+                : 'border-kids-teal text-kids-teal hover:bg-kids-teal hover:text-white'
             )}
             onClick={() => onChange(option.id)}
           >

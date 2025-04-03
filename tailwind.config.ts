@@ -74,7 +74,16 @@ export default {
 					700: '#004d80',
 					800: '#00324d',
 					900: '#00161a',
-				}
+				},
+				// Kids theme colors
+				'kids-blue': '#5B8CD7',
+				'kids-green': '#75C25B',
+				'kids-yellow': '#F2DF30',
+				'kids-orange': '#F29830',
+				'kids-pink': '#F56C98',
+				'kids-purple': '#9974BC',
+				'kids-teal': '#36D0C4',
+				'kids-lime': '#C9D841',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -105,13 +114,23 @@ export default {
 				'slide-right': {
 					'0%': { transform: 'translateX(-100%)' },
 					'100%': { transform: 'translateX(0)' }
+				},
+				'float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
+				},
+				'bounce-slight': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-5px)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'slide-left': 'slide-left 0.3s ease-out',
-				'slide-right': 'slide-right 0.3s ease-out'
+				'slide-right': 'slide-right 0.3s ease-out',
+				'float': 'float 6s ease-in-out infinite',
+				'bounce-slight': 'bounce-slight 2s ease-in-out infinite'
 			}
 		}
 	},
