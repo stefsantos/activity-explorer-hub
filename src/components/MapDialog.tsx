@@ -31,7 +31,7 @@ const MapDialog: React.FC<MapDialogProps> = ({ isOpen, onClose, activities }) =>
             className="h-full w-full"
             showUserLocation={true}
             centerOnUser={true}
-            zoom={10}
+            zoom={12}
             activities={activities}
           />
         </div>
