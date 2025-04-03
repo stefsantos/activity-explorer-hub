@@ -88,7 +88,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      setProfile(data);
+      // Make sure the profile object has an email property
+      if (data) {
+        setProfile({
+          ...data,
+          email: data.email || user?.email || ''
+        });
+      }
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
@@ -170,7 +176,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { success: false, error: error.message };
       }
       
-      setProfile(data);
+      // Make sure the profile object has an email property
+      if (data) {
+        setProfile({
+          ...data,
+          email: data.email || user?.email || ''
+        });
+      }
+      
       toast.success('Profile updated successfully');
       return { success: true };
     } catch (error) {
