@@ -9,7 +9,6 @@ import Index from "./pages/Index";
 import ActivityList from "./pages/ActivityList";
 import ActivityDetail from "./pages/ActivityDetail";
 import SavedActivities from "./pages/SavedActivities";
-import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,7 +25,6 @@ const App = () => (
             <Route path="/activities" element={<ActivityList />} />
             <Route path="/activity/:id" element={<ActivityDetail />} />
             <Route path="/saved" element={<SavedActivities />} />
-            <Route path="/auth" element={<Auth />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
