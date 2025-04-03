@@ -77,14 +77,19 @@ export async function fetchActivities() {
 
     if (error) {
       console.error('Error fetching activities:', error);
-      return [];
+      throw new Error(`Failed to fetch activities: ${error.message}`);
     }
 
     console.log("Fetched activities:", data?.length || 0);
+    
+    if (!data || data.length === 0) {
+      console.warn("No activities found in the database. This may indicate an empty table or connection issue.");
+    }
+    
     return data || [];
   } catch (e) {
     console.error("Exception fetching activities:", e);
-    return [];
+    throw e;
   }
 }
 
@@ -102,14 +107,19 @@ export async function fetchFeaturedActivities() {
 
     if (error) {
       console.error('Error fetching featured activities:', error);
-      return [];
+      throw new Error(`Failed to fetch featured activities: ${error.message}`);
     }
 
     console.log("Fetched featured activities:", data?.length || 0);
+    
+    if (!data || data.length === 0) {
+      console.warn("No featured activities found in the database.");
+    }
+    
     return data || [];
   } catch (e) {
     console.error("Exception fetching featured activities:", e);
-    return [];
+    throw e;
   }
 }
 
@@ -128,14 +138,19 @@ export async function fetchPopularActivities(limit = 4) {
 
     if (error) {
       console.error('Error fetching popular activities:', error);
-      return [];
+      throw new Error(`Failed to fetch popular activities: ${error.message}`);
     }
 
     console.log("Fetched popular activities:", data?.length || 0);
+    
+    if (!data || data.length === 0) {
+      console.warn("No popular activities found in the database.");
+    }
+    
     return data || [];
   } catch (e) {
     console.error("Exception fetching popular activities:", e);
-    return [];
+    throw e;
   }
 }
 

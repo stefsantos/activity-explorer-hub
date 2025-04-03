@@ -10,6 +10,8 @@ import { categories, locations, ageRanges } from '@/data/activities';
 import { Palette, Users, Mountain, BookOpen, Music, Utensils, HeartPulse, FlaskConical } from 'lucide-react';
 import { fetchFeaturedActivities, fetchPopularActivities, fetchActivities } from '@/services/supabaseService';
 import { useQuery } from '@tanstack/react-query';
+import { checkAndSeedActivities } from '@/utils/seedData';
+import { toast } from 'sonner';
 
 const Index = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -18,51 +20,116 @@ const Index = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
+  const [seedAttempted, setSeedAttempted] = useState(false);
 
-  // Fetch activities from Supabase with improved error handling
+  useEffect(() => {
+    const attemptSeed = async () => {
+      if (seedAttempted) return;
+      
+      try {
+        await checkAndSeedActivities();
+        setSeedAttempted(true);
+      } catch (error) {
+        console.error("Error seeding activities:", error);
+      }
+    };
+    
+    attemptSeed();
+  }, [seedAttempted]);
+
   const {
     data: allActivities = [],
     isLoading: allActivitiesLoading,
-    error: allActivitiesError
+    error: allActivitiesError,
+    refetch: refetchAllActivities
   } = useQuery({
     queryKey: ['activities'],
-    queryFn: fetchActivities
+    queryFn: fetchActivities,
+    retry: 3,
+    staleTime: 30000
   });
   
   const {
     data: featuredActivities = [],
     isLoading: featuredActivitiesLoading,
-    error: featuredActivitiesError
+    error: featuredActivitiesError,
+    refetch: refetchFeaturedActivities
   } = useQuery({
     queryKey: ['featuredActivities'],
-    queryFn: fetchFeaturedActivities
+    queryFn: fetchFeaturedActivities,
+    retry: 3,
+    staleTime: 30000
   });
   
   const {
     data: popularActivities = [],
     isLoading: popularActivitiesLoading,
-    error: popularActivitiesError
+    error: popularActivitiesError,
+    refetch: refetchPopularActivities
   } = useQuery({
     queryKey: ['popularActivities'],
-    queryFn: () => fetchPopularActivities(4)
+    queryFn: () => fetchPopularActivities(4),
+    retry: 3,
+    staleTime: 30000
   });
 
-  // Log fetching status and results
   useEffect(() => {
-    if (allActivitiesError) console.error("Error loading all activities:", allActivitiesError);
-    if (featuredActivitiesError) console.error("Error loading featured activities:", featuredActivitiesError);
-    if (popularActivitiesError) console.error("Error loading popular activities:", popularActivitiesError);
+    if (
+      !allActivitiesLoading && 
+      !featuredActivitiesLoading && 
+      !popularActivitiesLoading && 
+      seedAttempted && 
+      allActivities.length === 0
+    ) {
+      const timeoutId = setTimeout(() => {
+        console.log("No activities found after seeding, trying to refetch...");
+        refetchAllActivities();
+        refetchFeaturedActivities();
+        refetchPopularActivities();
+      }, 2000);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [
+    allActivities, 
+    allActivitiesLoading, 
+    featuredActivitiesLoading, 
+    popularActivitiesLoading, 
+    seedAttempted,
+    refetchAllActivities,
+    refetchFeaturedActivities,
+    refetchPopularActivities
+  ]);
+
+  useEffect(() => {
+    if (allActivitiesError) {
+      console.error("Error loading all activities:", allActivitiesError);
+      toast.error("Failed to load activities. Please try again later.");
+    }
+    if (featuredActivitiesError) {
+      console.error("Error loading featured activities:", featuredActivitiesError);
+      toast.error("Failed to load featured activities. Please try again later.");
+    }
+    if (popularActivitiesError) {
+      console.error("Error loading popular activities:", popularActivitiesError);
+      toast.error("Failed to load popular activities. Please try again later.");
+    }
     
     console.log("Loaded activities:", {
       all: allActivities?.length || 0,
       featured: featuredActivities?.length || 0,
       popular: popularActivities?.length || 0
     });
-  }, [allActivities, featuredActivities, popularActivities, 
-      allActivitiesError, featuredActivitiesError, popularActivitiesError]);
+  }, [
+    allActivities, 
+    featuredActivities, 
+    popularActivities, 
+    allActivitiesError, 
+    featuredActivitiesError, 
+    popularActivitiesError
+  ]);
 
   useEffect(() => {
-    // Filter activities based on selected filters
     let filtered = [...allActivities];
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(activity => activity.category.toLowerCase() === categoryFilter.toLowerCase());
@@ -71,7 +138,6 @@ const Index = () => {
       filtered = filtered.filter(activity => activity.location && activity.location.name.toLowerCase() === locationFilter.toLowerCase());
     }
 
-    // Age range filtering (using min_age and max_age)
     if (ageRangeFilter !== 'all' && ageRangeFilter !== '') {
       filtered = filtered.filter(activity => {
         if (ageRangeFilter === 'toddler') return activity.min_age === 0 && activity.max_age === 3;
@@ -80,12 +146,11 @@ const Index = () => {
         if (ageRangeFilter === 'teens') return activity.min_age === 13 && activity.max_age === 17;
         if (ageRangeFilter === 'youngAdults') return activity.min_age === 18 && activity.max_age === 25;
         if (ageRangeFilter === 'adults') return activity.min_age === 25;
-        if (ageRangeFilter === 'family') return true; // All ages
+        if (ageRangeFilter === 'family') return true;
         return true;
       });
     }
 
-    // Pagination
     const itemsPerPage = 6;
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
     setTotalPages(totalPages);
@@ -148,7 +213,6 @@ const Index = () => {
       <Navbar />
       
       <main className="container mx-auto px-4 py-8">
-        {/* Hero Section with Main Heading */}
         <section className="mb-10 text-center relative">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">
             <span className="text-gray-800">The Largest Kids Activity</span>
@@ -158,12 +222,15 @@ const Index = () => {
             <span className="text-kids-orange">Philippines.</span>
           </h2>
           
-          
-          {/* Featured Carousel */}
-          <FeaturedCarousel activities={featuredActivities} />
+          {featuredActivitiesLoading ? (
+            <div className="w-full h-[450px] bg-gray-100 rounded-2xl flex items-center justify-center animate-pulse">
+              <p className="text-gray-500">Loading featured activities...</p>
+            </div>
+          ) : (
+            <FeaturedCarousel activities={featuredActivities} />
+          )}
         </section>
         
-        {/* Popular Activities */}
         <section className="mb-12">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Our Most Popular Activities</h2>
@@ -176,11 +243,27 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {popularActivities.map(activity => <ActivityCard key={activity.id} activity={activity} />)}
+            {popularActivitiesLoading ? (
+              Array(4).fill(0).map((_, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden h-full animate-pulse">
+                  <div className="h-48 bg-gray-200"></div>
+                  <div className="p-4">
+                    <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                    <div className="h-10 bg-gray-200 rounded-full w-1/3 mt-auto"></div>
+                  </div>
+                </div>
+              ))
+            ) : popularActivities.length > 0 ? (
+              popularActivities.map(activity => <ActivityCard key={activity.id} activity={activity} />)
+            ) : (
+              <div className="col-span-full text-center py-6">
+                <p className="text-gray-500">No popular activities found</p>
+              </div>
+            )}
           </div>
         </section>
         
-        {/* Category Icons */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Explore by Category</h2>
           <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
@@ -196,7 +279,6 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Filter Section */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Find the Perfect Activity</h2>
           
@@ -211,7 +293,6 @@ const Index = () => {
         }} />
         </section>
         
-        {/* Activity List */}
         <section id="activity-list" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Activities Just For You</h2>
           
