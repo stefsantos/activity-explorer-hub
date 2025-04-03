@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/contexts/UserContext";
-import { signUp, login, LoginData } from "@/services/authService";
+import { signUp, loginWithUsername } from "@/services/authService";
 import { Mail, User, Phone, Lock, UserCircle } from "lucide-react";
 
 const signupSchema = z.object({
@@ -28,7 +28,7 @@ const signupSchema = z.object({
 });
 
 const loginSchema = z.object({
-  email: z.string().email("Valid email is required"),
+  username: z.string().min(3, "Username is required"),
   password: z.string().min(1, "Password is required"),
 });
 
@@ -64,7 +64,7 @@ const Auth = () => {
   const loginForm = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     }
   });
@@ -91,7 +91,7 @@ const Auth = () => {
 
       toast.success("Signup successful! Please log in with your credentials.");
       setActiveTab("login");
-      loginForm.setValue("email", data.email);
+      loginForm.setValue("username", data.username);
     } catch (error) {
       console.error("Signup error:", error);
       toast.error("An unexpected error occurred. Please try again.");
@@ -103,12 +103,7 @@ const Auth = () => {
   const handleLogin = async (data: LoginValues) => {
     setIsLoading(true);
     try {
-      const loginData: LoginData = {
-        email: data.email,
-        password: data.password
-      };
-      
-      const result = await login(loginData);
+      const result = await loginWithUsername(data);
 
       if (!result.success) {
         const errorMessage = result.error instanceof Error 
@@ -159,14 +154,14 @@ const Auth = () => {
                 <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
                   <FormField
                     control={loginForm.control}
-                    name="email"
+                    name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>Username</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                            <Input placeholder="Enter your email" className="pl-10" {...field} />
+                            <UserCircle className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <Input placeholder="Enter your username" className="pl-10" {...field} />
                           </div>
                         </FormControl>
                         <FormMessage />
