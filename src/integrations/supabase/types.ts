@@ -386,61 +386,31 @@ export type Database = {
       }
       profiles: {
         Row: {
-          created_at: string
-          first_name: string
+          email: string | null
+          first_name: string | null
           id: string
-          last_name: string
-          phone: string
-          updated_at: string
-          username: string
+          last_name: string | null
+          phone: string | null
+          updated_at: string | null
+          username: string | null
         }
         Insert: {
-          created_at?: string
-          first_name: string
+          email?: string | null
+          first_name?: string | null
           id: string
-          last_name: string
-          phone: string
-          updated_at?: string
-          username: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string | null
+          username?: string | null
         }
         Update: {
-          created_at?: string
-          first_name?: string
+          email?: string | null
+          first_name?: string | null
           id?: string
-          last_name?: string
-          phone?: string
-          updated_at?: string
-          username?: string
-        }
-        Relationships: []
-      }
-      user_reviews: {
-        Row: {
-          activity_id: string
-          comment: string | null
-          created_at: string
-          id: string
-          rating: number
-          review_date: string
-          user_id: string
-        }
-        Insert: {
-          activity_id: string
-          comment?: string | null
-          created_at?: string
-          id?: string
-          rating: number
-          review_date?: string
-          user_id: string
-        }
-        Update: {
-          activity_id?: string
-          comment?: string | null
-          created_at?: string
-          id?: string
-          rating?: number
-          review_date?: string
-          user_id?: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string | null
+          username?: string | null
         }
         Relationships: []
       }
