@@ -8,39 +8,78 @@ import FilterCarousel from '@/components/FilterCarousel';
 import Pagination from '@/components/Pagination';
 import Navbar from '@/components/Navbar';
 import { 
-  activities, 
-  filterActivities, 
-  getFeaturedActivities, 
-  getPopularActivities,
   categories,
   locations,
   ageRanges,
-  Activity
 } from '@/data/activities';
 import { Palette, Users, Mountain, BookOpen, Music, Utensils, HeartPulse, FlaskConical } from 'lucide-react';
+import { fetchFeaturedActivities, fetchPopularActivities, fetchActivities } from '@/services/supabaseService';
+import { useQuery } from '@tanstack/react-query';
 
 const Index = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
   const [ageRangeFilter, setAgeRangeFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
-  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
+  const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   
-  const featuredActivities = getFeaturedActivities();
-  const popularActivities = getPopularActivities();
+  // Fetch activities from Supabase
+  const { data: allActivities = [] } = useQuery({
+    queryKey: ['activities'],
+    queryFn: fetchActivities
+  });
+  
+  const { data: featuredActivities = [] } = useQuery({
+    queryKey: ['featuredActivities'],
+    queryFn: fetchFeaturedActivities
+  });
+  
+  const { data: popularActivities = [] } = useQuery({
+    queryKey: ['popularActivities'],
+    queryFn: () => fetchPopularActivities(4)
+  });
 
   useEffect(() => {
-    const { activities: filtered, totalPages: pages } = filterActivities(
-      categoryFilter,
-      locationFilter,
-      ageRangeFilter,
-      currentPage,
-      6
-    );
-    setFilteredActivities(filtered);
-    setTotalPages(pages);
-  }, [categoryFilter, locationFilter, ageRangeFilter, currentPage]);
+    // Filter activities based on selected filters
+    let filtered = [...allActivities];
+    
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(activity => 
+        activity.category.toLowerCase() === categoryFilter.toLowerCase()
+      );
+    }
+    
+    if (locationFilter !== 'all' && locationFilter !== '') {
+      filtered = filtered.filter(activity => 
+        activity.location && activity.location.name.toLowerCase() === locationFilter.toLowerCase()
+      );
+    }
+    
+    // Age range filtering (using min_age and max_age)
+    if (ageRangeFilter !== 'all' && ageRangeFilter !== '') {
+      filtered = filtered.filter(activity => {
+        if (ageRangeFilter === 'toddler') return activity.min_age === 0 && activity.max_age === 3;
+        if (ageRangeFilter === 'preschool') return activity.min_age === 3 && activity.max_age === 5;
+        if (ageRangeFilter === 'children') return activity.min_age === 6 && activity.max_age === 12;
+        if (ageRangeFilter === 'teens') return activity.min_age === 13 && activity.max_age === 17;
+        if (ageRangeFilter === 'youngAdults') return activity.min_age === 18 && activity.max_age === 25;
+        if (ageRangeFilter === 'adults') return activity.min_age === 25;
+        if (ageRangeFilter === 'family') return true; // All ages
+        return true;
+      });
+    }
+    
+    // Pagination
+    const itemsPerPage = 6;
+    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    setTotalPages(totalPages);
+    
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedActivities = filtered.slice(startIndex, startIndex + itemsPerPage);
+    
+    setFilteredActivities(paginatedActivities);
+  }, [allActivities, categoryFilter, locationFilter, ageRangeFilter, currentPage]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

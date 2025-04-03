@@ -1,28 +1,36 @@
 
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@/contexts/UserContext';
-import { activities, Activity } from '@/data/activities';
 import ActivityCard from '@/components/ActivityCard';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Bookmark } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchActivities } from '@/services/supabaseService';
 
 const SavedActivities = () => {
   const { isLoggedIn, bookmarkedActivities } = useUser();
-  const [savedActivities, setSavedActivities] = useState<Activity[]>([]);
+  const [savedActivities, setSavedActivities] = useState<any[]>([]);
   const navigate = useNavigate();
 
+  // Fetch all activities from Supabase
+  const { data: activities = [] } = useQuery({
+    queryKey: ['activities'],
+    queryFn: fetchActivities
+  });
+
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || !activities.length) {
       return;
     }
     
+    // Filter activities based on bookmarked IDs
     const filtered = activities.filter(activity => 
       bookmarkedActivities.includes(activity.id)
     );
     setSavedActivities(filtered);
-  }, [isLoggedIn, bookmarkedActivities]);
+  }, [isLoggedIn, bookmarkedActivities, activities]);
 
   if (!isLoggedIn) {
     return (

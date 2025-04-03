@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Activity } from "@/data/activities";
 import { ChevronLeft, ChevronRight, MapPin, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 interface FeaturedCarouselProps {
-  activities: Activity[];
+  activities: any[];
 }
 
 const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ activities }) => {
@@ -17,7 +17,7 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ activities }) => {
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
-    if (isAutoPlaying) {
+    if (isAutoPlaying && totalSlides > 0) {
       interval = setInterval(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % totalSlides);
       }, 5000);
@@ -42,6 +42,26 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ activities }) => {
     setIsAutoPlaying(false);
     setCurrentIndex(index);
   };
+
+  // Format age range text
+  const getAgeRangeText = (activity: any) => {
+    if (activity.min_age !== null && activity.max_age !== null) {
+      return `${activity.min_age}-${activity.max_age} years`;
+    } else if (activity.min_age !== null) {
+      return `${activity.min_age}+ years`;
+    } else if (activity.max_age !== null) {
+      return `Up to ${activity.max_age} years`;
+    }
+    return "All ages";
+  };
+
+  if (activities.length === 0) {
+    return (
+      <div className="w-full h-[450px] bg-gray-100 rounded-2xl flex items-center justify-center">
+        <p className="text-gray-500">No featured activities available</p>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full h-[450px] overflow-hidden rounded-2xl shadow-xl">
@@ -72,20 +92,22 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ activities }) => {
                 <div className="flex flex-wrap gap-3 mb-4">
                   <div className="flex items-center bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs">
                     <MapPin size={12} className="mr-1" />
-                    {activity.location}
+                    {activity.location ? activity.location.name : "Various locations"}
                   </div>
                   <div className="flex items-center bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs">
                     <Users size={12} className="mr-1" />
-                    {activity.ageRange}
+                    {getAgeRangeText(activity)}
                   </div>
                   <div className="flex items-center bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
                     ${activity.price}
                   </div>
                 </div>
                 
-                <Button className="bg-kids-orange hover:bg-kids-orange/90 text-white rounded-full px-6">
-                  Explore Now
-                </Button>
+                <Link to={`/activity/${activity.id}`}>
+                  <Button className="bg-kids-orange hover:bg-kids-orange/90 text-white rounded-full px-6">
+                    Explore Now
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

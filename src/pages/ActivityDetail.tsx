@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { fetchActivityById, ActivityDetail as ActivityDetailType } from '@/services/supabaseService';
+import { fetchActivityById, ActivityDetailType } from '@/services/supabaseService';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -198,18 +198,20 @@ const ActivityDetail = () => {
               )}
             </div>
             
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                <MapPin className="mr-2 text-kids-blue" size={20} />
-                Location
-              </h2>
-              <MapComponent 
-                latitude={mapLocation.lat} 
-                longitude={mapLocation.lng} 
-                title={activity.title}
-                address={activity.location?.address || ''}
-              />
-            </div>
+            {mapLocation && (
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                  <MapPin className="mr-2 text-kids-blue" size={20} />
+                  Location
+                </h2>
+                <MapComponent 
+                  latitude={mapLocation.lat} 
+                  longitude={mapLocation.lng} 
+                  title={activity.title}
+                  address={activity.location?.address || ''}
+                />
+              </div>
+            )}
 
             <div className="mb-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4">Description</h2>

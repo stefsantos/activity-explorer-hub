@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 
-export interface ActivityDetail {
+export interface ActivityDetailType {
   id: string;
   title: string;
   description: string;
@@ -119,7 +119,7 @@ export async function fetchPopularActivities(limit = 4) {
   return data;
 }
 
-export async function fetchActivityById(id: string): Promise<ActivityDetail | null> {
+export async function fetchActivityById(id: string): Promise<ActivityDetailType | null> {
   // Fetch the basic activity data with location and organizer
   const { data: activity, error: activityError } = await supabase
     .from('activities')

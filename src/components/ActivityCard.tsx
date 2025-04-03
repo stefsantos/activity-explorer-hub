@@ -1,19 +1,30 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Activity } from "@/data/activities";
 import { useUser } from "@/contexts/UserContext";
 import { Bookmark, MapPin, Clock, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ActivityCardProps {
-  activity: Activity;
+  activity: any;
   size?: 'regular' | 'large';
 }
 
 const ActivityCard: React.FC<ActivityCardProps> = ({ activity, size = 'regular' }) => {
   const { isLoggedIn, toggleBookmark, isBookmarked } = useUser();
   const bookmarked = isBookmarked(activity.id);
+
+  // Format age range text
+  const getAgeRangeText = () => {
+    if (activity.min_age !== null && activity.max_age !== null) {
+      return `${activity.min_age}-${activity.max_age} years`;
+    } else if (activity.min_age !== null) {
+      return `${activity.min_age}+ years`;
+    } else if (activity.max_age !== null) {
+      return `Up to ${activity.max_age} years`;
+    }
+    return "All ages";
+  };
 
   return (
     <Link to={`/activity/${activity.id}`} className="block">
@@ -68,18 +79,18 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, size = 'regular' 
             
             <div className="flex items-center text-gray-500 my-1 text-xs">
               <MapPin size={12} className="mr-1 text-kids-blue" />
-              <span>{activity.location}</span>
+              <span>{activity.location ? activity.location.name : "Various locations"}</span>
             </div>
             
             <div className="mt-2 flex items-center justify-between">
               <div className="flex items-center text-xs text-gray-500">
                 <Users size={12} className="mr-1 text-kids-purple" />
-                <span>{activity.ageRange}</span>
+                <span>{getAgeRangeText()}</span>
               </div>
               
               <div className="flex items-center">
                 <span className="text-yellow-500">★</span>
-                <span className="text-xs ml-1">{activity.rating}</span>
+                <span className="text-xs ml-1">{activity.rating || "N/A"}</span>
               </div>
             </div>
             
