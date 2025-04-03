@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -6,17 +7,20 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { toast } from '@/hooks/use-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import Navbar from '@/components/Navbar';
 import MapComponent from '@/components/MapComponent';
+import BookingForm from '@/components/BookingForm';
 import { MapPin, Clock, Users, Star, Calendar, CheckCircle, Package, GitBranch, Compass } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 
 const ActivityDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { isLoggedIn, toggleBookmark, isBookmarked } = useUser();
+  const { isLoggedIn, toggleBookmark, isBookmarked, login } = useUser();
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [mapLocation, setMapLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   const { data: activity, isLoading, error } = useQuery({
     queryKey: ['activity', id],
@@ -56,15 +60,19 @@ const ActivityDetail = () => {
   };
 
   const handleBookNow = () => {
-    if (!isLoggedIn) {
-      toast({
-        title: "Login Required",
-        description: "Please log in to book this activity",
-        variant: "destructive"
-      });
-      return;
+    if (isLoggedIn) {
+      showSuccessToast();
+    } else {
+      setIsBookingModalOpen(true);
     }
+  };
 
+  const handleBookingSuccess = () => {
+    setIsBookingModalOpen(false);
+    showSuccessToast();
+  };
+
+  const showSuccessToast = () => {
     const selectedVariantDetails = selectedVariant 
       ? activity?.variants.find(v => v.id === selectedVariant)
       : null;
@@ -442,6 +450,29 @@ const ActivityDetail = () => {
           </div>
         </div>
       </main>
+      
+      {/* Booking Modal */}
+      <Dialog open={isBookingModalOpen} onOpenChange={setIsBookingModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Complete Your Booking</DialogTitle>
+          </DialogHeader>
+          {activity && (
+            <BookingForm 
+              activityId={activity.id}
+              activityTitle={activity.title}
+              variantId={selectedVariant}
+              packageId={selectedPackage}
+              price={getCalculatedPrice()}
+              onSuccess={handleBookingSuccess}
+              onLogin={() => {
+                setIsBookingModalOpen(false);
+                login();
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
       
       <footer className="bg-kids-blue/90 text-white py-12 mt-12">
         <div className="container mx-auto px-4">

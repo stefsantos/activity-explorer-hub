@@ -87,6 +87,76 @@ export type Database = {
           },
         ]
       }
+      activity_bookings: {
+        Row: {
+          activity_id: string
+          booking_date: string
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          package_id: string | null
+          phone: string
+          price: number
+          status: string
+          user_id: string | null
+          variant_id: string | null
+        }
+        Insert: {
+          activity_id: string
+          booking_date?: string
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          package_id?: string | null
+          phone: string
+          price: number
+          status?: string
+          user_id?: string | null
+          variant_id?: string | null
+        }
+        Update: {
+          activity_id?: string
+          booking_date?: string
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          package_id?: string | null
+          phone?: string
+          price?: number
+          status?: string
+          user_id?: string | null
+          variant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_bookings_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_bookings_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "activity_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_bookings_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "activity_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       activity_expectations: {
         Row: {
           activity_id: string
