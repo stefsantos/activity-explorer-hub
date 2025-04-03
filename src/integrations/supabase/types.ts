@@ -386,31 +386,61 @@ export type Database = {
       }
       profiles: {
         Row: {
-          email: string | null
-          first_name: string | null
+          created_at: string
+          first_name: string
           id: string
-          last_name: string | null
-          phone: string | null
-          updated_at: string | null
-          username: string | null
+          last_name: string
+          phone: string
+          updated_at: string
+          username: string
         }
         Insert: {
-          email?: string | null
-          first_name?: string | null
+          created_at?: string
+          first_name: string
           id: string
-          last_name?: string | null
-          phone?: string | null
-          updated_at?: string | null
-          username?: string | null
+          last_name: string
+          phone: string
+          updated_at?: string
+          username: string
         }
         Update: {
-          email?: string | null
-          first_name?: string | null
+          created_at?: string
+          first_name?: string
           id?: string
-          last_name?: string | null
-          phone?: string | null
-          updated_at?: string | null
-          username?: string | null
+          last_name?: string
+          phone?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
+      user_reviews: {
+        Row: {
+          activity_id: string
+          comment: string | null
+          created_at: string
+          id: string
+          rating: number
+          review_date: string
+          user_id: string
+        }
+        Insert: {
+          activity_id: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          review_date?: string
+          user_id: string
+        }
+        Update: {
+          activity_id?: string
+          comment?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          review_date?: string
+          user_id?: string
         }
         Relationships: []
       }

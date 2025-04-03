@@ -3,11 +3,11 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from "@/contexts/AuthContext";
 import SearchBox from './SearchBox';
 
 const Navbar = () => {
-  const { user, profile, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -45,28 +45,28 @@ const Navbar = () => {
               Activities
             </Link>
             {user && (
-              <Link to="/saved" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/saved') ? 'text-kids-blue' : 'text-gray-600 hover:text-kids-blue'}`}>
-                Saved
-              </Link>
+              <>
+                <Link to="/saved" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/saved') ? 'text-kids-blue' : 'text-gray-600 hover:text-kids-blue'}`}>
+                  Saved
+                </Link>
+                <Link to="/profile" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/profile') ? 'text-kids-blue' : 'text-gray-600 hover:text-kids-blue'}`}>
+                  Profile
+                </Link>
+              </>
             )}
             {user ? (
-              <div className="flex items-center space-x-2">
-                <Button variant="outline" className="flex items-center gap-2" asChild>
-                  <Link to="/profile">
-                    <User size={16} />
-                    {profile?.first_name || "Profile"}
-                  </Link>
+              <Button onClick={signOut} variant="outline" className="ml-2">
+                Logout
+              </Button>
+            ) : (
+              <div className="flex space-x-2 ml-2">
+                <Button variant="outline" asChild>
+                  <Link to="/signin">Sign In</Link>
                 </Button>
-                <Button onClick={() => logout()} variant="outline">
-                  Logout
+                <Button className="bg-kids-blue hover:bg-kids-blue/90" asChild>
+                  <Link to="/signup">Sign Up</Link>
                 </Button>
               </div>
-            ) : (
-              <Button asChild className="ml-2 bg-kids-blue hover:bg-kids-blue/90">
-                <Link to="/auth/login">
-                  Login
-                </Link>
-              </Button>
             )}
           </div>
 
@@ -110,16 +110,14 @@ const Navbar = () => {
                 Activities
               </Link>
               {user && (
-                <Link 
-                  to="/saved" 
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/saved') ? 'text-kids-blue bg-kids-blue/5' : 'text-gray-700 hover:bg-gray-50'}`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Saved
-                </Link>
-              )}
-              {user ? (
                 <>
+                  <Link 
+                    to="/saved" 
+                    className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/saved') ? 'text-kids-blue bg-kids-blue/5' : 'text-gray-700 hover:bg-gray-50'}`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Saved
+                  </Link>
                   <Link 
                     to="/profile" 
                     className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/profile') ? 'text-kids-blue bg-kids-blue/5' : 'text-gray-700 hover:bg-gray-50'}`}
@@ -127,24 +125,35 @@ const Navbar = () => {
                   >
                     Profile
                   </Link>
-                  <button
-                    onClick={() => {
-                      logout();
-                      setIsMenuOpen(false);
-                    }}
-                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    Logout
-                  </button>
                 </>
-              ) : (
-                <Link
-                  to="/auth/login"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-kids-blue hover:bg-kids-blue/5"
+              )}
+              {user ? (
+                <button
+                  onClick={() => {
+                    signOut();
+                    setIsMenuOpen(false);
+                  }}
+                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  Login
-                </Link>
+                  Logout
+                </button>
+              ) : (
+                <>
+                  <Link
+                    to="/signin"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-kids-blue hover:bg-kids-blue/5"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </>
               )}
             </div>
           </div>

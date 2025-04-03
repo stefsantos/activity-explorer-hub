@@ -1,59 +1,110 @@
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { z } from 'zod';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useAuth } from '@/contexts/AuthContext';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
+import { UserCircle } from 'lucide-react';
 
 const profileSchema = z.object({
-  first_name: z.string().min(2, 'First name must be at least 2 characters'),
-  last_name: z.string().min(2, 'Last name must be at least 2 characters'),
-  phone: z.string().min(10, 'Phone number must be at least 10 characters'),
-  username: z.string().optional(),
+  first_name: z.string().min(2, { message: 'First name must be at least 2 characters' }),
+  last_name: z.string().min(2, { message: 'Last name must be at least 2 characters' }),
+  email: z.string().email({ message: 'Please enter a valid email address' }).optional(),
+  phone: z.string().min(10, { message: 'Please enter a valid phone number' }),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 const Profile = () => {
-  const { profile, updateProfile } = useAuth();
-  
+  const { user, profile, updateProfile, signOut } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       first_name: profile?.first_name || '',
       last_name: profile?.last_name || '',
+      email: user?.email || '',
       phone: profile?.phone || '',
-      username: profile?.username || '',
     },
     values: {
       first_name: profile?.first_name || '',
       last_name: profile?.last_name || '',
+      email: user?.email || '',
       phone: profile?.phone || '',
-      username: profile?.username || '',
-    },
+    }
   });
 
   const onSubmit = async (values: ProfileFormValues) => {
-    await updateProfile(values);
+    setIsLoading(true);
+    const { success, error } = await updateProfile({
+      first_name: values.first_name,
+      last_name: values.last_name,
+      phone: values.phone,
+    });
+    setIsLoading(false);
+
+    if (success) {
+      toast.success('Profile updated successfully');
+    } else {
+      toast.error(error || 'Failed to update profile');
+    }
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/signin');
+  };
+
+  if (!user || !profile) {
+    return (
+      <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[80vh]">
+        <Card className="w-full max-w-md text-center p-8">
+          <p>You need to be logged in to view this page.</p>
+          <Button 
+            className="mt-4 bg-kids-blue hover:bg-kids-blue/90" 
+            onClick={() => navigate('/signin')}
+          >
+            Sign In
+          </Button>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Your Profile</h1>
-        
-        <div className="bg-white shadow rounded-lg p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Account Information</h2>
-          <p className="text-gray-500 mb-6">Update your personal information</p>
-          
+    <div className="container mx-auto px-4 py-8 max-w-3xl">
+      <Card>
+        <CardHeader>
+          <div className="flex items-center space-x-4">
+            <div className="bg-gray-100 p-2 rounded-full">
+              <UserCircle size={64} className="text-gray-500" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl">Your Profile</CardTitle>
+              <CardDescription>View and update your account information</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
                   name="first_name"
@@ -61,7 +112,7 @@ const Profile = () => {
                     <FormItem>
                       <FormLabel>First Name</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value || ''} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -75,79 +126,60 @@ const Profile = () => {
                     <FormItem>
                       <FormLabel>Last Name</FormLabel>
                       <FormControl>
-                        <Input {...field} value={field.value || ''} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="username"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Username</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value || ''} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
-                      <FormControl>
-                        <Input {...field} value={field.value || ''} />
+                        <Input {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input type="email" {...field} disabled />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               
-              <div className="flex items-center pt-2">
-                <p className="text-sm text-gray-500 flex-1">
-                  Email: {profile?.email || 'No email set'}
-                </p>
-                <Button type="submit" disabled={form.formState.isSubmitting || !form.formState.isDirty}>
-                  {form.formState.isSubmitting ? 'Saving...' : 'Save changes'}
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="flex justify-end">
+                <Button type="submit" className="bg-kids-blue hover:bg-kids-blue/90" disabled={isLoading}>
+                  {isLoading ? 'Saving...' : 'Save Changes'}
                 </Button>
               </div>
             </form>
           </Form>
-        </div>
-        
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Account Settings</h2>
-          <Separator className="my-4" />
           
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h3 className="font-medium">Change Password</h3>
-              <p className="text-sm text-gray-500">Update your password</p>
-            </div>
-            <Button variant="outline" asChild>
-              <Link to="/change-password">Change</Link>
+          <Separator className="my-6" />
+          
+          <div className="pt-2">
+            <h3 className="text-lg font-medium mb-4">Account Actions</h3>
+            <Button variant="outline" className="text-red-500 border-red-200 hover:bg-red-50" onClick={handleSignOut}>
+              Sign Out
             </Button>
           </div>
-          
-          <Separator className="my-4" />
-          
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="font-medium text-destructive">Delete Account</h3>
-              <p className="text-sm text-gray-500">Permanently delete your account and all data</p>
-            </div>
-            <Button variant="destructive">Delete Account</Button>
-          </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
