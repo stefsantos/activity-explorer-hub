@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { ActivityDetailType } from "../types";
 import { getUserReview } from "../reviews/reviewService";
@@ -65,11 +66,10 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
     .from('activities')
     .select(`
       *,
-      location:locations(*),
-      organizer:activity_organizers(*),
-      variants:activity_variants(*,location:locations(*)),
+      location:location_id(id, name, address, latitude, longitude),
+      organizer:organizer_id(id, name, description),
+      variants:activity_variants(*, location:location_id(id, name, address, latitude, longitude)),
       packages:activity_packages(*),
-      reviews:activity_reviews(id, reviewer_name, rating, comment, review_date),
       requirements:activity_requirements(*),
       expectations:activity_expectations(*)
     `)
@@ -110,9 +110,9 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
   // Return formatted activity data
   return {
     ...activity,
-    reviews: formattedReviews,
-    userReview
-  };
+    reviews: formattedReviews || [],
+    userReview: userReview || null
+  } as ActivityDetailType;
 }
 
 async function fetchActivityVariants(activityId: string) {
