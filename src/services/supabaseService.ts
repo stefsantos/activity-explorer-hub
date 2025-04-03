@@ -132,7 +132,6 @@ export async function fetchPopularActivities(limit = 4) {
 }
 
 export async function fetchActivityById(id: string): Promise<ActivityDetailType | null> {
-  // Fetch the basic activity data with location and organizer
   const { data: activity, error: activityError } = await supabase
     .from('activities')
     .select(`
@@ -148,7 +147,6 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
     return null;
   }
 
-  // Fetch variants
   const { data: variants, error: variantsError } = await supabase
     .from('activity_variants')
     .select(`
@@ -161,7 +159,6 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
     console.error('Error fetching variants:', variantsError);
   }
 
-  // Fetch packages
   const { data: packages, error: packagesError } = await supabase
     .from('activity_packages')
     .select('*')
@@ -171,7 +168,6 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
     console.error('Error fetching packages:', packagesError);
   }
 
-  // Fetch reviews
   const { data: reviews, error: reviewsError } = await supabase
     .from('activity_reviews')
     .select('*')
@@ -182,7 +178,6 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
     console.error('Error fetching reviews:', reviewsError);
   }
 
-  // Fetch requirements
   const { data: requirements, error: requirementsError } = await supabase
     .from('activity_requirements')
     .select('*')
@@ -192,7 +187,6 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
     console.error('Error fetching requirements:', requirementsError);
   }
 
-  // Fetch expectations
   const { data: expectations, error: expectationsError } = await supabase
     .from('activity_expectations')
     .select('*')
@@ -202,32 +196,29 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
     console.error('Error fetching expectations:', expectationsError);
   }
 
-  // Check if the current user has submitted a review
   let userReview = null;
   const { data: session } = await supabase.auth.getSession();
   if (session.session?.user) {
     const { data: userReviewData, error: userReviewError } = await supabase
-      .from('user_reviews')
-      .select('*')
-      .eq('activity_id', id)
-      .eq('user_id', session.session.user.id)
-      .single();
+      .rpc('get_user_review', { 
+        user_id_param: session.session.user.id, 
+        activity_id_param: id 
+      });
 
-    if (!userReviewError && userReviewData) {
+    if (!userReviewError && userReviewData && userReviewData.length > 0) {
       userReview = {
-        id: userReviewData.id,
-        rating: userReviewData.rating,
-        comment: userReviewData.comment,
-        review_date: userReviewData.review_date
+        id: userReviewData[0].id,
+        rating: userReviewData[0].rating,
+        comment: userReviewData[0].comment,
+        review_date: userReviewData[0].review_date
       };
     }
 
-    if (userReviewError && userReviewError.code !== 'PGRST116') { // PGRST116 is "no rows returned" error
+    if (userReviewError) {
       console.error('Error fetching user review:', userReviewError);
     }
   }
 
-  // Combine all data into the ActivityDetail structure
   return {
     ...activity,
     variants: variants || [],
@@ -270,58 +261,50 @@ export async function submitReview(activityId: string, rating: number, comment?:
 
   const userId = session.session.user.id;
   
-  // Check if user has already reviewed this activity
-  const { data: existingReview, error: checkError } = await supabase
-    .from('user_reviews')
-    .select('id')
-    .eq('activity_id', activityId)
-    .eq('user_id', userId)
-    .single();
+  const { data: existingReviews, error: checkError } = await supabase
+    .rpc('check_user_review', { 
+      user_id_param: userId, 
+      activity_id_param: activityId 
+    });
 
-  if (checkError && checkError.code !== 'PGRST116') { // Not a "no rows found" error
+  if (checkError) {
     console.error('Error checking for existing review:', checkError);
     return { success: false, error: 'Error checking for existing review' };
   }
 
   let result;
   
-  // If a review already exists, update it
-  if (existingReview) {
+  if (existingReviews && existingReviews.length > 0) {
+    const existingReviewId = existingReviews[0].id;
+    
     const { data, error } = await supabase
-      .from('user_reviews')
-      .update({
-        rating,
-        comment,
-        review_date: new Date().toISOString()
-      })
-      .eq('id', existingReview.id)
-      .select();
+      .rpc('update_user_review', {
+        review_id_param: existingReviewId,
+        rating_param: rating,
+        comment_param: comment || null
+      });
     
     if (error) {
       console.error('Error updating review:', error);
       return { success: false, error: 'Error updating review' };
     }
     
-    result = { success: true, reviewId: existingReview.id };
+    result = { success: true, reviewId: existingReviewId };
   } else {
-    // Otherwise, insert a new review
     const { data, error } = await supabase
-      .from('user_reviews')
-      .insert({
-        activity_id: activityId,
-        user_id: userId,
-        rating,
-        comment,
-        review_date: new Date().toISOString()
-      })
-      .select();
+      .rpc('insert_user_review', {
+        activity_id_param: activityId,
+        user_id_param: userId,
+        rating_param: rating,
+        comment_param: comment || null
+      });
     
     if (error) {
       console.error('Error submitting review:', error);
       return { success: false, error: 'Error submitting review' };
     }
     
-    if (data && data[0]) {
+    if (data && data.length > 0) {
       result = { success: true, reviewId: data[0].id };
     } else {
       result = { success: true };
@@ -338,9 +321,7 @@ export async function deleteReview(reviewId: string): Promise<{ success: boolean
   }
 
   const { error } = await supabase
-    .from('user_reviews')
-    .delete()
-    .eq('id', reviewId);
+    .rpc('delete_user_review', { review_id_param: reviewId });
   
   if (error) {
     console.error('Error deleting review:', error);
