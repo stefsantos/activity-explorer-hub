@@ -1,8 +1,17 @@
+
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { User } from '@supabase/supabase-js';
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { getCurrentUser, getUserProfile, logout as authLogout, Profile } from '@/services/authService';
+import { getCurrentUser, getUserProfile, logout as authLogout } from '@/services/authService';
+
+type Profile = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+  phone: string;
+};
 
 type UserContextType = {
   user: User | null;
@@ -24,23 +33,20 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [bookmarkedActivities, setBookmarkedActivities] = useState<string[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
+  // Initialize user auth state
   useEffect(() => {
+    // First, set up the auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log("Auth state changed:", event, session);
         const currentUser = session?.user || null;
         setUser(currentUser);
         setIsLoggedIn(!!currentUser);
         
         if (currentUser) {
-          const { success, profile: userProfile } = await getUserProfile(currentUser.id);
-          if (success && userProfile) {
-            setProfile({
-              ...userProfile,
-              email: currentUser.email || undefined
-            });
-          } else {
-            setProfile(null);
+          // Fetch the user profile when auth state changes
+          const { success, profile } = await getUserProfile(currentUser.id);
+          if (success && profile) {
+            setProfile(profile);
           }
         } else {
           setProfile(null);
@@ -48,13 +54,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
+    // Then check if there's an existing session
     checkUser();
 
+    // Cleanup subscription on unmount
     return () => {
       subscription.unsubscribe();
     };
   }, []);
 
+  // Fetch saved bookmarks from localStorage
   useEffect(() => {
     const savedBookmarks = localStorage.getItem('bookmarkedActivities');
     if (savedBookmarks) {
@@ -62,6 +71,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  // Save bookmarks to localStorage when they change
   useEffect(() => {
     if (bookmarkedActivities.length > 0) {
       localStorage.setItem('bookmarkedActivities', JSON.stringify(bookmarkedActivities));
@@ -74,12 +84,10 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       setUser(currentUser);
       setIsLoggedIn(true);
       
+      // Fetch user profile
       const profileResult = await getUserProfile(currentUser.id);
       if (profileResult.success && profileResult.profile) {
-        setProfile({
-          ...profileResult.profile,
-          email: currentUser.email || undefined
-        });
+        setProfile(profileResult.profile);
       }
     }
   };
@@ -89,27 +97,22 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = () => {
+    // This is just a placeholder for demo purposes
+    // The actual login will be handled by the login page
     toast("Please use the login page to sign in");
   };
 
   const logout = async () => {
-    console.log("Logging out user...");
-    try {
-      const { success, error } = await authLogout();
-      
-      if (success) {
-        console.log("Logout successful");
-        setUser(null);
-        setProfile(null);
-        setIsLoggedIn(false);
-        toast("Logged out successfully");
-      } else {
-        console.error("Logout error:", error);
-        toast.error("Failed to logout. Please try again.");
-      }
-    } catch (error) {
-      console.error("Exception during logout:", error);
-      toast.error("An error occurred during logout");
+    const { success, error } = await authLogout();
+    
+    if (success) {
+      setUser(null);
+      setProfile(null);
+      setIsLoggedIn(false);
+      toast("Logged out successfully");
+    } else {
+      console.error("Logout error:", error);
+      toast.error("Failed to logout. Please try again.");
     }
   };
 
