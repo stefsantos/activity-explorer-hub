@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,18 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				brand: {
+					50: '#e6f7ff',
+					100: '#b3e0ff',
+					200: '#80caff',
+					300: '#4db3ff',
+					400: '#1a9dff',
+					500: '#0086e6',
+					600: '#0069b3',
+					700: '#004d80',
+					800: '#00324d',
+					900: '#00161a',
 				}
 			},
 			borderRadius: {
@@ -84,11 +97,21 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'slide-left': {
+					'0%': { transform: 'translateX(100%)' },
+					'100%': { transform: 'translateX(0)' }
+				},
+				'slide-right': {
+					'0%': { transform: 'translateX(-100%)' },
+					'100%': { transform: 'translateX(0)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'slide-left': 'slide-left 0.3s ease-out',
+				'slide-right': 'slide-right 0.3s ease-out'
 			}
 		}
 	},

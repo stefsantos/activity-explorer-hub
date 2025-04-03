@@ -1,33 +1,24 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import ActivityCard from '@/components/ActivityCard';
-import FeaturedCarousel from '@/components/FeaturedCarousel';
 import FilterCarousel from '@/components/FilterCarousel';
 import Pagination from '@/components/Pagination';
 import Navbar from '@/components/Navbar';
 import { 
-  activities, 
-  filterActivities, 
-  getFeaturedActivities, 
-  getPopularActivities,
+  filterActivities,
   categories,
   locations,
   ageRanges,
   Activity
 } from '@/data/activities';
 
-const Index = () => {
+const ActivityList = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
   const [ageRangeFilter, setAgeRangeFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
   const [totalPages, setTotalPages] = useState(1);
-  
-  const featuredActivities = getFeaturedActivities();
-  const popularActivities = getPopularActivities();
 
   useEffect(() => {
     const { activities: filtered, totalPages: pages } = filterActivities(
@@ -35,7 +26,7 @@ const Index = () => {
       locationFilter,
       ageRangeFilter,
       currentPage,
-      6
+      9
     );
     setFilteredActivities(filtered);
     setTotalPages(pages);
@@ -44,7 +35,7 @@ const Index = () => {
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({
-      top: document.getElementById('activity-list')?.offsetTop ?? 0,
+      top: 0,
       behavior: 'smooth'
     });
   };
@@ -54,59 +45,47 @@ const Index = () => {
       <Navbar />
       
       <main className="container mx-auto px-4 py-8">
-        {/* Hero Section with Featured Carousel */}
-        <section className="mb-12">
-          <h1 className="text-3xl font-bold mb-6">Discover Amazing Activities</h1>
-          <FeaturedCarousel activities={featuredActivities} />
-        </section>
-        
-        {/* Popular Activities */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Popular Activities</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {popularActivities.map(activity => (
-              <ActivityCard key={activity.id} activity={activity} />
-            ))}
-          </div>
-        </section>
+        <h1 className="text-3xl font-bold mb-8">All Activities</h1>
         
         {/* Filter Section */}
         <section className="mb-8">
-          <h2 className="text-2xl font-bold mb-6">Explore Activities</h2>
-          
-          <FilterCarousel 
-            title="Categories"
-            options={categories}
-            selectedOption={categoryFilter}
-            onChange={(id) => {
-              setCategoryFilter(id);
-              setCurrentPage(1);
-            }}
-          />
-          
-          <FilterCarousel 
-            title="Locations"
-            options={locations}
-            selectedOption={locationFilter}
-            onChange={(id) => {
-              setLocationFilter(id);
-              setCurrentPage(1);
-            }}
-          />
-          
-          <FilterCarousel 
-            title="Age Ranges"
-            options={ageRanges}
-            selectedOption={ageRangeFilter}
-            onChange={(id) => {
-              setAgeRangeFilter(id);
-              setCurrentPage(1);
-            }}
-          />
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h2 className="text-xl font-bold mb-4">Filters</h2>
+            
+            <FilterCarousel 
+              title="Categories"
+              options={categories}
+              selectedOption={categoryFilter}
+              onChange={(id) => {
+                setCategoryFilter(id);
+                setCurrentPage(1);
+              }}
+            />
+            
+            <FilterCarousel 
+              title="Locations"
+              options={locations}
+              selectedOption={locationFilter}
+              onChange={(id) => {
+                setLocationFilter(id);
+                setCurrentPage(1);
+              }}
+            />
+            
+            <FilterCarousel 
+              title="Age Ranges"
+              options={ageRanges}
+              selectedOption={ageRangeFilter}
+              onChange={(id) => {
+                setAgeRangeFilter(id);
+                setCurrentPage(1);
+              }}
+            />
+          </div>
         </section>
         
         {/* Activity List */}
-        <section id="activity-list" className="mb-8">
+        <section>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredActivities.length > 0 ? (
               filteredActivities.map(activity => (
@@ -115,7 +94,7 @@ const Index = () => {
             ) : (
               <div className="col-span-full text-center py-12">
                 <h3 className="text-xl font-medium text-gray-700 mb-2">No activities found</h3>
-                <p className="text-gray-500">Try adjusting your filters or browse all activities</p>
+                <p className="text-gray-500">Try adjusting your filters</p>
               </div>
             )}
           </div>
@@ -125,14 +104,6 @@ const Index = () => {
             totalPages={totalPages} 
             onPageChange={handlePageChange} 
           />
-          
-          <div className="text-center mt-10">
-            <Link to="/activities">
-              <Button className="bg-brand-500 hover:bg-brand-600">
-                See All Activities
-              </Button>
-            </Link>
-          </div>
         </section>
       </main>
       
@@ -148,9 +119,9 @@ const Index = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2">
-                <li><Link to="/" className="text-gray-300 hover:text-white">Home</Link></li>
-                <li><Link to="/activities" className="text-gray-300 hover:text-white">Activities</Link></li>
-                <li><Link to="/saved" className="text-gray-300 hover:text-white">Saved Activities</Link></li>
+                <li><a href="/" className="text-gray-300 hover:text-white">Home</a></li>
+                <li><a href="/activities" className="text-gray-300 hover:text-white">Activities</a></li>
+                <li><a href="/saved" className="text-gray-300 hover:text-white">Saved Activities</a></li>
               </ul>
             </div>
             <div>
@@ -168,4 +139,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default ActivityList;
