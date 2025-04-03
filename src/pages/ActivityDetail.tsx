@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -11,7 +12,7 @@ import Navbar from '@/components/Navbar';
 import MapComponent from '@/components/MapComponent';
 import BookingForm from '@/components/BookingForm';
 import ReviewForm from '@/components/ReviewForm';
-import { MapPin, Clock, Users, Star, Calendar, CheckCircle, Package, GitBranch, Compass } from 'lucide-react';
+import { MapPin, Clock, Users, Star, Calendar, CheckCircle, Package, GitBranch, Compass, ExternalLink } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 
 const ActivityDetail = () => {
@@ -280,12 +281,20 @@ const ActivityDetail = () => {
                 {activity.organizer && (
                   <div className="mt-6">
                     <h3 className="text-lg font-semibold mb-2 text-gray-800">Organized by</h3>
-                    <div className="bg-gray-50 p-4 rounded">
-                      <h4 className="font-medium text-gray-700">{activity.organizer.name}</h4>
-                      {activity.organizer.description && (
-                        <p className="text-gray-600 text-sm mt-1">{activity.organizer.description}</p>
-                      )}
-                    </div>
+                    <Link 
+                      to={`/organizer/${activity.organizer.id}`}
+                      className="block bg-gray-50 p-4 rounded hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h4 className="font-medium text-gray-700">{activity.organizer.name}</h4>
+                          {activity.organizer.description && (
+                            <p className="text-gray-600 text-sm mt-1">{activity.organizer.description}</p>
+                          )}
+                        </div>
+                        <ExternalLink className="text-kids-blue ml-2" size={16} />
+                      </div>
+                    </Link>
                   </div>
                 )}
               </TabsContent>

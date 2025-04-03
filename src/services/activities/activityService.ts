@@ -1,6 +1,6 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { ActivityDetailType } from "../types";
+import { getUserReview } from "../reviews/reviewService";
 
 export async function fetchActivities() {
   const { data, error } = await supabase
@@ -57,64 +57,64 @@ export async function fetchPopularActivities(limit = 4) {
 }
 
 export async function fetchActivityById(id: string): Promise<ActivityDetailType | null> {
-  const { data: activity, error: activityError } = await supabase
+  const { data: session } = await supabase.auth.getSession();
+  const userId = session.session?.user?.id;
+
+  // Fetch the activity
+  const { data: activity, error } = await supabase
     .from('activities')
     .select(`
       *,
-      location:location_id(id, name, address, latitude, longitude),
-      organizer:organizer_id(id, name, description)
+      location:locations(*),
+      organizer:activity_organizers(*),
+      variants:activity_variants(*,location:locations(*)),
+      packages:activity_packages(*),
+      reviews:activity_reviews(id, reviewer_name, rating, comment, review_date),
+      requirements:activity_requirements(*),
+      expectations:activity_expectations(*)
     `)
     .eq('id', id)
     .single();
 
-  if (activityError) {
-    console.error('Error fetching activity:', activityError);
+  if (error) {
+    console.error('Error fetching activity:', error);
     return null;
   }
 
-  // Fetch related data using separate functions
-  const variants = await fetchActivityVariants(id);
-  const packages = await fetchActivityPackages(id);
-  const reviews = await fetchActivityReviews(id);
-  const requirements = await fetchActivityRequirements(id);
-  const expectations = await fetchActivityExpectations(id);
-  
-  // Get user review if user is logged in
+  // Get user's review if logged in
   let userReview = null;
-  const { data: session } = await supabase.auth.getSession();
-  if (session.session?.user) {
-    const { data: userReviewData, error: userReviewError } = await supabase
-      .rpc('get_user_review', { 
-        user_id_param: session.session.user.id, 
-        activity_id_param: id 
-      });
-
-    if (!userReviewError && userReviewData && Array.isArray(userReviewData) && userReviewData.length > 0) {
-      userReview = {
-        id: userReviewData[0].id,
-        rating: userReviewData[0].rating,
-        comment: userReviewData[0].comment,
-        review_date: userReviewData[0].review_date
-      };
-    }
-
-    if (userReviewError) {
-      console.error('Error fetching user review:', userReviewError);
-    }
+  if (userId) {
+    userReview = await getUserReview(userId, id);
   }
 
+  // RPC call to get reviews with user details
+  const { data: reviewData, error: reviewError } = await supabase
+    .rpc('get_activity_reviews', { activity_id_param: id });
+  
+  if (reviewError) {
+    console.error('Error fetching reviews:', reviewError);
+  }
+
+  // Process reviews to ensure proper typing
+  let formattedReviews = [];
+  if (reviewData && Array.isArray(reviewData) && reviewData.length > 0) {
+    formattedReviews = reviewData.map(review => ({
+      id: review.id,
+      reviewer_name: review.reviewer_name,
+      rating: review.rating,
+      comment: review.comment,
+      review_date: review.review_date
+    }));
+  }
+
+  // Return formatted activity data
   return {
     ...activity,
-    variants: variants || [],
-    packages: packages || [],
-    reviews: reviews || [],
-    requirements: requirements || [],
-    expectations: expectations || [],
+    reviews: formattedReviews,
     userReview
   };
 }
 
-// Helper functions to fetch related data
 async function fetchActivityVariants(activityId: string) {
   const { data, error } = await supabase
     .from('activity_variants')
