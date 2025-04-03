@@ -1,7 +1,7 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "@/contexts/UserContext";
@@ -11,16 +11,17 @@ import ActivityDetail from "./pages/ActivityDetail";
 import SavedActivities from "./pages/SavedActivities";
 import OrganizerDetail from "./pages/OrganizerDetail";
 import NotFound from "./pages/NotFound";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <UserProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+      <BrowserRouter>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/activities" element={<ActivityList />} />
@@ -29,8 +30,8 @@ const App = () => (
             <Route path="/saved" element={<SavedActivities />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+        </TooltipProvider>
+      </BrowserRouter>
     </UserProvider>
   </QueryClientProvider>
 );

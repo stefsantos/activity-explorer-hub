@@ -18,12 +18,14 @@ const OrganizerDetail = () => {
     queryKey: ['organizer', id],
     queryFn: () => fetchOrganizerById(id as string),
     enabled: !!id,
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to load organizer information",
-        variant: "destructive",
-      });
+    meta: {
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to load organizer information",
+          variant: "destructive",
+        });
+      }
     }
   });
 
