@@ -103,6 +103,33 @@ const MapComponent: React.FC<MapComponentProps> = ({
 
     // Add activity markers
     if (activities.length > 0 && map.current) {
+      // Add CSS for the popup styling
+      const style = document.createElement('style');
+      style.textContent = `
+        .activity-popup {
+          padding: 5px;
+        }
+        .activity-popup .price {
+          font-weight: bold;
+          color: #FF5A5F;
+          margin-top: 4px;
+        }
+        .activity-popup .view-btn {
+          background-color: #FF5A5F;
+          color: white;
+          border: none;
+          padding: 5px 10px;
+          border-radius: 4px;
+          margin-top: 5px;
+          cursor: pointer;
+          font-size: 12px;
+        }
+        .activity-popup .view-btn:hover {
+          background-color: #FF4449;
+        }
+      `;
+      document.head.appendChild(style);
+      
       activities.forEach(activity => {
         if (activity.location && activity.location.latitude && activity.location.longitude) {
           // Create a popup with activity details
@@ -111,7 +138,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
               <strong>${activity.title}</strong>
               <p>${activity.location.address}</p>
               <p class="price">₱${activity.price}</p>
-              <button class="view-btn">View Activity</button>
+              <button class="view-btn" data-activity-id="${activity.id}">View Activity</button>
             </div>
           `;
           
@@ -153,51 +180,38 @@ const MapComponent: React.FC<MapComponentProps> = ({
             }, 300);
           });
           
-          // Cancel the timeout if the user moves back to the popup
-          popup.getElement().addEventListener('mouseenter', () => {
-            clearTimeout(timeout);
-          });
-          
-          // Add click event to "View Activity" button in popup
+          // Handle clicks on the View Activity button using event delegation
           popup.on('open', () => {
-            const viewBtn = document.querySelector('.view-btn');
-            if (viewBtn) {
-              viewBtn.addEventListener('click', () => {
-                navigate(`/activities/${activity.id}`);
-              });
-            }
+            // Use setTimeout to ensure the DOM is ready
+            setTimeout(() => {
+              const popupElement = popup.getElement();
+              if (popupElement) {
+                const viewBtn = popupElement.querySelector('.view-btn');
+                if (viewBtn) {
+                  viewBtn.addEventListener('click', () => {
+                    navigate(`/activities/${activity.id}`);
+                  });
+                }
+                
+                // Cancel the timeout if the user moves back to the popup
+                popupElement.addEventListener('mouseenter', () => {
+                  clearTimeout(timeout);
+                });
+                
+                popupElement.addEventListener('mouseleave', () => {
+                  timeout = setTimeout(() => {
+                    if (popup.isOpen()) {
+                      activityMarker.togglePopup();
+                    }
+                  }, 300);
+                });
+              }
+            }, 10);
           });
           
           activityMarkers.current.push(activityMarker);
         }
       });
-      
-      // Add CSS for the popup styling
-      const style = document.createElement('style');
-      style.textContent = `
-        .activity-popup {
-          padding: 5px;
-        }
-        .activity-popup .price {
-          font-weight: bold;
-          color: #FF5A5F;
-          margin-top: 4px;
-        }
-        .activity-popup .view-btn {
-          background-color: #FF5A5F;
-          color: white;
-          border: none;
-          padding: 5px 10px;
-          border-radius: 4px;
-          margin-top: 5px;
-          cursor: pointer;
-          font-size: 12px;
-        }
-        .activity-popup .view-btn:hover {
-          background-color: #FF4449;
-        }
-      `;
-      document.head.appendChild(style);
     }
 
     // Cleanup
