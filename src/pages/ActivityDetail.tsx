@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import Navbar from '@/components/Navbar';
 import MapComponent from '@/components/MapComponent';
 import BookingForm from '@/components/BookingForm';
+import ReviewForm from '@/components/ReviewForm';
 import { MapPin, Clock, Users, Star, Calendar, CheckCircle, Package, GitBranch, Compass } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 
@@ -21,8 +22,9 @@ const ActivityDetail = () => {
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [mapLocation, setMapLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
-  const { data: activity, isLoading, error } = useQuery({
+  const { data: activity, isLoading, error, refetch } = useQuery({
     queryKey: ['activity', id],
     queryFn: () => fetchActivityById(id as string),
     enabled: !!id,
@@ -122,6 +124,11 @@ const ActivityDetail = () => {
     if (!activity?.reviews.length) return 0;
     const sum = activity.reviews.reduce((acc, review) => acc + review.rating, 0);
     return sum / activity.reviews.length;
+  };
+
+  const handleReviewSuccess = () => {
+    setShowReviewForm(false);
+    refetch(); // Refresh the activity data
   };
 
   if (isLoading) {
@@ -285,14 +292,35 @@ const ActivityDetail = () => {
               </TabsContent>
               
               <TabsContent value="reviews" className="bg-white rounded-lg p-6 shadow-sm">
-                <div className="flex items-center mb-6">
+                <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center bg-yellow-50 px-3 py-1 rounded-full">
                     <Star className="text-yellow-500 mr-1" size={16} />
                     <span className="font-semibold">{getAverageRating().toFixed(1)}</span>
                     <span className="text-gray-500 mx-1">•</span>
                     <span className="text-gray-600 text-sm">{activity.reviews.length} reviews</span>
                   </div>
+                  
+                  {isLoggedIn && (
+                    <Button 
+                      onClick={() => setShowReviewForm(!showReviewForm)}
+                      variant="outline" 
+                      className="border-kids-blue text-kids-blue"
+                    >
+                      {activity.userReview ? "Edit Your Review" : "Write a Review"}
+                    </Button>
+                  )}
                 </div>
+                
+                {/* Review Form */}
+                {showReviewForm && (
+                  <div className="mb-8">
+                    <ReviewForm 
+                      activityId={activity.id}
+                      userReview={activity.userReview}
+                      onSuccess={handleReviewSuccess}
+                    />
+                  </div>
+                )}
                 
                 <div className="space-y-6">
                   {activity.reviews.length === 0 ? (
