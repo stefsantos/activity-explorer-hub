@@ -1,23 +1,34 @@
 import { supabase } from "@/integrations/supabase/client";
+import { getUserProfile } from "@/contexts/UserContext";
 
-// Function to directly access user_reviews table bypassing TypeScript type checking
+// Function to get a user's review for a specific activity
 export async function getUserReview(userId: string, activityId: string) {
+  // We need to use the RPC function because direct table access doesn't match the types
   const { data, error } = await supabase
-    .from('user_reviews')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('activity_id', activityId)
-    .maybeSingle();
+    .rpc('get_user_review', {
+      user_id_param: userId,
+      activity_id_param: activityId
+    });
   
   if (error) {
     console.error('Error fetching user review:', error);
     return null;
   }
   
-  return data;
+  // Format the result for compatibility
+  if (data && data.length > 0) {
+    return {
+      id: data[0].id,
+      rating: data[0].rating,
+      comment: data[0].comment,
+      review_date: data[0].review_date
+    };
+  }
+  
+  return null;
 }
 
-// Alternative implementation using direct table access with type assertions
+// Alternative implementation using RPC functions
 export async function submitReviewDirect(
   activityId: string, 
   rating: number, 
@@ -32,11 +43,10 @@ export async function submitReviewDirect(
   
   // Check if user has already reviewed this activity
   const { data: existingReview, error: checkError } = await supabase
-    .from('user_reviews')
-    .select('id')
-    .eq('activity_id', activityId)
-    .eq('user_id', userId)
-    .maybeSingle();
+    .rpc('check_user_review', { 
+      user_id_param: userId, 
+      activity_id_param: activityId 
+    });
 
   if (checkError) {
     console.error('Error checking for existing review:', checkError);
@@ -46,30 +56,35 @@ export async function submitReviewDirect(
   let result;
   
   // If a review already exists, update it
-  if (existingReview) {
+  if (existingReview && existingReview.length > 0) {
+    const existingReviewId = existingReview[0].id;
+    
     const { data, error } = await supabase
-      .from('user_reviews')
-      .update({
-        rating,
-        comment,
-        review_date: new Date().toISOString()
-      })
-      .eq('id', existingReview.id)
-      .select();
+      .rpc('update_user_review', {
+        review_id_param: existingReviewId,
+        rating_param: rating,
+        comment_param: comment || null
+      });
     
     if (error) {
       console.error('Error updating review:', error);
       return { success: false, error: 'Error updating review' };
     }
     
-    result = { success: true, reviewId: existingReview.id };
+    result = { success: true, reviewId: existingReviewId };
   } else {
-    // Otherwise, insert a new review
+    // Get user profile for reviewer name
+    const userProfile = await getUserProfile();
+    const reviewer_name = userProfile?.first_name 
+      ? `${userProfile.first_name} ${userProfile.last_name || ''}`
+      : 'Anonymous';
+
+    // Otherwise, insert a new review into the activity_reviews table
     const { data, error } = await supabase
-      .from('user_reviews')
+      .from('activity_reviews')
       .insert({
         activity_id: activityId,
-        user_id: userId,
+        reviewer_name,
         rating,
         comment,
         review_date: new Date().toISOString()
@@ -98,9 +113,7 @@ export async function deleteReviewDirect(reviewId: string): Promise<{ success: b
   }
 
   const { error } = await supabase
-    .from('user_reviews')
-    .delete()
-    .eq('id', reviewId);
+    .rpc('delete_user_review', { review_id_param: reviewId });
   
   if (error) {
     console.error('Error deleting review:', error);

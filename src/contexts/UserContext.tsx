@@ -1,6 +1,6 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { toast } from "sonner";
+import { supabase } from './supabase'; // Assuming supabase is imported from a file named 'supabase'
 
 type User = {
   id: string;
@@ -25,14 +25,12 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [bookmarkedActivities, setBookmarkedActivities] = useState<string[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
-  // Simulate loading saved bookmarks from localStorage
   useEffect(() => {
     const savedBookmarks = localStorage.getItem('bookmarkedActivities');
     if (savedBookmarks) {
       setBookmarkedActivities(JSON.parse(savedBookmarks));
     }
     
-    // Check if user is logged in from localStorage
     const loggedInUser = localStorage.getItem('user');
     if (loggedInUser) {
       setUser(JSON.parse(loggedInUser));
@@ -40,7 +38,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  // Save bookmarks to localStorage whenever they change
   useEffect(() => {
     if (bookmarkedActivities.length > 0) {
       localStorage.setItem('bookmarkedActivities', JSON.stringify(bookmarkedActivities));
@@ -48,7 +45,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [bookmarkedActivities]);
 
   const login = () => {
-    // Mock login - in a real app, this would involve authentication
     const mockUser = {
       id: '1',
       name: 'Demo User',
@@ -111,3 +107,23 @@ export const useUser = () => {
   }
   return context;
 };
+
+export async function getUserProfile() {
+  const { data: session } = await supabase.auth.getSession();
+  if (!session.session?.user) {
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', session.session.user.id)
+    .single();
+
+  if (error) {
+    console.error('Error fetching user profile:', error);
+    return null;
+  }
+
+  return data;
+}
