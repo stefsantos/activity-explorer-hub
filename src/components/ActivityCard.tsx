@@ -29,9 +29,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, size = 'regular' 
 
   return (
     <div className="activity-card h-full">
-      <Link to={`/activity/${activity.id}`} className="block h-full">
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden h-full flex flex-col">
-          {/* Activity Image */}
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden h-full flex flex-col">
+        {/* Activity Image */}
+        <Link to={`/activity/${activity.id}`} className="block">
           <div className="relative">
             <img 
               src={activity.image} 
@@ -53,42 +53,50 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, size = 'regular' 
               </span>
             </div>
           </div>
+        </Link>
+        
+        {/* Activity Details */}
+        <div className="p-4 flex flex-col flex-grow">
+          <Link to={`/activity/${activity.id}`} className="block">
+            <h3 className="font-bold text-gray-800 text-lg truncate mb-1">{activity.title}</h3>
+          </Link>
           
-          {/* Activity Details */}
-          <div className="p-4 flex flex-col flex-grow">
-            <div className="mb-2">
-              <h3 className="font-bold text-gray-800 text-lg truncate">{activity.title}</h3>
-              
-              <div className="flex items-center text-gray-500 my-1 text-xs">
-                <MapPin size={12} className="mr-1 text-gray-500" />
-                <span className="truncate">{activity.location ? activity.location.name : "Various locations"}</span>
-              </div>
-              
-              {/* Rating Stars */}
-              <div className="flex items-center mt-1">
-                <div className="flex items-center">
-                  <Star size={14} className="text-yellow-400 fill-current" />
-                  <span className="ml-1 text-sm font-medium">{activity.rating || "4.9"}</span>
-                </div>
-              </div>
+          {/* Location with MapPin icon */}
+          {activity.location && (
+            <div className="flex items-center text-gray-500 mb-2 text-xs">
+              <MapPin size={12} className="mr-1 text-gray-500" />
+              <span className="truncate">{activity.location.name || "Various locations"}</span>
             </div>
-            
-            {/* Description */}
-            <p className="text-gray-600 text-sm mt-1 mb-4 line-clamp-2 flex-grow">
-              A week-long camp full of exciting experiments and scientific discoveries.
-            </p>
-            
-            {/* Price and Action */}
-            <div className="mt-auto flex items-center justify-between">
-              <span className="text-lg font-bold">₱{activity.price}</span>
-              <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white rounded-full">
-                <ShoppingCart size={14} className="mr-1" />
-                Add to Cart
-              </Button>
+          )}
+          
+          {/* Rating Stars */}
+          <div className="flex items-center mb-2">
+            <div className="flex items-center">
+              <Star size={14} className="text-amber-400 fill-current" />
+              <span className="ml-1 text-sm font-medium">{activity.rating || "4.9"}</span>
             </div>
           </div>
+          
+          {/* Ages line */}
+          <div className="text-xs text-gray-500 mb-1">
+            Ages {activity.min_age || 0}-{activity.max_age || 16} Years
+          </div>
+          
+          {/* Description - single line truncated */}
+          <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow">
+            A week-long camp full of exciting experiments and scientific discoveries.
+          </p>
+          
+          {/* Price and Add to Cart button */}
+          <div className="mt-auto flex items-center justify-between">
+            <span className="text-lg font-bold">₱{activity.price}</span>
+            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white rounded-full">
+              <ShoppingCart size={14} className="mr-1" />
+              Add to Cart
+            </Button>
+          </div>
         </div>
-      </Link>
+      </div>
     </div>
   );
 };

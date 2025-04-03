@@ -16,7 +16,8 @@ import {
   Star,
   X,
   Filter,
-  ChevronDown
+  ChevronDown,
+  Map as MapIcon
 } from 'lucide-react';
 import { 
   Collapsible,
@@ -111,7 +112,7 @@ const ActivityList = () => {
     }
     
     // Pagination
-    const itemsPerPage = 8;
+    const itemsPerPage = 12;
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
     setTotalPages(totalPages || 1);
     
@@ -161,24 +162,49 @@ const ActivityList = () => {
     setCurrentPage(1);
   };
 
+  // Helper function to get icon based on category name
+  const getCategoryIcon = (category: string) => {
+    const categoryColors: Record<string, string> = {
+      "Sports": "bg-blue-500",
+      "Arts & Crafts": "bg-pink-500",
+      "Music": "bg-purple-500",
+      "Outdoors": "bg-green-500",
+      "Educational": "bg-blue-500",
+      "Cooking": "bg-red-500",
+      "Technology": "bg-yellow-500",
+      "Gaming": "bg-green-500",
+      "Wellness": "bg-teal-500",
+    };
+    
+    return categoryColors[category] || "bg-gray-500";
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">All Activities</h1>
-          <p className="text-gray-600">Discover and book amazing activities for your kids</p>
+        {/* Search section */}
+        <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+          <div className="relative">
+            <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Input 
+              type="text"
+              placeholder="Search for activities, parks, events, and fun!"
+              className="pl-10 pr-4 py-2 w-full"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
         </div>
         
         {/* Main content area with sidebar and results */}
         <div className="flex flex-col md:flex-row gap-6">
           {/* Filter Sidebar */}
-          <div className="w-full md:w-64 lg:w-72 flex-shrink-0">
+          <div className="w-full md:w-72 flex-shrink-0">
             <div className="bg-white p-5 rounded-lg shadow-sm sticky top-24">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-bold flex items-center">
-                  <Filter size={18} className="mr-2" />
+                <h2 className="text-lg font-bold">
                   Filter by
                 </h2>
                 {(categoryFilter !== 'all' || 
@@ -203,7 +229,7 @@ const ActivityList = () => {
               {/* Activity Type / Category */}
               <div className="mb-6">
                 <h3 className="text-md font-semibold mb-3">Activity Type</h3>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-3">
                   {categories.slice(0, 9).map((category) => (
                     <div 
                       key={category.id}
@@ -215,10 +241,11 @@ const ActivityList = () => {
                       }`}
                     >
                       <div className={`w-10 h-10 rounded-full mx-auto flex items-center justify-center mb-1 ${
-                        category.id === categoryFilter ? 'bg-amber-500 text-white' : 'bg-white text-gray-600'
+                        category.id === categoryFilter 
+                          ? 'bg-amber-500 text-white' 
+                          : `${getCategoryIcon(category.name)} text-white`
                       }`}>
-                        {/* Icon would go here */}
-                        {category.id[0].toUpperCase()}
+                        {category.name[0].toUpperCase()}
                       </div>
                       <span className="text-xs font-medium block truncate">{category.name}</span>
                     </div>
@@ -227,54 +254,44 @@ const ActivityList = () => {
               </div>
               
               {/* Age Range Slider */}
-              <Collapsible defaultOpen={true} className="mb-6">
-                <CollapsibleTrigger className="flex w-full justify-between items-center">
-                  <h3 className="text-md font-semibold">Age Range</h3>
-                  <ChevronDown size={16} />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pt-3">
-                  <div className="px-2">
-                    <Slider 
-                      defaultValue={[1, 16]} 
-                      value={ageRange}
-                      min={1} 
-                      max={16}
-                      step={1}
-                      onValueChange={(value) => setAgeRange(value as [number, number])}
-                      className="mb-2"
-                    />
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>{ageRange[0]} years</span>
-                      <span>{ageRange[1]} years</span>
-                    </div>
+              <div className="mb-6">
+                <h3 className="text-md font-semibold mb-3">Age Range</h3>
+                <div className="px-2">
+                  <Slider 
+                    defaultValue={[1, 16]} 
+                    value={ageRange}
+                    min={1} 
+                    max={16}
+                    step={1}
+                    onValueChange={(value) => setAgeRange(value as [number, number])}
+                    className="mb-2"
+                  />
+                  <div className="flex justify-between text-sm text-gray-600 mt-1">
+                    <span>{ageRange[0]} years</span>
+                    <span>{ageRange[1]} years</span>
                   </div>
-                </CollapsibleContent>
-              </Collapsible>
+                </div>
+              </div>
               
               {/* Price Range Slider */}
-              <Collapsible defaultOpen={true} className="mb-6">
-                <CollapsibleTrigger className="flex w-full justify-between items-center">
-                  <h3 className="text-md font-semibold">Price Range</h3>
-                  <ChevronDown size={16} />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="pt-3">
-                  <div className="px-2">
-                    <Slider 
-                      defaultValue={[0, 5000]} 
-                      value={priceRange}
-                      min={0} 
-                      max={5000}
-                      step={100}
-                      onValueChange={(value) => setPriceRange(value as [number, number])}
-                      className="mb-2"
-                    />
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>₱{priceRange[0]}</span>
-                      <span>₱{priceRange[1]}</span>
-                    </div>
+              <div className="mb-6">
+                <h3 className="text-md font-semibold mb-3">Price Range</h3>
+                <div className="px-2">
+                  <Slider 
+                    defaultValue={[0, 5000]} 
+                    value={priceRange}
+                    min={0} 
+                    max={5000}
+                    step={100}
+                    onValueChange={(value) => setPriceRange(value as [number, number])}
+                    className="mb-2"
+                  />
+                  <div className="flex justify-between text-sm text-gray-600 mt-1">
+                    <span>₱{priceRange[0]}</span>
+                    <span>₱{priceRange[1]}</span>
                   </div>
-                </CollapsibleContent>
-              </Collapsible>
+                </div>
+              </div>
               
               {/* Location */}
               <Collapsible className="mb-6">
@@ -292,6 +309,25 @@ const ActivityList = () => {
                       className="w-full"
                     />
                   </div>
+                </CollapsibleContent>
+              </Collapsible>
+              
+              {/* Map */}
+              <Collapsible className="mb-6">
+                <CollapsibleTrigger className="flex w-full justify-between items-center">
+                  <h3 className="text-md font-semibold flex items-center">
+                    <MapIcon size={16} className="mr-1" />
+                    Map
+                  </h3>
+                  <ChevronDown size={16} />
+                </CollapsibleTrigger>
+                <CollapsibleContent className="pt-3">
+                  <div className="h-32 bg-gray-100 rounded-lg mb-2 relative">
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs">
+                      Map preview
+                    </div>
+                  </div>
+                  <div className="text-xs text-center text-blue-500">View larger map</div>
                 </CollapsibleContent>
               </Collapsible>
               
@@ -410,24 +446,10 @@ const ActivityList = () => {
           
           {/* Activity Results */}
           <div className="flex-grow">
-            {/* Search Bar */}
-            <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-              <div className="relative">
-                <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <Input 
-                  type="text"
-                  placeholder="Search for activities, parks, events, and fun!"
-                  className="pl-10 pr-4 py-2 w-full"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
-            
             {/* Activity Grid */}
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[...Array(8)].map((_, i) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {[...Array(12)].map((_, i) => (
                   <div key={i} className="bg-white rounded-lg h-80 animate-pulse">
                     <div className="bg-gray-200 h-48 rounded-t-lg"></div>
                     <div className="p-4">
@@ -445,7 +467,7 @@ const ActivityList = () => {
             ) : (
               <>
                 {filteredActivities.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredActivities.map(activity => (
                       <ActivityCard key={activity.id} activity={activity} />
                     ))}
