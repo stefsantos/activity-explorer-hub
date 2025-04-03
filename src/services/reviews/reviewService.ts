@@ -1,110 +1,120 @@
 import { supabase } from "@/integrations/supabase/client";
-import { getUserProfile } from "@/contexts/UserContext";
+import { UserReviewType } from "@/services/types";
 
-// Function to get a user's review for a specific activity
-export async function getUserReview(userId: string, activityId: string) {
-  // Use the RPC function to get user reviews
+export async function getUserReview(userId: string, activityId: string): Promise<UserReviewType | null> {
+  // Get the user's review for this activity if it exists
   const { data, error } = await supabase
-    .rpc('get_user_review', {
-      user_id_param: userId,
-      activity_id_param: activityId
-    });
-  
+    .from('activity_reviews')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('activity_id', activityId)
+    .single();
+
   if (error) {
+    if (error.code === 'PGRST116') {
+      // No review found
+      return null;
+    }
     console.error('Error fetching user review:', error);
     return null;
   }
-  
-  // Format the result for compatibility
-  if (data && Array.isArray(data) && data.length > 0) {
-    return {
-      id: data[0].id,
-      rating: data[0].rating,
-      comment: data[0].comment,
-      review_date: data[0].review_date
-    };
-  }
-  
-  return null;
+
+  if (!data) return null;
+
+  return {
+    id: data.id,
+    rating: data.rating,
+    comment: data.comment,
+    activity_id: data.activity_id
+  };
 }
 
-export async function submitReview(activityId: string, rating: number, comment?: string): Promise<{ success: boolean; error?: string; reviewId?: string }> {
-  const { data: session } = await supabase.auth.getSession();
-  if (!session.session?.user) {
-    return { success: false, error: 'You must be logged in to submit a review' };
-  }
-
-  const userId = session.session.user.id;
-  
-  // Check if user already has a review for this activity
-  const { data: existingReviews, error: checkError } = await supabase
-    .rpc('check_user_review', { 
-      user_id_param: userId, 
-      activity_id_param: activityId 
-    });
+export async function submitReview(
+  userId: string,
+  activityId: string,
+  rating: number,
+  comment?: string
+): Promise<boolean> {
+  // Check if user already has a review
+  const { data: existingReview, error: checkError } = await supabase
+    .from('activity_reviews')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('activity_id', activityId);
 
   if (checkError) {
     console.error('Error checking for existing review:', checkError);
-    return { success: false, error: 'Error checking for existing review' };
+    return false;
   }
 
-  let result;
-  
-  // If user already has a review, update it
-  if (existingReviews && Array.isArray(existingReviews) && existingReviews.length > 0) {
-    const existingReviewId = existingReviews[0].id;
-    
-    const { data, error } = await supabase
-      .rpc('update_user_review', {
-        review_id_param: existingReviewId,
-        rating_param: rating,
-        comment_param: comment || null
-      });
-    
-    if (error) {
-      console.error('Error updating review:', error);
-      return { success: false, error: 'Error updating review' };
+  // If review exists, update it
+  if (existingReview && Array.isArray(existingReview) && existingReview.length > 0) {
+    const { error: updateError } = await supabase
+      .from('activity_reviews')
+      .update({
+        rating,
+        comment,
+        review_date: new Date()
+      })
+      .eq('id', existingReview[0].id);
+
+    if (updateError) {
+      console.error('Error updating review:', updateError);
+      return false;
     }
-    
-    result = { success: true, reviewId: existingReviewId };
-  } else {
-    // Otherwise, insert a new review
-    const { data, error } = await supabase
-      .rpc('insert_user_review', {
-        activity_id_param: activityId,
-        user_id_param: userId,
-        rating_param: rating,
-        comment_param: comment || null
-      });
-    
-    if (error) {
-      console.error('Error submitting review:', error);
-      return { success: false, error: 'Error submitting review' };
-    }
-    
-    if (data && Array.isArray(data) && data.length > 0) {
-      result = { success: true, reviewId: data[0].id };
-    } else {
-      result = { success: true };
-    }
+    return true;
   }
 
-  return result;
+  // Otherwise insert new review
+  const { error: insertError } = await supabase
+    .from('activity_reviews')
+    .insert({
+      activity_id: activityId,
+      user_id: userId,
+      rating,
+      comment,
+      reviewer_name: 'Anonymous User' // This should be replaced with actual user's name
+    });
+
+  if (insertError) {
+    console.error('Error inserting review:', insertError);
+    return false;
+  }
+
+  // Update activity average rating and review count
+  await updateActivityRatings(activityId);
+
+  return true;
 }
 
-export async function deleteReview(reviewId: string): Promise<{ success: boolean; error?: string }> {
-  const { data: session } = await supabase.auth.getSession();
-  if (!session.session?.user) {
-    return { success: false, error: 'You must be logged in to delete a review' };
+async function updateActivityRatings(activityId: string): Promise<void> {
+  // Get all reviews for this activity
+  const { data: reviews, error: reviewsError } = await supabase
+    .from('activity_reviews')
+    .select('rating')
+    .eq('activity_id', activityId);
+
+  if (reviewsError) {
+    console.error('Error fetching reviews for rating update:', reviewsError);
+    return;
   }
 
-  const { error } = await supabase
-    .rpc('delete_user_review', { review_id_param: reviewId });
-  
-  if (error) {
-    console.error('Error deleting review:', error);
-    return { success: false, error: 'Error deleting review' };
+  // Calculate average rating
+  if (reviews && Array.isArray(reviews) && reviews.length > 0) {
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    const averageRating = totalRating / reviews.length;
+
+    // Update activity with new rating and count
+    const { error: updateError } = await supabase
+      .from('activities')
+      .update({
+        rating: averageRating,
+        review_count: reviews.length
+      })
+      .eq('id', activityId);
+
+    if (updateError) {
+      console.error('Error updating activity ratings:', updateError);
+    }
   }
-  
-  return { success: true };
 }

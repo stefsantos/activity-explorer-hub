@@ -96,7 +96,14 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
   }
 
   // Process reviews to ensure proper typing
-  let formattedReviews = [];
+  let formattedReviews: Array<{
+    id: string;
+    reviewer_name: string;
+    rating: number;
+    comment: string | null;
+    review_date: string;
+  }> = [];
+  
   if (reviewData && Array.isArray(reviewData) && reviewData.length > 0) {
     formattedReviews = reviewData.map(review => ({
       id: review.id,
@@ -110,7 +117,7 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
   // Return formatted activity data
   return {
     ...activity,
-    reviews: formattedReviews || [],
+    reviews: formattedReviews,
     userReview: userReview || null
   } as ActivityDetailType;
 }
