@@ -11,9 +11,7 @@ export const getReviews = async (activityId: string): Promise<Review[]> => {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-
-    // Convert the data to include user_id with proper type casting
-    return (data as unknown as Review[]) || [];
+    return (data || []) as Review[];
   } catch (error) {
     console.error('Error fetching reviews:', error);
     return [];
@@ -36,7 +34,7 @@ export const getUserReview = async (userId: string, activityId: string): Promise
       throw error;
     }
 
-    return data as unknown as Review;
+    return data as Review;
   } catch (error) {
     console.error('Error fetching user review:', error);
     return null;
@@ -64,9 +62,7 @@ export const submitReview = async (
       .single();
 
     if (error) throw error;
-
-    // Add the missing user_id property with type casting
-    return (data as unknown) as Review;
+    return data as Review;
   } catch (error) {
     console.error('Error submitting review:', error);
     return null;
@@ -96,9 +92,7 @@ export const submitReviewDirect = async (
       .single();
 
     if (error) throw error;
-
-    // Return with proper type casting and success property
-    return { success: true, data: data as unknown as Review };
+    return { success: true, data: data as Review };
   } catch (error: any) {
     console.error('Error submitting review:', error);
     return { success: false, error: error.message || 'Failed to submit review' };
@@ -129,9 +123,7 @@ export const getReviewById = async (reviewId: string): Promise<Review | null> =>
       .single();
 
     if (error) throw error;
-
-    // Add the missing user_id property with type casting
-    return (data as unknown) as Review;
+    return data as Review;
   } catch (error) {
     console.error('Error fetching review:', error);
     return null;
