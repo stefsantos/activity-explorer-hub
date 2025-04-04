@@ -11,7 +11,7 @@ export const getReviews = async (activityId: string): Promise<Review[]> => {
       .order('review_date', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+    return data as Review[] || [];
   } catch (error) {
     console.error('Error fetching reviews:', error);
     return [];
@@ -31,7 +31,7 @@ export const getUserReview = async (activityId: string, userId: string): Promise
     
     if (error && error.code !== 'PGRST116') throw error; // PGRST116 is the "no rows returned" error
     
-    return data || null;
+    return data as Review || null;
   } catch (error) {
     console.error('Error fetching user review:', error);
     return null;
@@ -52,7 +52,7 @@ export const submitReview = async (
       reviewer_name: reviewerName,
       rating,
       comment,
-      user_id: userId
+      user_id: userId || null
     };
 
     const { data, error } = await supabase
@@ -62,7 +62,7 @@ export const submitReview = async (
       .single();
 
     if (error) throw error;
-    return data;
+    return data as Review;
   } catch (error) {
     console.error('Error submitting review:', error);
     return null;
@@ -85,7 +85,7 @@ export const updateReview = async (
       .single();
 
     if (error) throw error;
-    return data;
+    return data as Review;
   } catch (error) {
     console.error('Error updating review:', error);
     return null;
