@@ -18,13 +18,16 @@ const AuthCallback = () => {
         }
 
         if (data?.session) {
+          console.log("Auth callback successful, session found", data.session);
           toast.success('Successfully signed in!');
           navigate('/', { replace: true });
         } else {
+          console.log("No session found in auth callback");
           // If no session, redirect to sign in page
           navigate('/auth', { replace: true });
         }
       } catch (error: any) {
+        console.error("Auth callback error:", error);
         toast.error(error.message || 'Authentication error');
         navigate('/auth', { replace: true });
       }
