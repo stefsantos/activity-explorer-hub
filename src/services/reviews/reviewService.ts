@@ -1,8 +1,8 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { ActivityReview } from '@/services/types';
+import { Review } from '@/services/types';
 
-export const getReviews = async (activityId: string): Promise<ActivityReview[]> => {
+export const getReviews = async (activityId: string): Promise<Review[]> => {
   try {
     const { data, error } = await supabase
       .from('activity_reviews')
@@ -18,7 +18,7 @@ export const getReviews = async (activityId: string): Promise<ActivityReview[]> 
   }
 };
 
-export const getUserReview = async (activityId: string, userId: string): Promise<ActivityReview | null> => {
+export const getUserReview = async (activityId: string, userId: string): Promise<Review | null> => {
   if (!userId) return null;
   
   try {
@@ -38,13 +38,14 @@ export const getUserReview = async (activityId: string, userId: string): Promise
   }
 };
 
+// Submit or update a review
 export const submitReview = async (
   activityId: string,
   reviewerName: string,
   rating: number,
   comment: string,
   userId?: string
-): Promise<ActivityReview | null> => {
+): Promise<Review | null> => {
   try {
     const reviewData = {
       activity_id: activityId,
@@ -74,7 +75,7 @@ export const updateReview = async (
     rating?: number;
     comment?: string;
   }
-): Promise<ActivityReview | null> => {
+): Promise<Review | null> => {
   try {
     const { data, error } = await supabase
       .from('activity_reviews')
@@ -103,5 +104,57 @@ export const deleteReview = async (reviewId: string): Promise<boolean> => {
   } catch (error) {
     console.error('Error deleting review:', error);
     return false;
+  }
+};
+
+// Direct functions that return success/error objects
+export const submitReviewDirect = async (
+  activityId: string,
+  userId: string,
+  reviewerName: string,
+  rating: number,
+  comment?: string
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const reviewData = {
+      activity_id: activityId,
+      user_id: userId,
+      reviewer_name: reviewerName,
+      rating,
+      comment: comment || null
+    };
+
+    const { error } = await supabase
+      .from('activity_reviews')
+      .insert([reviewData]);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error submitting review:', error);
+    return { 
+      success: false, 
+      error: error.message || "Failed to submit review" 
+    };
+  }
+};
+
+export const deleteReviewDirect = async (
+  reviewId: string
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const { error } = await supabase
+      .from('activity_reviews')
+      .delete()
+      .eq('id', reviewId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error deleting review:', error);
+    return { 
+      success: false, 
+      error: error.message || "Failed to delete review" 
+    };
   }
 };
