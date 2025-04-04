@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { User, Session, Provider } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -14,6 +14,7 @@ interface AuthContextProps {
     last_name?: string;
     phone?: string;
   }) => Promise<{ error: any | null, user: User | null }>;
+  signInWithOAuth: (provider: Provider) => Promise<{ error: any | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -65,6 +66,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const signInWithOAuth = async (provider: Provider) => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: provider,
+        options: {
+          redirectTo: window.location.origin + '/auth/callback',
+        }
+      });
+      
+      return { error };
+    } catch (error) {
+      console.error(`Error signing in with ${provider}:`, error);
+      return { error };
+    }
+  };
+
   const signUp = async (email: string, password: string, userData: { 
     first_name?: string;
     last_name?: string;
@@ -98,6 +115,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         signIn,
         signUp,
+        signInWithOAuth,
         signOut,
       }}
     >

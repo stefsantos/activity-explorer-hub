@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,6 +13,8 @@ import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Separator } from '@/components/ui/separator';
+import { Github, Mail } from 'lucide-react';
 
 const signInFormSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -35,7 +38,7 @@ const signUpFormSchema = z.object({
 type SignUpFormValues = z.infer<typeof signUpFormSchema>;
 
 const Auth = () => {
-  const { user, signIn, signUp } = useAuth();
+  const { user, signIn, signUp, signInWithOAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
@@ -103,6 +106,17 @@ const Auth = () => {
     }
   };
 
+  const handleOAuthSignIn = async (provider: 'github' | 'google') => {
+    setIsLoading(true);
+    try {
+      const { error } = await signInWithOAuth(provider);
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error(error.message || `Error signing in with ${provider}`);
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="grid h-screen place-items-center bg-gray-100">
       <Card className="w-[350px] md:w-[500px] shadow-lg">
@@ -111,6 +125,43 @@ const Auth = () => {
           <CardDescription className="text-center">Sign in or create an account</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
+          <div className="grid grid-cols-2 gap-4">
+            <Button 
+              variant="outline" 
+              onClick={() => handleOAuthSignIn('github')} 
+              disabled={isLoading}
+              className="w-full"
+            >
+              <Github className="mr-2 h-4 w-4" />
+              GitHub
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => handleOAuthSignIn('google')} 
+              disabled={isLoading}
+              className="w-full"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="mr-2 h-4 w-4" viewBox="0 0 48 48">
+                <path fill="#FFC107" d="M43.6 20H24v8h11.3c-1.2 5-5.3 8.8-11.3 8.8-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.1 7.9 3l6.1-6.1C33.9 6.5 29.2 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.7-.4-4z"/>
+                <path fill="#FF3D00" d="M6.3 14.7l7.1 5.2c1.8-5 6.7-8.7 12.6-8.7 3 0 5.8 1.1 7.9 3l6.1-6.1C33.9 6.5 29.2 4 24 4c-8.8 0-16.3 5.4-19.7 12.7z"/>
+                <path fill="#4CAF50" d="M24 44c5 0 9.6-1.7 13.2-4.6l-6.4-5.4c-1.9 1.3-4.4 2-6.8 2-6 0-11.1-3.8-12.9-8.8l-7.1 5.4C7.6 38.4 15.1 44 24 44z"/>
+                <path fill="#1976D2" d="M43.6 20H24v8h11.3c-.6 2.5-2.1 4.8-4.2 6.2l6.4 5.4c3.7-3.4 6-8.4 6-14.4 0-1.3-.1-2.7-.4-4z"/>
+              </svg>
+              Google
+            </Button>
+          </div>
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t"></span>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
           <Tabs defaultValue="sign-in" className="w-full">
             <TabsList>
               <TabsTrigger value="sign-in" className="w-1/2">Sign In</TabsTrigger>
@@ -146,7 +197,7 @@ const Auth = () => {
                     )}
                   />
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? 'Signing In...' : 'Sign In'}
+                    {isLoading ? 'Signing In...' : 'Sign In with Email'}
                   </Button>
                 </form>
               </Form>

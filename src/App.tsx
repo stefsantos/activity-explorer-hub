@@ -12,6 +12,7 @@ import ActivityDetail from "./pages/ActivityDetail";
 import SavedActivities from "./pages/SavedActivities";
 import OrganizerDetail from "./pages/OrganizerDetail";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/organizer/:id" element={<OrganizerDetail />} />
               <Route path="/saved" element={<SavedActivities />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </TooltipProvider>
