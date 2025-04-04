@@ -186,6 +186,41 @@ export type Database = {
           },
         ]
       }
+      activity_images: {
+        Row: {
+          activity_id: string
+          alt_text: string | null
+          created_at: string | null
+          display_order: number
+          id: string
+          image_url: string
+        }
+        Insert: {
+          activity_id: string
+          alt_text?: string | null
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          image_url: string
+        }
+        Update: {
+          activity_id?: string
+          alt_text?: string | null
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          image_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_images_activity_id_fkey"
+            columns: ["activity_id"]
+            isOneToOne: false
+            referencedRelation: "activities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       activity_locations: {
         Row: {
           address: string

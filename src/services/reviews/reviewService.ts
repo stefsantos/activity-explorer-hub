@@ -11,7 +11,10 @@ export const getReviews = async (activityId: string): Promise<Review[]> => {
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return (data || []) as Review[];
+    return data.map(review => ({
+      ...review,
+      user_id: review.user_id || undefined
+    })) as Review[];
   } catch (error) {
     console.error('Error fetching reviews:', error);
     return [];
@@ -34,7 +37,10 @@ export const getUserReview = async (userId: string, activityId: string): Promise
       throw error;
     }
 
-    return data as Review;
+    return {
+      ...data,
+      user_id: data.user_id || undefined
+    } as Review;
   } catch (error) {
     console.error('Error fetching user review:', error);
     return null;
@@ -62,7 +68,10 @@ export const submitReview = async (
       .single();
 
     if (error) throw error;
-    return data as Review;
+    return {
+      ...data,
+      user_id: data.user_id || undefined
+    } as Review;
   } catch (error) {
     console.error('Error submitting review:', error);
     return null;
@@ -92,7 +101,13 @@ export const submitReviewDirect = async (
       .single();
 
     if (error) throw error;
-    return { success: true, data: data as Review };
+    return { 
+      success: true, 
+      data: {
+        ...data,
+        user_id: data.user_id || undefined
+      } as Review 
+    };
   } catch (error: any) {
     console.error('Error submitting review:', error);
     return { success: false, error: error.message || 'Failed to submit review' };
@@ -123,7 +138,10 @@ export const getReviewById = async (reviewId: string): Promise<Review | null> =>
       .single();
 
     if (error) throw error;
-    return data as Review;
+    return {
+      ...data,
+      user_id: data.user_id || undefined
+    } as Review;
   } catch (error) {
     console.error('Error fetching review:', error);
     return null;

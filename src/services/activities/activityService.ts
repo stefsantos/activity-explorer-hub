@@ -81,6 +81,17 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
     return null;
   }
 
+  // Fetch activity images
+  const { data: images, error: imagesError } = await supabase
+    .from('activity_images')
+    .select('*')
+    .eq('activity_id', id)
+    .order('display_order', { ascending: true });
+  
+  if (imagesError) {
+    console.error('Error fetching activity images:', imagesError);
+  }
+
   // Get user's review if logged in
   let userReview = null;
   if (userId) {
@@ -120,6 +131,7 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
   // Return formatted activity data
   return {
     ...activity,
+    images: images || [],
     reviews: formattedReviews,
     userReview: userReview || null
   } as ActivityDetailType;

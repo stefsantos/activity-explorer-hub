@@ -1,3 +1,4 @@
+
 export interface ActivityDetailType {
   id: string;
   title: string;
@@ -44,6 +45,14 @@ export interface ActivityDetailType {
     description: string | null;
     price: number;
     max_participants: number | null;
+  }[];
+  images: {
+    id: string;
+    activity_id: string;
+    image_url: string;
+    alt_text: string | null;
+    display_order: number;
+    created_at: string;
   }[];
   reviews: {
     id: string;
@@ -118,7 +127,7 @@ export interface Activity {
 export interface Review {
   id: string;
   activity_id: string;
-  user_id: string;
+  user_id?: string;
   reviewer_name: string;
   rating: number;
   comment: string | null;

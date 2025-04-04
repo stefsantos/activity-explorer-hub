@@ -166,6 +166,7 @@ const ActivityDetail = () => {
             <ActivityHeader 
               id={activity.id} 
               image={activity.image} 
+              images={activity.images}
               title={activity.title} 
               category={activity.category} 
               featured={activity.featured} 
