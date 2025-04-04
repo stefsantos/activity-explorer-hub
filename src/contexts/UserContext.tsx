@@ -1,7 +1,7 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { toast } from "sonner";
-import { supabase } from '@/integrations/supabase/client'; // Updated import path
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './AuthContext';
 
 type User = {
   id: string;
@@ -22,6 +22,7 @@ type UserContextType = {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
+  const { user: authUser, signOut } = useAuth();
   const [user, setUser] = useState<User | null>(null);
   const [bookmarkedActivities, setBookmarkedActivities] = useState<string[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
@@ -31,13 +32,29 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     if (savedBookmarks) {
       setBookmarkedActivities(JSON.parse(savedBookmarks));
     }
-    
-    const loggedInUser = localStorage.getItem('user');
-    if (loggedInUser) {
-      setUser(JSON.parse(loggedInUser));
-      setIsLoggedIn(true);
-    }
   }, []);
+
+  useEffect(() => {
+    if (authUser) {
+      setUser({
+        id: authUser.id,
+        name: authUser.user_metadata?.first_name 
+          ? `${authUser.user_metadata.first_name} ${authUser.user_metadata.last_name || ''}`
+          : authUser.email || 'User',
+        email: authUser.email || '',
+      });
+      setIsLoggedIn(true);
+    } else {
+      const loggedInUser = localStorage.getItem('user');
+      if (loggedInUser) {
+        setUser(JSON.parse(loggedInUser));
+        setIsLoggedIn(true);
+      } else {
+        setUser(null);
+        setIsLoggedIn(false);
+      }
+    }
+  }, [authUser]);
 
   useEffect(() => {
     if (bookmarkedActivities.length > 0) {
@@ -46,6 +63,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, [bookmarkedActivities]);
 
   const login = () => {
+    if (authUser) return;
+
     const mockUser = {
       id: '1',
       name: 'Demo User',
@@ -58,7 +77,11 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     toast("Logged in successfully");
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (authUser) {
+      await signOut();
+    }
+    
     setUser(null);
     setIsLoggedIn(false);
     localStorage.removeItem('user');
