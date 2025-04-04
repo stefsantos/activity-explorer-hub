@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useNavigate } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchActivityById, ActivityDetailType } from '@/services';
@@ -18,6 +17,7 @@ import { useUser } from '@/contexts/UserContext';
 const ActivityDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { isLoggedIn, toggleBookmark, isBookmarked, login } = useUser();
+  const navigate = useNavigate();
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
   const [mapLocation, setMapLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -129,6 +129,11 @@ const ActivityDetail = () => {
   const handleReviewSuccess = () => {
     setShowReviewForm(false);
     refetch(); // Refresh the activity data
+  };
+
+  const handleLoginRedirect = () => {
+    setIsBookingModalOpen(false);
+    navigate('/auth', { state: { returnUrl: window.location.pathname } });
   };
 
   if (isLoading) {
@@ -501,10 +506,7 @@ const ActivityDetail = () => {
               packageId={selectedPackage}
               price={getCalculatedPrice()}
               onSuccess={handleBookingSuccess}
-              onLogin={() => {
-                setIsBookingModalOpen(false);
-                login();
-              }}
+              onLogin={handleLoginRedirect}
             />
           )}
         </DialogContent>

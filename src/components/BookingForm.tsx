@@ -10,6 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { useUser } from "@/contexts/UserContext";
 import { Calendar, Mail, Phone, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const bookingFormSchema = z.object({
   first_name: z.string().min(2, "First name must be at least 2 characters"),
@@ -40,6 +41,8 @@ const BookingForm = ({
   onLogin
 }: BookingFormProps) => {
   const { isLoggedIn, user } = useUser();
+  const navigate = useNavigate();
+  
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
@@ -79,6 +82,11 @@ const BookingForm = ({
       console.error('Error in booking submission:', error);
       toast.error('Something went wrong. Please try again.');
     }
+  };
+
+  const handleLoginRedirect = () => {
+    navigate('/auth', { state: { returnUrl: window.location.pathname } });
+    onLogin(); // Close modal if needed
   };
 
   return (
@@ -178,7 +186,7 @@ const BookingForm = ({
                   type="button"
                   variant="ghost" 
                   className="text-kids-blue hover:text-kids-blue/90"
-                  onClick={onLogin}
+                  onClick={handleLoginRedirect}
                 >
                   Log in to book faster
                 </Button>
