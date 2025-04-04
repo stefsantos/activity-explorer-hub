@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useNavigate } from 'react';
-import { useParams, Link } from 'react-router-dom';
+
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchActivityById, ActivityDetailType } from '@/services';
 import { Button } from '@/components/ui/button';

@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
-import { submitReview as submitReviewDirect, deleteReview as deleteReviewDirect } from '@/services'; // Updated import path
+import { submitReviewDirect, deleteReviewDirect } from '@/services/reviews/reviewService';
 import { useUser } from '@/contexts/UserContext';
 
 type ReviewFormValues = {
@@ -26,7 +26,7 @@ interface ReviewFormProps {
 }
 
 const ReviewForm = ({ activityId, userReview, onSuccess }: ReviewFormProps) => {
-  const { isLoggedIn, login } = useUser();
+  const { isLoggedIn, login, user } = useUser();
   const [rating, setRating] = useState<number>(userReview?.rating || 0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
