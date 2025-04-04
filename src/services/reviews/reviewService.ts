@@ -14,7 +14,7 @@ export async function getReviewsByActivityId(activityId: string): Promise<Review
     return [];
   }
 
-  return data as Review[] || [];
+  return data as unknown as Review[] || [];
 }
 
 // Get a specific user's review for an activity
@@ -33,7 +33,7 @@ export async function getUserReview(userId: string, activityId: string): Promise
     return null;
   }
 
-  return data as Review;
+  return data as unknown as Review;
 }
 
 // Submit a review for an activity
@@ -43,43 +43,69 @@ export async function submitReview(
   reviewerName: string,
   rating: number,
   comment: string
-): Promise<Review> {
-  // This is a placeholder implementation for mock data
-  // In a real application, this would submit the review to an API
-  return {
-    id: `mock-${Date.now()}`,
-    activity_id: activityId,
-    user_id: userId,
-    reviewer_name: reviewerName,
-    rating: rating,
-    comment: comment,
-    review_date: new Date().toISOString(),
-  };
-}
-
-// Update an existing review
-export async function updateReview(
-  reviewId: string,
-  rating: number,
-  comment: string
-): Promise<Review> {
-  // This is a placeholder implementation for mock data
-  // In a real application, this would update the review in an API
-  return {
-    id: reviewId,
-    activity_id: "mock-activity-id",
-    user_id: "mock-user-id",
-    reviewer_name: "Mock User",
-    rating: rating,
-    comment: comment,
-    review_date: new Date().toISOString(),
-  };
+): Promise<Review | null> {
+  try {
+    const existingReview = await getUserReview(userId, activityId);
+    
+    if (existingReview) {
+      // Update existing review
+      const { data, error } = await supabase
+        .from('activity_reviews')
+        .update({
+          rating,
+          comment,
+          review_date: new Date().toISOString().split('T')[0]
+        })
+        .eq('id', existingReview.id)
+        .select()
+        .single();
+        
+      if (error) {
+        console.error('Error updating review:', error);
+        return null;
+      }
+      
+      return data as unknown as Review;
+    } else {
+      // Insert new review
+      const { data, error } = await supabase
+        .from('activity_reviews')
+        .insert({
+          activity_id: activityId,
+          user_id: userId,
+          reviewer_name: reviewerName,
+          rating,
+          comment,
+          review_date: new Date().toISOString().split('T')[0]
+        })
+        .select()
+        .single();
+        
+      if (error) {
+        console.error('Error submitting review:', error);
+        return null;
+      }
+      
+      return data as unknown as Review;
+    }
+  } catch (error) {
+    console.error('Error in submitReview:', error);
+    return null;
+  }
 }
 
 // Delete a review
 export async function deleteReview(reviewId: string): Promise<{ success: boolean; error?: string }> {
   try {
-    // In a real application, this would delete the review from an API
+    const { error } = await supabase
+      .from('activity_reviews')
+      .delete()
+      .eq('id', reviewId);
+      
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    
     return { success: true };
   } catch (error) {
     console.error('Error deleting review:', error);
@@ -90,15 +116,13 @@ export async function deleteReview(reviewId: string): Promise<{ success: boolean
 // Wrapper for submitReview that returns a consistent format
 export async function submitReviewDirect(
   activityId: string, 
+  userId: string,
+  reviewerName: string,
   rating: number, 
   comment?: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    // In a real implementation, you would get these from the user context
-    const userId = "mock-user-id";
-    const reviewerName = "Mock User";
-    
-    await submitReview(
+    const result = await submitReview(
       activityId,
       userId,
       reviewerName,
@@ -106,7 +130,11 @@ export async function submitReviewDirect(
       comment || ""
     );
     
-    return { success: true };
+    if (result) {
+      return { success: true };
+    } else {
+      return { success: false, error: 'Failed to submit review' };
+    }
   } catch (error) {
     console.error('Error submitting review:', error);
     return { success: false, error: 'Failed to submit review' };

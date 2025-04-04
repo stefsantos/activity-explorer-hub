@@ -43,7 +43,7 @@ const ReviewForm = ({ activityId, userReview, onSuccess }: ReviewFormProps) => {
   };
 
   const onSubmit = async (values: ReviewFormValues) => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn || !user) {
       toast("Please login to submit a review");
       login();
       return;
@@ -57,7 +57,14 @@ const ReviewForm = ({ activityId, userReview, onSuccess }: ReviewFormProps) => {
     setIsSubmitting(true);
     
     try {
-      const result = await submitReviewDirect(activityId, rating, values.comment || undefined);
+      const userName = user.name || 'Anonymous User';
+      const result = await submitReviewDirect(
+        activityId,
+        user.id,
+        userName,
+        rating,
+        values.comment || undefined
+      );
       
       if (result.success) {
         toast.success(userReview ? "Review updated successfully" : "Review submitted successfully");
