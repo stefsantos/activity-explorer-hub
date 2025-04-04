@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
@@ -23,6 +22,7 @@ const SearchBox = () => {
       setIsLoading(true);
       try {
         const data = await searchActivities(debouncedQuery);
+        console.log(data);
         setResults(data);
       } catch (error) {
         console.error('Error searching activities:', error);
@@ -106,7 +106,7 @@ const SearchBox = () => {
                 {results.length} results found
               </div>
               <ul>
-                {results.map((activity) => (
+                {results.map((activity: any) => (
                   <li key={activity.id} className="border-b last:border-0">
                     <Link
                       to={`/activity/${activity.id}`}
@@ -115,10 +115,10 @@ const SearchBox = () => {
                     >
                       <div 
                         className="w-10 h-10 rounded-md bg-gray-200 flex-shrink-0 mr-3 bg-cover bg-center"
-                        style={{ backgroundImage: `url(${activity.image})` }}
+                        style={{ backgroundImage: `url(${activity.image_url})` }} 
                       ></div>
                       <div className="flex-grow">
-                        <h4 className="text-gray-800 font-medium text-sm">{activity.title}</h4>
+                        <h4 className="text-gray-800 font-medium text-sm">{activity.name}</h4>
                         <div className="flex items-center text-xs text-gray-500">
                           <span className="mr-2">{activity.category}</span>
                           {activity.location && (
