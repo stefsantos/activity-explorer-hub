@@ -30,12 +30,19 @@ export async function getUserReview(userId: string, activityId: string): Promise
 }
 
 export async function submitReview(
-  userId: string,
   activityId: string,
   rating: number,
   comment?: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    // Get current user
+    const { data: sessionData } = await supabase.auth.getSession();
+    const userId = sessionData.session?.user?.id;
+    
+    if (!userId) {
+      return { success: false, error: "You must be logged in to submit a review" };
+    }
+
     // Check if user already has a review
     const { data: existingReview, error: checkError } = await supabase
       .from('activity_reviews')
@@ -67,6 +74,22 @@ export async function submitReview(
       return { success: true };
     }
 
+    // Get user profile for reviewer name
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('first_name, last_name')
+      .eq('id', userId)
+      .single();
+    
+    if (profileError) {
+      console.error('Error fetching user profile:', profileError);
+      return { success: false, error: 'Could not retrieve user information' };
+    }
+
+    const reviewerName = profileData?.first_name && profileData?.last_name 
+      ? `${profileData.first_name} ${profileData.last_name}` 
+      : 'Anonymous User';
+
     // Otherwise insert new review
     const { error: insertError } = await supabase
       .from('activity_reviews')
@@ -75,7 +98,7 @@ export async function submitReview(
         user_id: userId,
         rating,
         comment,
-        reviewer_name: 'Anonymous User' // This should be replaced with actual user's name
+        reviewer_name: reviewerName
       });
 
     if (insertError) {
@@ -95,6 +118,21 @@ export async function submitReview(
 
 export async function deleteReview(reviewId: string): Promise<{ success: boolean; error?: string }> {
   try {
+    // Get review to find activity_id before deleting
+    const { data: review, error: findError } = await supabase
+      .from('activity_reviews')
+      .select('activity_id')
+      .eq('id', reviewId)
+      .single();
+      
+    if (findError) {
+      console.error('Error finding review:', findError);
+      return { success: false, error: findError.message };
+    }
+    
+    const activityId = review?.activity_id;
+    
+    // Delete the review
     const { error } = await supabase
       .from('activity_reviews')
       .delete()
@@ -104,6 +142,11 @@ export async function deleteReview(reviewId: string): Promise<{ success: boolean
       console.error('Error deleting review:', error);
       return { success: false, error: error.message };
     }
+    
+    // Update activity ratings if we found an activity ID
+    if (activityId) {
+      await updateActivityRatings(activityId);
+    }
 
     return { success: true };
   } catch (e) {
@@ -112,34 +155,52 @@ export async function deleteReview(reviewId: string): Promise<{ success: boolean
   }
 }
 
+// Function to update activity ratings based on reviews
 async function updateActivityRatings(activityId: string): Promise<void> {
-  // Get all reviews for this activity
-  const { data: reviews, error: reviewsError } = await supabase
-    .from('activity_reviews')
-    .select('rating')
-    .eq('activity_id', activityId);
+  try {
+    // Get all reviews for this activity
+    const { data: reviews, error: reviewsError } = await supabase
+      .from('activity_reviews')
+      .select('rating')
+      .eq('activity_id', activityId);
 
-  if (reviewsError) {
-    console.error('Error fetching reviews for rating update:', reviewsError);
-    return;
-  }
-
-  // Calculate average rating
-  if (reviews && Array.isArray(reviews) && reviews.length > 0) {
-    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-    const averageRating = totalRating / reviews.length;
-
-    // Update activity with new rating and count
-    const { error: updateError } = await supabase
-      .from('activities')
-      .update({
-        rating: averageRating,
-        review_count: reviews.length
-      })
-      .eq('id', activityId);
-
-    if (updateError) {
-      console.error('Error updating activity ratings:', updateError);
+    if (reviewsError) {
+      console.error('Error fetching reviews for rating update:', reviewsError);
+      return;
     }
+
+    // Calculate average rating
+    if (reviews && Array.isArray(reviews) && reviews.length > 0) {
+      const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+      const averageRating = totalRating / reviews.length;
+
+      // Update activity with new rating and count
+      const { error: updateError } = await supabase
+        .from('activities')
+        .update({
+          rating: averageRating.toFixed(1),
+          review_count: reviews.length
+        })
+        .eq('id', activityId);
+
+      if (updateError) {
+        console.error('Error updating activity ratings:', updateError);
+      }
+    } else {
+      // No reviews, reset rating and count
+      const { error: resetError } = await supabase
+        .from('activities')
+        .update({
+          rating: null,
+          review_count: 0
+        })
+        .eq('id', activityId);
+
+      if (resetError) {
+        console.error('Error resetting activity ratings:', resetError);
+      }
+    }
+  } catch (error) {
+    console.error('Error in updateActivityRatings:', error);
   }
 }
