@@ -1,4 +1,3 @@
-
 export interface ActivityDetailType {
   id: string;
   title: string;
@@ -114,4 +113,14 @@ export interface Activity {
     latitude: number;
     longitude: number;
   } | null;
+}
+
+export interface Review {
+  id: string;
+  activity_id: string;
+  user_id: string;
+  reviewer_name: string;
+  rating: number;
+  comment: string | null;
+  review_date: string;
 }

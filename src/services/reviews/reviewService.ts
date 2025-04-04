@@ -1,16 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import type { ActivityDetailType } from "@/services/types";
-
-export interface Review {
-  id: string;
-  activity_id: string;
-  user_id: string;
-  reviewer_name: string;
-  rating: number;
-  comment: string | null;
-  review_date: string;
-}
+import type { Review } from "@/services/types";
 
 // Get all reviews for an activity
 export async function getReviewsByActivityId(activityId: string): Promise<Review[]> {
@@ -24,7 +14,7 @@ export async function getReviewsByActivityId(activityId: string): Promise<Review
     return [];
   }
 
-  return data || [];
+  return data as Review[] || [];
 }
 
 // Get a specific user's review for an activity
@@ -43,7 +33,7 @@ export async function getUserReview(userId: string, activityId: string): Promise
     return null;
   }
 
-  return data;
+  return data as Review;
 }
 
 // Submit a review for an activity
