@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { UserReviewType } from "@/services/types";
 
@@ -175,10 +176,11 @@ async function updateActivityRatings(activityId: string): Promise<void> {
       const averageRating = totalRating / reviews.length;
 
       // Update activity with new rating and count
+      // Fix: Convert the string to a number using parseFloat
       const { error: updateError } = await supabase
         .from('activities')
         .update({
-          rating: averageRating.toFixed(1),
+          rating: parseFloat(averageRating.toFixed(1)),
           review_count: reviews.length
         })
         .eq('id', activityId);
