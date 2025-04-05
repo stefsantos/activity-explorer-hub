@@ -146,13 +146,14 @@ const Index = () => {
       <section className="mb-10 relative">
         <div className="flex flex-col lg:flex-row items-center lg:items-center lg:gap-8">
           {/* Text Section */}
-          <div className="lg:w-1/2 text-center lg:text-left flex flex-col justify-center">
+          <div className="lg:w-1/3 text-center lg:text-left flex flex-col justify-center">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">
-              <span className="text-gray-800"><b>The Largest Kids Activity</b></span>
+              <span className="text-gray-800"><b>The Largest Kids Activity Platform</b></span>
             </h1>
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-              <span className="text-gray-800"><b>Platform in the </b></span>
+              <span className="text-gray-800"><b>in the </b></span>
               <span className="text-kids-orange"><b>Philippines</b></span>
+              <span className="text-gray-800"><b>.</b></span>
             </h2>
             <div className="text-center lg:text-left py-10">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">
@@ -162,7 +163,7 @@ const Index = () => {
           </div>
 
           {/* Featured Carousel */}
-          <div className="lg:w-1/2">
+          <div className="lg:w-2/3">
             <FeaturedCarousel activities={featuredActivities} />
           </div>
         </div>
