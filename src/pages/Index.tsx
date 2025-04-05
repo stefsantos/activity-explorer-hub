@@ -160,6 +160,13 @@ const Index = () => {
                 More than 1000+ Activities around the Philippines all in one place!
               </h2>
             </div>
+            <Link to="/activities">
+              <button
+                className="bg-kids-orange hover:bg-kids-orange/90 text-white py-2 px-6 rounded text-lg font-medium"
+              >
+                Explore Activities
+              </button>
+            </Link>
           </div>
 
           {/* Featured Carousel */}
