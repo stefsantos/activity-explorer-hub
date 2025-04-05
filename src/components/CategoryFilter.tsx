@@ -62,41 +62,45 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
         </div>
       </div>
       
-      <div 
-        className="relative flex overflow-x-auto pb-4 filter-scroll" 
-        ref={scrollRef}
-      >
+      <div className="flex justify-center w-full">
         <div 
-          className={cn(
-            "flex-shrink-0 mr-4 text-center cursor-pointer flex flex-col items-center",
-            selectedCategory === 'all' ? 'opacity-100' : 'opacity-80'
-          )}
-          onClick={() => onChange('all')}
+          className="relative flex overflow-x-auto pb-4 filter-scroll w-full" 
+          ref={scrollRef}
         >
-          <div className={cn(
-            "category-icon flex items-center justify-center rounded-full w-16 h-16 text-white mb-2",
-            "bg-kids-blue"
-          )}>
-            {getCategoryIcon('All')}
-          </div>
-          <span className="text-xs font-medium text-gray-700">All</span>
-        </div>
-        
-        {categories.map(category => (
-          <div 
-            key={category.id} 
-            className={cn(
-              "flex-shrink-0 mr-4 text-center cursor-pointer flex flex-col items-center",
-              selectedCategory === category.id ? 'opacity-100' : 'opacity-80'
-            )}
-            onClick={() => onChange(category.id)}
-          >
-            <div className={cn("category-icon", getCategoryColor(category.name))}>
-              {getCategoryIcon(category.name)}
+          <div className="flex w-full justify-between">
+            <div 
+              className={cn(
+                "flex-shrink-0 text-center cursor-pointer flex flex-col items-center mx-1",
+                selectedCategory === 'all' ? 'opacity-100' : 'opacity-80'
+              )}
+              onClick={() => onChange('all')}
+            >
+              <div className={cn(
+                "category-icon flex items-center justify-center rounded-full w-16 h-16 text-white mb-2",
+                "bg-kids-blue"
+              )}>
+                {getCategoryIcon('All')}
+              </div>
+              <span className="text-xs font-medium text-gray-700">All</span>
             </div>
-            <span className="text-xs font-medium text-gray-700">{category.name}</span>
+            
+            {categories.map(category => (
+              <div 
+                key={category.id} 
+                className={cn(
+                  "flex-shrink-0 text-center cursor-pointer flex flex-col items-center mx-1",
+                  selectedCategory === category.id ? 'opacity-100' : 'opacity-80'
+                )}
+                onClick={() => onChange(category.id)}
+              >
+                <div className={cn("category-icon", getCategoryColor(category.name))}>
+                  {getCategoryIcon(category.name)}
+                </div>
+                <span className="text-xs font-medium text-gray-700">{category.name}</span>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </section>
   );

@@ -1,3 +1,4 @@
+
 export interface Activity {
   id: string;
   title: string;
@@ -30,5 +31,5 @@ export interface Review {
   comment: string;
   created_at: string;
   review_date: string;
-  user_id?: string; // Make user_id optional
+  user_id?: string; // Added user_id as optional to fix TypeScript errors
 }

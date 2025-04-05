@@ -60,40 +60,44 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
         </div>
       </div>
       
-      <div 
-        className="relative flex overflow-x-auto pb-4 filter-scroll" 
-        ref={scrollRef}
-      >
-        <Button
-          variant={selectedOption === 'all' ? 'default' : 'outline'}
-          size="sm"
-          className={cn(
-            "flex-shrink-0 mr-2 rounded-full px-4",
-            selectedOption === 'all' 
-              ? 'bg-kids-teal text-white hover:bg-kids-teal/90' 
-              : 'border-kids-teal text-kids-teal hover:bg-kids-teal hover:text-white'
-          )}
-          onClick={() => onChange('all')}
+      <div className="flex justify-center w-full">
+        <div 
+          className="relative flex overflow-x-auto pb-4 filter-scroll w-full" 
+          ref={scrollRef}
         >
-          All
-        </Button>
-        
-        {options.map((option) => (
-          <Button
-            key={option.id}
-            variant={selectedOption === option.id ? 'default' : 'outline'}
-            size="sm"
-            className={cn(
-              "flex-shrink-0 mr-2 whitespace-nowrap rounded-full px-4",
-              selectedOption === option.id 
-                ? 'bg-kids-teal text-white hover:bg-kids-teal/90' 
-                : 'border-kids-teal text-kids-teal hover:bg-kids-teal hover:text-white'
-            )}
-            onClick={() => onChange(option.id)}
-          >
-            {option.name}
-          </Button>
-        ))}
+          <div className="flex space-x-2">
+            <Button
+              variant={selectedOption === 'all' ? 'default' : 'outline'}
+              size="sm"
+              className={cn(
+                "flex-shrink-0 rounded-full px-4",
+                selectedOption === 'all' 
+                  ? 'bg-kids-teal text-white hover:bg-kids-teal/90' 
+                  : 'border-kids-teal text-kids-teal hover:bg-kids-teal hover:text-white'
+              )}
+              onClick={() => onChange('all')}
+            >
+              All
+            </Button>
+            
+            {options.map((option) => (
+              <Button
+                key={option.id}
+                variant={selectedOption === option.id ? 'default' : 'outline'}
+                size="sm"
+                className={cn(
+                  "flex-shrink-0 whitespace-nowrap rounded-full px-4",
+                  selectedOption === option.id 
+                    ? 'bg-kids-teal text-white hover:bg-kids-teal/90' 
+                    : 'border-kids-teal text-kids-teal hover:bg-kids-teal hover:text-white'
+                )}
+                onClick={() => onChange(option.id)}
+              >
+                {option.name}
+              </Button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
