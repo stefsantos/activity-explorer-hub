@@ -24,6 +24,7 @@ export type Location = {
   address?: string;
   latitude: number;
   longitude: number;
+  city?: string;
 };
 
 export type AgeRange = {
@@ -44,15 +45,15 @@ export const categories: Category[] = [
 ];
 
 export const locations: Location[] = [
-  { id: "manila", name: "Manila", latitude: 14.5995, longitude: 120.9842 },
-  { id: "cebu", name: "Cebu", latitude: 10.3157, longitude: 123.8854 },
-  { id: "davao", name: "Davao", latitude: 7.1907, longitude: 125.4553 },
-  { id: "quezon", name: "Quezon City", latitude: 14.6760, longitude: 121.0437 },
-  { id: "makati", name: "Makati", latitude: 14.5547, longitude: 121.0244 },
-  { id: "pasig", name: "Pasig", latitude: 14.5764, longitude: 121.0851 },
-  { id: "taguig", name: "Taguig", latitude: 14.5176, longitude: 121.0509 },
-  { id: "baguio", name: "Baguio", latitude: 16.4023, longitude: 120.5960 },
-  { id: "iloilo", name: "Iloilo", latitude: 10.7202, longitude: 122.5621 },
+  { id: "manila", name: "Manila Central", latitude: 14.5995, longitude: 120.9842, city: "Manila" },
+  { id: "cebu", name: "Cebu City Center", latitude: 10.3157, longitude: 123.8854, city: "Cebu" },
+  { id: "davao", name: "Davao City Plaza", latitude: 7.1907, longitude: 125.4553, city: "Davao" },
+  { id: "quezon", name: "Quezon City Circle", latitude: 14.6760, longitude: 121.0437, city: "Quezon City" },
+  { id: "makati", name: "Makati CBD", latitude: 14.5547, longitude: 121.0244, city: "Makati" },
+  { id: "pasig", name: "Pasig City Hall", latitude: 14.5764, longitude: 121.0851, city: "Pasig" },
+  { id: "taguig", name: "BGC Taguig", latitude: 14.5176, longitude: 121.0509, city: "Taguig" },
+  { id: "baguio", name: "Burnham Park", latitude: 16.4023, longitude: 120.5960, city: "Baguio" },
+  { id: "iloilo", name: "Iloilo River Esplanade", latitude: 10.7202, longitude: 122.5621, city: "Iloilo" },
 ];
 
 export const ageRanges: AgeRange[] = [
@@ -232,30 +233,38 @@ export const filterActivities = (
   }
 
   if (locationFilter && locationFilter !== "all") {
-    const targetLocation = locations.find(loc => loc.id === locationFilter);
-    
-    if (targetLocation) {
-      // Filter activities by proximity to the selected location (within ~5km radius)
-      const maxDistanceKm = 5;
+    if (locationFilter.startsWith('city-')) {
+      const targetCity = locationFilter.replace('city-', '');
       
       filtered = filtered.filter(activity => {
-        // Simple distance check based on coordinates
-        // This is a simplified version for demonstration purposes
-        const activityLoc = typeof activity.location === 'string' 
-          ? locations.find(l => l.name === activity.location)
-          : null;
-          
-        if (!activityLoc) return false;
+        const activityCity = activity.city || 
+          (typeof activity.location !== 'string' ? activity.location?.city : undefined);
         
-        const distance = calculateDistance(
-          targetLocation.latitude, 
-          targetLocation.longitude,
-          activityLoc.latitude,
-          activityLoc.longitude
-        );
-        
-        return distance <= maxDistanceKm;
+        return activityCity === targetCity;
       });
+    } else {
+      const targetLocation = locations.find(loc => loc.id === locationFilter);
+      
+      if (targetLocation) {
+        const maxDistanceKm = 5;
+        
+        filtered = filtered.filter(activity => {
+          const activityLoc = typeof activity.location === 'string' 
+            ? locations.find(l => l.name === activity.location)
+            : null;
+            
+          if (!activityLoc) return false;
+          
+          const distance = calculateDistance(
+            targetLocation.latitude, 
+            targetLocation.longitude,
+            activityLoc.latitude,
+            activityLoc.longitude
+          );
+          
+          return distance <= maxDistanceKm;
+        });
+      }
     }
   }
 
@@ -275,7 +284,6 @@ export const filterActivities = (
   };
 };
 
-// Helper function to calculate distance between two points using Haversine formula
 export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
   const R = 6371; // Radius of the Earth in km
   const dLat = (lat2 - lat1) * Math.PI / 180;

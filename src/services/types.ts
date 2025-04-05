@@ -1,9 +1,11 @@
+
 export interface ActivityLocation {
   id: string;
   name: string;
   address?: string;
   latitude?: number;
   longitude?: number;
+  city?: string;
 }
 
 export interface Activity {
@@ -24,6 +26,7 @@ export interface Activity {
   created_at?: string;
   updated_at?: string;
   organizer_id?: string;
+  city?: string;
   organizer?: {
     id: string;
     name: string;

@@ -11,6 +11,7 @@ interface Location {
   latitude: number;
   longitude: number;
   address?: string;
+  city?: string;
 }
 
 interface LocationSelectorProps {
@@ -27,14 +28,19 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [locationOptions, setLocationOptions] = useState<Location[]>([]);
   const [filteredLocations, setFilteredLocations] = useState<Location[]>([]);
+  const [cityOptions, setCityOptions] = useState<string[]>([]);
   
   useEffect(() => {
     // Combine default Philippines locations with any from activities
     const locationMap = new Map<string, Location>();
+    const citiesSet = new Set<string>();
     
     // Add default locations first
     defaultLocations.forEach(location => {
       locationMap.set(location.id, location);
+      if (location.city) {
+        citiesSet.add(location.city);
+      }
     });
     
     // Add locations from activities
@@ -45,17 +51,27 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           locationMap.set(locationId, {
             id: activity.location.id,
             name: activity.location.name,
-            latitude: activity.location.latitude,
-            longitude: activity.location.longitude,
-            address: activity.location.address
+            latitude: activity.location.latitude || 0,
+            longitude: activity.location.longitude || 0,
+            address: activity.location.address,
+            city: activity.location.city || activity.city
           });
+        }
+        
+        // Add city from either location or activity
+        const city = activity.location.city || activity.city;
+        if (city) {
+          citiesSet.add(city);
         }
       }
     });
     
     const allLocations = Array.from(locationMap.values());
+    const allCities = Array.from(citiesSet);
+    
     setLocationOptions(allLocations);
     setFilteredLocations(allLocations);
+    setCityOptions(allCities.sort());
   }, [activities]);
   
   // Filter locations when search query changes
@@ -68,11 +84,29 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
     const query = searchQuery.toLowerCase();
     const filtered = locationOptions.filter(location => 
       location.name.toLowerCase().includes(query) || 
-      (location.address && location.address.toLowerCase().includes(query))
+      (location.address && location.address.toLowerCase().includes(query)) ||
+      (location.city && location.city.toLowerCase().includes(query))
     );
     
     setFilteredLocations(filtered);
   }, [searchQuery, locationOptions]);
+  
+  // Group locations by city
+  const locationsByCity: Record<string, Location[]> = {};
+  filteredLocations.forEach(location => {
+    if (location.city) {
+      if (!locationsByCity[location.city]) {
+        locationsByCity[location.city] = [];
+      }
+      locationsByCity[location.city].push(location);
+    } else {
+      // Create an "Other" category for locations without a city
+      if (!locationsByCity["Other"]) {
+        locationsByCity["Other"] = [];
+      }
+      locationsByCity["Other"].push(location);
+    }
+  });
   
   return (
     <div className="space-y-3">
@@ -100,27 +134,67 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           <span>All Locations</span>
         </div>
         
-        {filteredLocations.map(location => (
-          <div 
-            key={location.id}
-            className={`flex items-center space-x-2 p-2 rounded cursor-pointer ${
-              selectedLocation === location.id ? 'bg-amber-100 text-amber-700' : 'hover:bg-gray-100'
-            }`}
-            onClick={() => onLocationChange(location.id)}
-          >
-            <div className={`w-3 h-3 rounded-full ${
-              selectedLocation === location.id ? 'bg-amber-500' : 'border border-gray-400'
-            }`}></div>
-            <div className="flex flex-col">
-              <span className="font-medium">{location.name}</span>
-              {location.address && (
-                <span className="text-xs text-gray-500 flex items-center">
-                  <MapPin size={10} className="mr-1" /> {location.address}
-                </span>
-              )}
-            </div>
+        {/* Display cities as main filter options */}
+        {cityOptions.length > 0 && (
+          <div className="mt-2">
+            <h4 className="text-xs font-medium text-gray-500 uppercase mb-1 px-2">Cities</h4>
+            {cityOptions.map(city => {
+              // Count activities in this city
+              const locationsCount = locationsByCity[city]?.length || 0;
+              
+              return (
+                <div 
+                  key={`city-${city}`}
+                  className={`flex items-center justify-between p-2 rounded cursor-pointer ${
+                    selectedLocation === `city-${city}` ? 'bg-amber-100 text-amber-700' : 'hover:bg-gray-100'
+                  }`}
+                  onClick={() => onLocationChange(`city-${city}`)}
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-3 h-3 rounded-full ${
+                      selectedLocation === `city-${city}` ? 'bg-amber-500' : 'border border-gray-400'
+                    }`}></div>
+                    <span className="font-medium">{city}</span>
+                  </div>
+                  <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">
+                    {locationsCount}
+                  </span>
+                </div>
+              );
+            })}
           </div>
-        ))}
+        )}
+        
+        {/* Display specific locations */}
+        <div className="mt-2">
+          <h4 className="text-xs font-medium text-gray-500 uppercase mb-1 px-2">Specific Locations</h4>
+          {filteredLocations.map(location => (
+            <div 
+              key={location.id}
+              className={`flex items-center space-x-2 p-2 rounded cursor-pointer ${
+                selectedLocation === location.id ? 'bg-amber-100 text-amber-700' : 'hover:bg-gray-100'
+              }`}
+              onClick={() => onLocationChange(location.id)}
+            >
+              <div className={`w-3 h-3 rounded-full ${
+                selectedLocation === location.id ? 'bg-amber-500' : 'border border-gray-400'
+              }`}></div>
+              <div className="flex flex-col">
+                <span className="font-medium">{location.name}</span>
+                {location.city && (
+                  <span className="text-xs text-gray-500">
+                    {location.city}
+                  </span>
+                )}
+                {location.address && (
+                  <span className="text-xs text-gray-500 flex items-center">
+                    <MapPin size={10} className="mr-1" /> {location.address}
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
         
         {filteredLocations.length === 0 && (
           <div className="text-center py-3 text-gray-500">
