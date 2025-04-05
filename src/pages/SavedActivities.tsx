@@ -4,7 +4,7 @@ import ActivityCard from '@/components/ActivityCard';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { Bookmark } from 'lucide-react';
+import { Bookmark, Link } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchActivities } from '@/services';
 
@@ -76,13 +76,13 @@ const SavedActivities = () => {
         )}
       </main>
       
-      <footer className="bg-gray-800 text-white py-8">
+      <footer className="bg-gray-800 text-white py-8 mt-12">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">ActivityHub</h3>
+              <h3 className="text-lg font-semibold mb-4">LittleBranchPH</h3>
               <p className="text-gray-300">
-                Discover and book amazing activities for all ages.
+              The Largest Kids Activity Platform in the Philippines.
               </p>
             </div>
             <div>
@@ -95,12 +95,17 @@ const SavedActivities = () => {
             </div>
             <div>
               <h3 className="text-lg font-semibold mb-4">Contact</h3>
-              <p className="text-gray-300">support@activityhub.com</p>
-              <p className="text-gray-300">123-456-7890</p>
+              <p className="text-gray-300">littlebranchph@gmail.com</p>
+              <Link to={'https://www.linkedin.com/company/littlebranchph'} target="_blank">
+                <p className="text-gray-300"><i className='bx bxl-linkedin-square'></i> Littlebranch PH</p>
+              </Link>
+              <Link to={'https://www.instagram.com/littlebranchph/'} target="_blank">
+                <p className="text-gray-300"><i className='bx bxl-instagram'></i> @littlebranchph</p>
+              </Link>
             </div>
           </div>
           <div className="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} ActivityHub. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} LittleBranchPH. All rights reserved.</p>
           </div>
         </div>
       </footer>

@@ -245,8 +245,12 @@ const Index = () => {
             <div>
               <h3 className="text-lg font-semibold mb-4">Contact</h3>
               <p className="text-gray-300">littlebranchph@gmail.com</p>
-              {/* <p className="text-gray-300"><i className='bx bxl-instagram'></i> @littlebranchph</p>
-              <p className="text-gray-300"><i className='bx bxl-linkedin-square' ></i> Littlebranch PH</p> */}
+              <Link to={'https://www.linkedin.com/company/littlebranchph'} target="_blank">
+                <p className="text-gray-300"><i className='bx bxl-linkedin-square'></i> Littlebranch PH</p>
+              </Link>
+              <Link to={'https://www.instagram.com/littlebranchph/'} target="_blank">
+                <p className="text-gray-300"><i className='bx bxl-instagram'></i> @littlebranchph</p>
+              </Link>
             </div>
           </div>
           <div className="border-t border-gray-700 mt-8 pt-6 text-center text-gray-400">
