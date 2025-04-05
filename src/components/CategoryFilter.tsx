@@ -39,7 +39,7 @@ const CategoryFilter: React.FC<CategoryFilterProps> = ({
   };
 
   return (
-    <section className="mb-12">
+    <section className="mb-2">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold text-gray-800">Explore by Category</h2>
         <div className="flex space-x-2">

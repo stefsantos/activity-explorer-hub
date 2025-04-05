@@ -143,18 +143,31 @@ const Index = () => {
       <Navbar />
       
       <main className="container mx-auto px-4 py-8">
-        <section className="mb-10 text-center relative">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">
-            <span className="text-gray-800">The Largest Kids Activity</span>
-          </h1>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
-            <span className="text-gray-800">Platform in the </span>
-            <span className="text-kids-orange">Philippines.</span>
-          </h2>
-          
-          <FeaturedCarousel activities={featuredActivities} />
-        </section>
-        
+      <section className="mb-10 relative">
+        <div className="flex flex-col lg:flex-row items-center lg:items-center lg:gap-8">
+          {/* Text Section */}
+          <div className="lg:w-1/2 text-center lg:text-left flex flex-col justify-center">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">
+              <span className="text-gray-800"><b>The Largest Kids Activity</b></span>
+            </h1>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+              <span className="text-gray-800"><b>Platform in the </b></span>
+              <span className="text-kids-orange"><b>Philippines</b></span>
+            </h2>
+            <div className="text-center lg:text-left py-10">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                More than 1000+ Activities around the Philippines all in one place!
+              </h2>
+            </div>
+          </div>
+
+          {/* Featured Carousel */}
+          <div className="lg:w-1/2">
+            <FeaturedCarousel activities={featuredActivities} />
+          </div>
+        </div>
+      </section>
+
         {/* <section className="mb-12">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Our Most Popular Activities</h2>
@@ -177,8 +190,6 @@ const Index = () => {
       }} getCategoryIcon={getCategoryIcon} getCategoryColor={getCategoryColor} />
         
         <section className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Find the Perfect Activity</h2>
-          
           <CityFilterCarousel 
             title="Cities in the Philippines" 
             cities={cities} 
