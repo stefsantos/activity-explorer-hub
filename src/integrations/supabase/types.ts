@@ -23,7 +23,7 @@ export type Database = {
           max_age: number | null
           min_age: number | null
           organizer_id: string | null
-          price: number | null
+          price: number
           rating: number | null
           review_count: number | null
           schedule: string | null
@@ -43,7 +43,7 @@ export type Database = {
           max_age?: number | null
           min_age?: number | null
           organizer_id?: string | null
-          price?: number | null
+          price: number
           rating?: number | null
           review_count?: number | null
           schedule?: string | null
@@ -63,7 +63,7 @@ export type Database = {
           max_age?: number | null
           min_age?: number | null
           organizer_id?: string | null
-          price?: number | null
+          price?: number
           rating?: number | null
           review_count?: number | null
           schedule?: string | null
