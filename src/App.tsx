@@ -16,6 +16,7 @@ import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Analytics } from "@vercel/analytics/react"
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
         </BrowserRouter>
       </UserProvider>
     </AuthProvider>
+    <Analytics/>
   </QueryClientProvider>
 );
 
