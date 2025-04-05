@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { Facebook, Mail } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import ActivityFooter from '@/components/activity/ActivityFooter';
 
 const signInFormSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -334,6 +335,7 @@ const Auth = () => {
         </CardContent>
       </Card>
     </div>
+    <ActivityFooter />
     </>);
 };
 
