@@ -173,7 +173,7 @@ const ActivityList = () => {
       "Cooking": "bg-red-500",
       "Technology": "bg-yellow-500",
       "Gaming": "bg-green-500",
-      "Wellness": "bg-teal-500",
+      "Entertainment": "bg-teal-500",
     };
     
     return categoryColors[category] || "bg-gray-500";

@@ -43,7 +43,7 @@ export const categories: Category[] = [
   { id: "music", name: "Music" },
   { id: "technology", name: "Technology" },
   { id: "gaming", name: "Gaming" },
-  { id: "wellness", name: "Wellness" },
+  { id: "entertainment", name: "Entertainment" },
 ];
 
 export const locations: Location[] = [
@@ -188,7 +188,7 @@ export const activities: Activity[] = [
     description: "Relaxing yoga sessions designed specifically for teenagers.",
     image: "https://images.unsplash.com/photo-1599447292412-5357cbde6c7b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80",
     location: "Parañaque City Center",
-    category: "Wellness",
+    category: "Entertainment",
     ageRange: "13-17 years",
     price: 30,
     rating: 4.6,
