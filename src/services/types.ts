@@ -51,7 +51,7 @@ export interface ActivityDetailType extends Activity {
   duration: string;
   group_size: string;
   location_id: string;
-  price_includes: string[];
+  price_includes?: string[];
   requirements: string[];
   expectations: string[];
   organizer: {
@@ -59,6 +59,7 @@ export interface ActivityDetailType extends Activity {
     name: string;
     bio: string;
     logo: string;
+    description?: string;
   };
 }
 
@@ -70,9 +71,11 @@ export interface OrganizerDetailType {
   contact_email: string;
   contact_phone: string;
   website: string;
+  description?: string;
   social_media: {
     facebook?: string;
     instagram?: string;
     twitter?: string;
   };
+  activities?: Activity[];
 }

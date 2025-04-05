@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { ActivityDetailType } from "../types";
 import { getUserReview } from "../reviews/reviewService";
@@ -8,7 +7,7 @@ export async function fetchActivities() {
     .from('activities')
     .select(`
       *,
-      location:location_id(id, name, address, latitude, longitude),
+      location:location_id(id, name, address, latitude, longitude, city),
       organizer:organizer_id(id, name, description)
     `);
 
@@ -25,7 +24,7 @@ export async function fetchFeaturedActivities() {
     .from('activities')
     .select(`
       *,
-      location:location_id(id, name, address, latitude, longitude),
+      location:location_id(id, name, address, latitude, longitude, city),
       organizer:organizer_id(id, name, description)
     `)
     .eq('featured', true);
@@ -43,7 +42,7 @@ export async function fetchPopularActivities(limit = 4) {
     .from('activities')
     .select(`
       *,
-      location:location_id(id, name, address, latitude, longitude),
+      location:location_id(id, name, address, latitude, longitude, city),
       organizer:organizer_id(id, name, description)
     `)
     .order('rating', { ascending: false })
@@ -66,9 +65,9 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
     .from('activities')
     .select(`
       *,
-      location:location_id(id, name, address, latitude, longitude),
+      location:location_id(id, name, address, latitude, longitude, city),
       organizer:organizer_id(id, name, description),
-      variants:activity_variants(*, location:location_id(id, name, address, latitude, longitude)),
+      variants:activity_variants(*, location:location_id(id, name, address, latitude, longitude, city)),
       packages:activity_packages(*),
       requirements:activity_requirements(*),
       expectations:activity_expectations(*)
@@ -133,8 +132,9 @@ export async function fetchActivityById(id: string): Promise<ActivityDetailType 
     ...activity,
     images: images || [],
     reviews: formattedReviews,
-    userReview: userReview || null
-  } as ActivityDetailType;
+    userReview: userReview || null,
+    price_includes: [] // Add this to fix the TypeScript error
+  } as unknown as ActivityDetailType;
 }
 
 async function fetchActivityVariants(activityId: string) {
@@ -142,7 +142,7 @@ async function fetchActivityVariants(activityId: string) {
     .from('activity_variants')
     .select(`
       *,
-      location:location_id(id, name, address, latitude, longitude)
+      location:location_id(id, name, address, latitude, longitude, city)
     `)
     .eq('activity_id', activityId);
 

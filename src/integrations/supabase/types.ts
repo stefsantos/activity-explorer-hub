@@ -12,6 +12,7 @@ export type Database = {
       activities: {
         Row: {
           category: string
+          city: string | null
           created_at: string
           description: string
           duration: string | null
@@ -32,6 +33,7 @@ export type Database = {
         }
         Insert: {
           category: string
+          city?: string | null
           created_at?: string
           description: string
           duration?: string | null
@@ -52,6 +54,7 @@ export type Database = {
         }
         Update: {
           category?: string
+          city?: string | null
           created_at?: string
           description?: string
           duration?: string | null
@@ -224,6 +227,7 @@ export type Database = {
       activity_locations: {
         Row: {
           address: string
+          city: string | null
           created_at: string
           id: string
           latitude: number
@@ -232,6 +236,7 @@ export type Database = {
         }
         Insert: {
           address: string
+          city?: string | null
           created_at?: string
           id?: string
           latitude: number
@@ -240,6 +245,7 @@ export type Database = {
         }
         Update: {
           address?: string
+          city?: string | null
           created_at?: string
           id?: string
           latitude?: number
