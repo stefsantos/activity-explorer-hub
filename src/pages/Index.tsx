@@ -1,9 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import ActivityCard from '@/components/ActivityCard';
 import FeaturedCarousel from '@/components/FeaturedCarousel';
 import FilterCarousel from '@/components/FilterCarousel';
+import CityFilterCarousel from '@/components/CityFilterCarousel';
 import CategoryFilter from '@/components/CategoryFilter';
 import Pagination from '@/components/Pagination';
 import Navbar from '@/components/Navbar';
@@ -11,6 +13,7 @@ import { categories, locations, ageRanges } from '@/data/activities';
 import { Palette, Users, Mountain, BookOpen, Music, Utensils, HeartPulse, FlaskConical } from 'lucide-react';
 import { fetchFeaturedActivities, fetchPopularActivities, fetchActivities } from '@/services';
 import { useQuery } from '@tanstack/react-query';
+
 const Index = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
@@ -18,32 +21,55 @@ const Index = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
+  
+  // Get unique cities from locations
+  const cities = [...new Set(locations.map(loc => loc.city))]
+    .filter(Boolean)
+    .map(city => ({ id: city?.toLowerCase() || '', name: city || '' }));
+  
   const {
     data: allActivities = []
   } = useQuery({
     queryKey: ['activities'],
     queryFn: fetchActivities
   });
+  
   const {
     data: featuredActivities = []
   } = useQuery({
     queryKey: ['featuredActivities'],
     queryFn: fetchFeaturedActivities
   });
+  
   const {
     data: popularActivities = []
   } = useQuery({
     queryKey: ['popularActivities'],
     queryFn: () => fetchPopularActivities(4)
   });
+  
   useEffect(() => {
     let filtered = [...allActivities];
+    
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(activity => activity.category.toLowerCase() === categoryFilter.toLowerCase());
     }
-    if (locationFilter !== 'all' && locationFilter !== '') {
-      filtered = filtered.filter(activity => activity.location && activity.location.name.toLowerCase() === locationFilter.toLowerCase());
+    
+    if (locationFilter !== 'all') {
+      if (locationFilter.startsWith('city-')) {
+        // Filter by city
+        const city = locationFilter.replace('city-', '');
+        filtered = filtered.filter(activity => activity.city === city);
+      } else {
+        // Filter by specific location
+        filtered = filtered.filter(activity => 
+          activity.location && 
+          typeof activity.location === 'string' && 
+          activity.location.toLowerCase() === locationFilter.toLowerCase()
+        );
+      }
     }
+    
     if (ageRangeFilter !== 'all' && ageRangeFilter !== '') {
       filtered = filtered.filter(activity => {
         if (ageRangeFilter === 'toddler') return activity.min_age === 0 && activity.max_age === 3;
@@ -56,6 +82,7 @@ const Index = () => {
         return true;
       });
     }
+    
     const itemsPerPage = 6;
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
     setTotalPages(totalPages);
@@ -63,6 +90,7 @@ const Index = () => {
     const paginatedActivities = filtered.slice(startIndex, startIndex + itemsPerPage);
     setFilteredActivities(paginatedActivities);
   }, [allActivities, categoryFilter, locationFilter, ageRangeFilter, currentPage]);
+  
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({
@@ -70,6 +98,7 @@ const Index = () => {
       behavior: 'smooth'
     });
   };
+  
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'Arts & Crafts':
@@ -90,6 +119,7 @@ const Index = () => {
         return <Users size={24} />;
     }
   };
+  
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'Arts & Crafts':
@@ -110,6 +140,7 @@ const Index = () => {
         return 'bg-kids-pink';
     }
   };
+  
   return <div className="min-h-screen bg-gray-50">
       <Navbar />
       
@@ -150,10 +181,15 @@ const Index = () => {
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Find the Perfect Activity</h2>
           
-          <FilterCarousel title="Locations" options={locations} selectedOption={locationFilter} onChange={id => {
-          setLocationFilter(id);
-          setCurrentPage(1);
-        }} />
+          <CityFilterCarousel 
+            title="Cities in the Philippines" 
+            cities={cities} 
+            selectedCity={locationFilter} 
+            onChange={id => {
+              setLocationFilter(id);
+              setCurrentPage(1);
+            }} 
+          />
           
           <FilterCarousel title="Age Ranges" options={ageRanges} selectedOption={ageRangeFilter} onChange={id => {
           setAgeRangeFilter(id);

@@ -260,10 +260,8 @@ export const filterActivities = (
       const targetCity = locationFilter.replace('city-', '');
       
       filtered = filtered.filter(activity => {
-        const activityCity = activity.city || 
-          (typeof activity.location !== 'string' ? activity.location?.city : undefined);
-        
-        return activityCity === targetCity;
+        // Use the city field directly from the activity
+        return activity.city === targetCity;
       });
     } else {
       const targetLocation = locations.find(loc => loc.id === locationFilter);
