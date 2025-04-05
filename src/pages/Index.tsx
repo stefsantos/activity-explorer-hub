@@ -10,7 +10,7 @@ import CategoryFilter from '@/components/CategoryFilter';
 import Pagination from '@/components/Pagination';
 import Navbar from '@/components/Navbar';
 import { categories, locations, ageRanges } from '@/data/activities';
-import { Palette, Users, Mountain, BookOpen, Music, Utensils, HeartPulse, FlaskConical } from 'lucide-react';
+import { Palette, Users, Mountain, BookOpen, Music, Utensils, HeartPulse, FlaskConical, Monitor, Popcorn, Gamepad2 } from 'lucide-react';
 import { fetchFeaturedActivities, fetchPopularActivities, fetchActivities } from '@/services';
 import { useQuery } from '@tanstack/react-query';
 import ActivityFooter from '@/components/activity/ActivityFooter';
@@ -107,6 +107,12 @@ const Index = () => {
         return <Mountain size={24} />;
       case 'Education':
         return <BookOpen size={24} />;
+      case 'Gaming':
+        return <Gamepad2 size={24} />;
+      case 'Entertainment':
+        return <Popcorn size={24} />;
+      case 'Monitor':
+        return <Monitor size={24} />;
       case 'Music':
         return <Music size={24} />;
       case 'Cooking':
@@ -116,28 +122,34 @@ const Index = () => {
       default:
         return <Users size={24} />;
     }
-  };
+  };  
   
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'Arts & Crafts':
-        return 'bg-kids-teal';
+        return 'bg-[#F3EE16]'; // Bright yellow
       case 'Sports':
-        return 'bg-kids-yellow';
+        return 'bg-[#41DBBE]'; // Vibrant teal
       case 'Outdoors':
-        return 'bg-kids-green';
+        return 'bg-[#26902A]'; // Bold green
       case 'Education':
-        return 'bg-kids-blue';
+        return 'bg-[#425E9C]'; // Deep blue
       case 'Music':
-        return 'bg-kids-purple';
+        return 'bg-[#AD59B0]'; // Rich purple
       case 'Cooking':
-        return 'bg-kids-orange';
+        return 'bg-[#F06F5D]'; // Soft red-orange
       case 'Science':
-        return 'bg-kids-lime';
+        return 'bg-[#BDC939]'; // Lime green
+      case 'Gaming':
+        return 'bg-[#FF4B4B]'; // Bright red
+      case 'Entertainment':
+        return 'bg-[#F38B9A]'; // Playful pink
+      case 'Monitor':
+        return 'bg-[#D58C3D]'; // Earthy orange-brown
       default:
-        return 'bg-kids-pink';
+        return 'bg-gray-300'; // Neutral fallback color
     }
-  };
+  };  
   
   return <div className="min-h-screen bg-gray-50">
       <Navbar />
