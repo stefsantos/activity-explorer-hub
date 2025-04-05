@@ -60,7 +60,8 @@ const ActivityDetail = () => {
 
   const handleBookNow = () => {
     if (isLoggedIn) {
-      showSuccessToast();
+      // showSuccessToast();
+      setIsBookingModalOpen(true);
     } else {
       setIsBookingModalOpen(true);
     }
