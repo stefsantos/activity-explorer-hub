@@ -71,7 +71,7 @@ const SearchBox = () => {
           placeholder="Search activities..."
           value={query}
           onChange={handleInputChange}
-          className="w-full sm:w-64 pl-10 pr-10 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-kids-blue/30 focus:bg-white"
+          className="w-full sm:w-[800px] pl-10 pr-10 py-2 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-kids-blue/30 focus:bg-white"
           onFocus={() => query.trim().length > 0 && setIsOpen(true)}
         />
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />

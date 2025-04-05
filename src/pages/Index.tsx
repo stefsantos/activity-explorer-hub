@@ -231,7 +231,7 @@ const Index = () => {
       <Button 
         variant="ghost" 
         size="lg" 
-        className="fixed bottom-12 left-1/2 transform -translate-x-1/2 bg-kids-orange hover:bg-kids-orange/90 text-white shadow-lg rounded-full px-6 py-4 z-50 flex items-center gap-2" 
+        className="fixed bottom-12 left-1/2 transform -translate-x-1/2 bg-orange-500 hover:bg-orange-600 text-white shadow-lg rounded-full px-6 py-4 z-50 flex items-center gap-2"
         onClick={() => setIsMapDialogOpen(true)}
         aria-label="View map"
       >
