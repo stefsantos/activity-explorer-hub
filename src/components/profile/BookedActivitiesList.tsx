@@ -79,60 +79,69 @@ const BookedActivitiesList = ({ bookings, isLoading }: BookedActivitiesListProps
   }
 
   return (
-    <div className="space-y-4">
-      {bookings.map((booking) => (
-        <Card key={booking.id} className="bg-white rounded-lg shadow overflow-hidden">
-          <CardContent className="p-0">
-            <div className="flex flex-col sm:flex-row">
-              <div 
-                className="w-full sm:w-36 h-36 bg-cover bg-center"
-                style={{
-                  backgroundImage: `url(${booking.activity?.image || '/placeholder.svg'})`
-                }}
-              ></div>
-              <div className="p-4 flex-1">
-                <h3 className="font-semibold text-lg mb-1">{booking.activity?.title || 'Activity'}</h3>
-                
-                <div className="space-y-2 mb-3">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    <span>
-                      {booking.booking_date ? format(new Date(booking.booking_date), 'PPP') : 'Date not specified'}
-                    </span>
-                  </div>
-                  
-                  {booking.variant && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Clock className="w-4 h-4 mr-2" />
-                      <span>{booking.variant.name}</span>
-                    </div>
-                  )}
-                  
-                  {booking.package && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Package className="w-4 h-4 mr-2" />
-                      <span>{booking.package.name}</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="flex justify-between items-center">
-                  <span className="font-semibold text-kids-teal">₱{booking.price}</span>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => navigate(`/activity/${booking.activity?.id}`)}
-                  >
-                    View Details
-                  </Button>
-                </div>
+<div className="space-y-4">
+  {bookings.map((booking) => (
+    <Card key={booking.id} className="bg-white rounded-lg shadow overflow-hidden">
+      <CardContent className="p-0">
+        <div className="flex flex-col sm:flex-row relative">
+          {/* Status at the top-right */}
+          <div
+            className={`absolute top-4 right-4 text-sm rounded-full px-3 py-1 ${
+              booking.status === 'Confirmed'
+                ? 'bg-green-100 text-green-800'
+                : 'bg-gray-100 text-gray-800'
+            }`}
+          >
+            {booking.status}
+          </div>
+          <div 
+            className="w-full sm:w-36 h-36 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${booking.activity?.image || '/placeholder.svg'})`
+            }}
+          ></div>
+          <div className="p-4 flex-1">
+            <h3 className="font-semibold text-lg mb-1">{booking.activity?.title || 'Activity'}</h3>
+            
+            <div className="space-y-2 mb-3">
+              <div className="flex items-center text-sm text-gray-600">
+                <Calendar className="w-4 h-4 mr-2" />
+                <span>
+                  {booking.booking_date ? format(new Date(booking.booking_date), 'PPP') : 'Date not specified'}
+                </span>
               </div>
+              
+              {booking.variant && (
+                <div className="flex items-center text-sm text-gray-600">
+                  <Clock className="w-4 h-4 mr-2" />
+                  <span>{booking.variant.name}</span>
+                </div>
+              )}
+              
+              {booking.package && (
+                <div className="flex items-center text-sm text-gray-600">
+                  <Package className="w-4 h-4 mr-2" />
+                  <span>{booking.package.name}</span>
+                </div>
+              )}
             </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+            
+            <div className="flex justify-between items-center">
+              <span className="font-semibold text-kids-teal">₱{booking.price}</span>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate(`/activity/${booking.activity?.id}`)}
+              >
+                View Details
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  ))}
+</div>
   );
 };
-
 export default BookedActivitiesList;
