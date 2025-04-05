@@ -79,13 +79,14 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
           {/* Price and Book Now button */}
           <div className="mt-auto flex items-center justify-between">
             <span className="text-lg font-bold">₱{activity.price}</span>
-            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white rounded-full" onClick={e => {
+            {/* <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white rounded-full" onClick={e => {
             e.preventDefault(); // Stop link navigation
             // Additional booking button functionality could go here
           }}>
               <Calendar size={14} className="mr-1" />
               Book Now
-            </Button>
+            </Button> */}
+            <div></div>
           </div>
         </div>
       </div>
