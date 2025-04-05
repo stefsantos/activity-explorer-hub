@@ -9,6 +9,17 @@ interface ActivityDetailsTabProps {
 }
 
 const ActivityDetailsTab = ({ activity }: ActivityDetailsTabProps) => {
+  const getAgeRangeText = () => {
+    if (activity.min_age !== null && activity.max_age !== null) {
+      return `${activity.min_age}-${activity.max_age} years`;
+    } else if (activity.min_age !== null) {
+      return `${activity.min_age}+ years`;
+    } else if (activity.max_age !== null) {
+      return `Up to ${activity.max_age} years`;
+    }
+    return "All ages";
+  };
+
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm">
       <h3 className="text-lg font-semibold mb-4 text-gray-800">Activity Details</h3>
@@ -39,9 +50,7 @@ const ActivityDetailsTab = ({ activity }: ActivityDetailsTabProps) => {
           <div>
             <h4 className="font-medium text-gray-700">Age Range</h4>
             <p className="text-gray-600">
-              {activity.min_age && activity.max_age 
-                ? `${activity.min_age} - ${activity.max_age} years`
-                : 'Not specified'}
+              {getAgeRangeText()}
             </p>
           </div>
         </div>
