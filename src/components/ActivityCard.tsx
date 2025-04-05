@@ -28,38 +28,34 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, size = 'regular' 
   };
 
   return (
-    <div className="activity-card h-full">
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden h-full flex flex-col">
+    <Link to={`/activity/${activity.id}`} className="activity-card h-full block">
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden h-full flex flex-col hover:shadow-md transition-shadow duration-300">
         {/* Activity Image */}
-        <Link to={`/activity/${activity.id}`} className="block">
-          <div className="relative">
-            <img 
-              src={activity.image} 
-              alt={activity.title} 
-              className="w-full h-48 object-cover"
-            />
-            
-            {/* Category tag */}
-            <div className="absolute top-3 left-3">
-              <span className="bg-amber-500 text-white text-xs px-3 py-1 rounded-full font-medium">
-                {activity.category}
-              </span>
-            </div>
-            
-            {/* Age range badge */}
-            <div className="absolute top-3 right-3">
-              <span className="bg-white text-gray-700 text-xs px-3 py-1 rounded-full font-medium shadow-sm">
-                {getAgeRangeText()}
-              </span>
-            </div>
+        <div className="relative">
+          <img 
+            src={activity.image} 
+            alt={activity.title} 
+            className="w-full h-48 object-cover"
+          />
+          
+          {/* Category tag */}
+          <div className="absolute top-3 left-3">
+            <span className="bg-amber-500 text-white text-xs px-3 py-1 rounded-full font-medium">
+              {activity.category}
+            </span>
           </div>
-        </Link>
+          
+          {/* Age range badge */}
+          <div className="absolute top-3 right-3">
+            <span className="bg-white text-gray-700 text-xs px-3 py-1 rounded-full font-medium shadow-sm">
+              {getAgeRangeText()}
+            </span>
+          </div>
+        </div>
         
         {/* Activity Details */}
         <div className="p-4 flex flex-col flex-grow">
-          <Link to={`/activity/${activity.id}`} className="block">
-            <h3 className="font-bold text-gray-800 text-lg truncate mb-1">{activity.title}</h3>
-          </Link>
+          <h3 className="font-bold text-gray-800 text-lg truncate mb-1">{activity.title}</h3>
           
           {/* Location with MapPin icon */}
           {activity.location && (
@@ -90,14 +86,17 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, size = 'regular' 
           {/* Price and Book Now button */}
           <div className="mt-auto flex items-center justify-between">
             <span className="text-lg font-bold">₱{activity.price}</span>
-            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white rounded-full">
+            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white rounded-full" onClick={(e) => {
+              e.preventDefault(); // Stop link navigation
+              // Additional booking button functionality could go here
+            }}>
               <Calendar size={14} className="mr-1" />
               Book Now
             </Button>
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
