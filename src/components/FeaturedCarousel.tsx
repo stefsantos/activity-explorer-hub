@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, MapPin, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -61,7 +62,12 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
       <div className="flex transition-transform duration-500 ease-in-out w-full h-full" style={{
       transform: `translateX(-${currentIndex * 100}%)`
     }}>
-        {activities.map(activity => <div key={activity.id} className="featured-slide w-full h-full flex-shrink-0 relative">
+        {activities.map(activity => (
+          <Link
+            key={activity.id}
+            to={`/activity/${activity.id}`}
+            className="featured-slide w-full h-full flex-shrink-0 relative"
+          >
             <img src={activity.image} alt={activity.title} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent shadow-[inset_0_-50px_50px_rgba(0,0,0,0.6)]">
               <div className="absolute bottom-0 left-0 p-6 text-white w-full text-left">
@@ -69,7 +75,6 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
                   Featured
                 </span>
                 <h2 className="text-3xl md:text-4xl font-bold mb-2">{activity.title}</h2>
-                
                 
                 <div className="flex flex-wrap gap-3 mb-4">
                   <div className="flex items-center bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs">
@@ -85,25 +90,34 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
                   </div>
                 </div>
                 
-                <Link to={`/activity/${activity.id}`}>
-                  
-                </Link>
+                <Button variant="default" className="bg-kids-blue hover:bg-kids-blue/90">
+                  View Details
+                </Button>
               </div>
             </div>
-          </div>)}
+          </Link>
+        ))}
       </div>
 
       {/* Navigation Arrows */}
-      <button className="absolute top-1/2 left-4 -translate-y-1/2 p-3 bg-white/80 rounded-full shadow-md hover:bg-white transition-colors" onClick={goToPrevious} aria-label="Previous slide">
+      <button 
+        className="absolute top-1/2 left-4 -translate-y-1/2 p-3 bg-white/80 rounded-full shadow-md hover:bg-white transition-colors z-10" 
+        onClick={goToPrevious} 
+        aria-label="Previous slide"
+      >
         <ChevronLeft size={20} className="text-kids-blue" />
       </button>
       
-      <button className="absolute top-1/2 right-4 -translate-y-1/2 p-3 bg-white/80 rounded-full shadow-md hover:bg-white transition-colors" onClick={goToNext} aria-label="Next slide">
+      <button 
+        className="absolute top-1/2 right-4 -translate-y-1/2 p-3 bg-white/80 rounded-full shadow-md hover:bg-white transition-colors z-10" 
+        onClick={goToNext} 
+        aria-label="Next slide"
+      >
         <ChevronRight size={20} className="text-kids-blue" />
       </button>
 
       {/* Indicators */}
-      <div className="absolute bottom-6 left-6 flex space-x-2">
+      <div className="absolute bottom-6 left-6 flex space-x-2 z-10">
         {activities.map((_, index) => <button key={index} className={cn("w-3 h-3 rounded-full transition-all", currentIndex === index ? "bg-white w-6" : "bg-white/50 hover:bg-white/70")} onClick={() => goToSlide(index)} aria-label={`Go to slide ${index + 1}`}></button>)}
       </div>
     </div>;
