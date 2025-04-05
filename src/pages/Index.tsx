@@ -18,6 +18,7 @@ const Index = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
   const [ageRangeFilter, setAgeRangeFilter] = useState('all');
+  const [ageRange, setAgeRange] = useState<[number, number]>([1, 16]);
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -52,7 +53,7 @@ const Index = () => {
     let filtered = [...allActivities];
     
     if (categoryFilter !== 'all') {
-      filtered = filtered.filter(activity => activity.category.toLowerCase() === categoryFilter.toLowerCase());
+      filtered = filtered.filter(activity => activity.category && activity.category.toLowerCase && activity.category.toLowerCase() === categoryFilter.toLowerCase());
     }
     
     if (locationFilter !== 'all') {
@@ -70,18 +71,12 @@ const Index = () => {
       }
     }
     
-    if (ageRangeFilter !== 'all' && ageRangeFilter !== '') {
-      filtered = filtered.filter(activity => {
-        if (ageRangeFilter === 'toddler') return activity.min_age === 0 && activity.max_age === 3;
-        if (ageRangeFilter === 'preschool') return activity.min_age === 3 && activity.max_age === 5;
-        if (ageRangeFilter === 'children') return activity.min_age === 6 && activity.max_age === 12;
-        if (ageRangeFilter === 'teens') return activity.min_age === 13 && activity.max_age === 17;
-        if (ageRangeFilter === 'youngAdults') return activity.min_age === 18 && activity.max_age === 25;
-        if (ageRangeFilter === 'adults') return activity.min_age === 25;
-        if (ageRangeFilter === 'family') return true;
-        return true;
-      });
-    }
+    // Filter by age range slider
+    filtered = filtered.filter(activity => {
+      const minAge = activity.min_age || 0;
+      const maxAge = activity.max_age || 18;
+      return minAge <= ageRange[1] && maxAge >= ageRange[0];
+    });
     
     const itemsPerPage = 6;
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
@@ -89,7 +84,7 @@ const Index = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const paginatedActivities = filtered.slice(startIndex, startIndex + itemsPerPage);
     setFilteredActivities(paginatedActivities);
-  }, [allActivities, categoryFilter, locationFilter, ageRangeFilter, currentPage]);
+  }, [allActivities, categoryFilter, locationFilter, ageRange, currentPage]);
   
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -191,10 +186,21 @@ const Index = () => {
             }} 
           />
           
-          <FilterCarousel title="Age Ranges" options={ageRanges} selectedOption={ageRangeFilter} onChange={id => {
-          setAgeRangeFilter(id);
-          setCurrentPage(1);
-        }} />
+          <FilterCarousel 
+            title="Age Ranges" 
+            options={ageRanges} 
+            selectedOption={ageRangeFilter} 
+            onChange={id => {
+              setAgeRangeFilter(id);
+              setCurrentPage(1);
+            }}
+            isAgeFilter={true}
+            ageRange={ageRange}
+            onAgeRangeChange={(value) => {
+              setAgeRange(value);
+              setCurrentPage(1);
+            }}
+          />
         </section>
         
         <section id="activity-list" className="mb-12">
