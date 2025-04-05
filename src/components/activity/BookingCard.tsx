@@ -28,7 +28,7 @@ const BookingCard = ({
       <h1 className="text-2xl font-bold text-gray-800 mb-2">{activity.title}</h1>
       
       <div className="flex items-center mb-4">
-        <span className="text-2xl font-bold text-kids-teal">${getCalculatedPrice()}</span>
+        <span className="text-2xl font-bold text-kids-teal">₱{getCalculatedPrice()}</span>
         {selectedPackage && (
           <span className="ml-2 text-sm text-gray-500">per package</span>
         )}
