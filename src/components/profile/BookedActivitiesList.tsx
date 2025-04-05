@@ -1,11 +1,10 @@
 
 import React from 'react';
-import { Calendar, Clock, Package, Tag } from 'lucide-react';
+import { Calendar, Clock, Package } from 'lucide-react';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { Badge } from '@/components/ui/badge';
 
 interface BookingType {
   id: string;
@@ -79,19 +78,6 @@ const BookedActivitiesList = ({ bookings, isLoading }: BookedActivitiesListProps
     );
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'confirmed':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-amber-100 text-amber-800';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
     <div className="space-y-4">
       {bookings.map((booking) => (
@@ -105,12 +91,7 @@ const BookedActivitiesList = ({ bookings, isLoading }: BookedActivitiesListProps
                 }}
               ></div>
               <div className="p-4 flex-1">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-lg">{booking.activity?.title || 'Activity'}</h3>
-                  <Badge className={getStatusColor(booking.status)}>
-                    {booking.status || 'Pending'}
-                  </Badge>
-                </div>
+                <h3 className="font-semibold text-lg mb-1">{booking.activity?.title || 'Activity'}</h3>
                 
                 <div className="space-y-2 mb-3">
                   <div className="flex items-center text-sm text-gray-600">
@@ -133,20 +114,10 @@ const BookedActivitiesList = ({ bookings, isLoading }: BookedActivitiesListProps
                       <span>{booking.package.name}</span>
                     </div>
                   )}
-                  
-                  {booking.activity?.category && (
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Tag className="w-4 h-4 mr-2" />
-                      <span>{booking.activity.category}</span>
-                    </div>
-                  )}
                 </div>
                 
                 <div className="flex justify-between items-center">
-                  <div>
-                    <span className="font-semibold text-kids-teal">${booking.price}</span>
-                    <span className="text-sm text-gray-500 ml-1">per person</span>
-                  </div>
+                  <span className="font-semibold text-kids-teal">${booking.price}</span>
                   <Button 
                     variant="outline" 
                     size="sm"

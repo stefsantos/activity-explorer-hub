@@ -83,8 +83,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setUser(JSON.parse(loggedInUser));
         setIsLoggedIn(true);
         
-        // For demo users, we still try to load bookings based on email
-        refreshBookings();
+        // For demo users, we can't load real bookings so we clear them
+        setUserBookings([]);
       } else {
         setUser(null);
         setIsLoggedIn(false);
@@ -114,11 +114,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setUserBookings(data as Booking[]);
       } else if (error) {
         console.error('Error fetching bookings:', error);
-        toast.error('Failed to load your bookings');
       }
     } catch (error) {
       console.error('Error in refreshBookings:', error);
-      toast.error('An error occurred while loading your bookings');
     } finally {
       setIsLoadingBookings(false);
     }
@@ -136,10 +134,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setUser(mockUser);
     setIsLoggedIn(true);
     localStorage.setItem('user', JSON.stringify(mockUser));
-    toast.success("Logged in successfully");
-    
-    // Try to load bookings for demo user
-    refreshBookings();
+    toast("Logged in successfully");
   };
 
   const logout = async () => {
@@ -151,21 +146,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setIsLoggedIn(false);
     localStorage.removeItem('user');
     setUserBookings([]);
-    toast.success("Logged out successfully");
+    toast("Logged out successfully");
   };
 
   const toggleBookmark = (activityId: string) => {
     if (!isLoggedIn) {
-      toast.error("Please log in to bookmark activities");
+      toast("Please log in to bookmark activities");
       return;
     }
     
     setBookmarkedActivities(prevBookmarks => {
       if (prevBookmarks.includes(activityId)) {
-        toast.success("Removed from bookmarks");
+        toast("Removed from bookmarks");
         return prevBookmarks.filter(id => id !== activityId);
       } else {
-        toast.success("Added to bookmarks");
+        toast("Added to bookmarks");
         return [...prevBookmarks, activityId];
       }
     });

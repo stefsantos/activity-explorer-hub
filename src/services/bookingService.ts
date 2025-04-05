@@ -11,28 +11,13 @@ export interface BookingData {
   email: string;
   phone: string;
   price: number;
-  booking_date?: string;
-  status?: string;
 }
 
-export interface BookingResponse {
-  success: boolean;
-  data?: any;
-  error?: any;
-}
-
-export async function createBooking(bookingData: BookingData): Promise<BookingResponse> {
+export async function createBooking(bookingData: BookingData) {
   try {
-    // Set default booking date and status if not provided
-    const fullBookingData = {
-      ...bookingData,
-      booking_date: bookingData.booking_date || new Date().toISOString(),
-      status: bookingData.status || 'pending'
-    };
-    
     const { data, error } = await supabase
       .from('activity_bookings')
-      .insert(fullBookingData)
+      .insert(bookingData)
       .select();
     
     if (error) {
@@ -47,13 +32,9 @@ export async function createBooking(bookingData: BookingData): Promise<BookingRe
   }
 }
 
-export async function fetchUserBookings(userId: string | null, email: string | null): Promise<BookingResponse> {
+export async function fetchUserBookings(userId: string | null, email: string | null) {
   try {
     console.log('Fetching bookings for user:', userId || email);
-    
-    if (!userId && !email) {
-      return { success: false, error: 'No user ID or email provided' };
-    }
     
     let query = supabase
       .from('activity_bookings')
@@ -69,6 +50,8 @@ export async function fetchUserBookings(userId: string | null, email: string | n
       query = query.eq('user_id', userId);
     } else if (email) {
       query = query.eq('email', email);
+    } else {
+      return { success: false, error: new Error('No user ID or email provided') };
     }
     
     const { data, error } = await query;
@@ -82,26 +65,6 @@ export async function fetchUserBookings(userId: string | null, email: string | n
     return { success: true, data };
   } catch (error) {
     console.error('Error in fetchUserBookings:', error);
-    return { success: false, error };
-  }
-}
-
-export async function updateBookingStatus(bookingId: string, status: string): Promise<BookingResponse> {
-  try {
-    const { data, error } = await supabase
-      .from('activity_bookings')
-      .update({ status })
-      .eq('id', bookingId)
-      .select();
-    
-    if (error) {
-      console.error('Error updating booking status:', error);
-      return { success: false, error };
-    }
-    
-    return { success: true, data };
-  } catch (error) {
-    console.error('Error in updateBookingStatus:', error);
     return { success: false, error };
   }
 }
