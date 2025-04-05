@@ -218,7 +218,7 @@ const Index = () => {
           <div className="text-center mt-10">
             <Link to="/activities">
               <Button className="bg-kids-orange hover:bg-kids-orange/90 text-white rounded-full px-8 py-6 text-lg font-medium">
-                See All Activities THIS IS FOR TESTING
+                See All Activities
               </Button>
             </Link>
           </div>
