@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from "@/contexts/UserContext";
-import { MapPin, Star, ShoppingCart } from "lucide-react";
+import { MapPin, Star, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
@@ -87,12 +87,12 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, size = 'regular' 
             A week-long camp full of exciting experiments and scientific discoveries.
           </p>
           
-          {/* Price and Add to Cart button */}
+          {/* Price and Book Now button */}
           <div className="mt-auto flex items-center justify-between">
             <span className="text-lg font-bold">₱{activity.price}</span>
             <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white rounded-full">
-              <ShoppingCart size={14} className="mr-1" />
-              Add to Cart
+              <Calendar size={14} className="mr-1" />
+              Book Now
             </Button>
           </div>
         </div>
