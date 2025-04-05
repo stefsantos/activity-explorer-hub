@@ -1,18 +1,19 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, User, LogOut } from 'lucide-react';
+import { Mail, User, LogOut, Calendar } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import Navbar from '@/components/Navbar';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
+import BookedActivitiesList from '@/components/profile/BookedActivitiesList';
 
 const Profile = () => {
-  const { user, isLoggedIn, logout, bookmarkedActivities } = useUser();
+  const { user, isLoggedIn, logout, bookmarkedActivities, userBookings, isLoadingBookings } = useUser();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('saved');
+  const [activeTab, setActiveTab] = useState('bookings');
 
   if (!isLoggedIn) {
     navigate('/auth');
@@ -71,15 +72,26 @@ const Profile = () => {
 
           {/* Profile Tabs */}
           <Tabs 
-            defaultValue="saved" 
+            defaultValue="bookings" 
             value={activeTab} 
             onValueChange={setActiveTab} 
             className="space-y-4"
           >
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="bookings">Booked Activities</TabsTrigger>
               <TabsTrigger value="saved">Saved Activities</TabsTrigger>
               <TabsTrigger value="account">Account Settings</TabsTrigger>
             </TabsList>
+            
+            <TabsContent value="bookings" className="space-y-4">
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4">Your Booked Activities</h2>
+                <BookedActivitiesList 
+                  bookings={userBookings}
+                  isLoading={isLoadingBookings}
+                />
+              </div>
+            </TabsContent>
             
             <TabsContent value="saved" className="space-y-4">
               <div className="bg-white rounded-lg shadow p-6">

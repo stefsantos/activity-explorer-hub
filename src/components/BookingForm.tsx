@@ -40,7 +40,7 @@ const BookingForm = ({
   onSuccess,
   onLogin
 }: BookingFormProps) => {
-  const { isLoggedIn, user } = useUser();
+  const { isLoggedIn, user, refreshBookings } = useUser();
   const navigate = useNavigate();
   
   const form = useForm<BookingFormValues>({
@@ -74,6 +74,11 @@ const BookingForm = ({
         console.error('Error creating booking:', error);
         toast.error('Failed to create booking. Please try again.');
         return;
+      }
+
+      // Refresh user bookings if the user is logged in
+      if (isLoggedIn) {
+        await refreshBookings();
       }
 
       toast.success('Booking successfully created!');

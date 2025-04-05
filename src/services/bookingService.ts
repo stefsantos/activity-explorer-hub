@@ -38,9 +38,9 @@ export async function fetchUserBookings(userId: string | null, email: string | n
       .from('activity_bookings')
       .select(`
         *,
-        activity:activity_id(id, title, image, price, category),
-        variant:variant_id(id, name),
-        package:package_id(id, name, price)
+        activity:activity_id(*),
+        variant:variant_id(*),
+        package:package_id(*)
       `)
       .order('booking_date', { ascending: false });
     

@@ -1,7 +1,9 @@
+
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { toast } from "sonner";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './AuthContext';
+import { fetchUserBookings } from '@/services/bookingService';
 
 type User = {
   id: string;
@@ -9,14 +11,40 @@ type User = {
   email: string;
 };
 
+type Booking = {
+  id: string;
+  activity_id: string;
+  activity: {
+    id: string;
+    title: string;
+    image: string;
+    category: string;
+  };
+  variant?: {
+    id: string;
+    name: string;
+  };
+  package?: {
+    id: string;
+    name: string;
+    price: number;
+  };
+  booking_date: string;
+  price: number;
+  status: string;
+};
+
 type UserContextType = {
   user: User | null;
   isLoggedIn: boolean;
   bookmarkedActivities: string[];
+  userBookings: Booking[];
+  isLoadingBookings: boolean;
   login: () => void;
   logout: () => void;
   toggleBookmark: (activityId: string) => void;
   isBookmarked: (activityId: string) => boolean;
+  refreshBookings: () => Promise<void>;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -26,6 +54,8 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [bookmarkedActivities, setBookmarkedActivities] = useState<string[]>([]);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [userBookings, setUserBookings] = useState<Booking[]>([]);
+  const [isLoadingBookings, setIsLoadingBookings] = useState<boolean>(false);
 
   useEffect(() => {
     const savedBookmarks = localStorage.getItem('bookmarkedActivities');
@@ -44,14 +74,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         email: authUser.email || '',
       });
       setIsLoggedIn(true);
+      
+      // Load user bookings when user is authenticated
+      refreshBookings();
     } else {
       const loggedInUser = localStorage.getItem('user');
       if (loggedInUser) {
         setUser(JSON.parse(loggedInUser));
         setIsLoggedIn(true);
+        
+        // For demo users, we can't load real bookings so we clear them
+        setUserBookings([]);
       } else {
         setUser(null);
         setIsLoggedIn(false);
+        setUserBookings([]);
       }
     }
   }, [authUser]);
@@ -61,6 +98,28 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       localStorage.setItem('bookmarkedActivities', JSON.stringify(bookmarkedActivities));
     }
   }, [bookmarkedActivities]);
+
+  const refreshBookings = async () => {
+    if (!isLoggedIn || !user) return;
+    
+    setIsLoadingBookings(true);
+    try {
+      const { success, data, error } = await fetchUserBookings(
+        authUser ? authUser.id : null, 
+        user.email
+      );
+      
+      if (success && data) {
+        setUserBookings(data as Booking[]);
+      } else if (error) {
+        console.error('Error fetching bookings:', error);
+      }
+    } catch (error) {
+      console.error('Error in refreshBookings:', error);
+    } finally {
+      setIsLoadingBookings(false);
+    }
+  };
 
   const login = () => {
     if (authUser) return;
@@ -85,6 +144,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     setUser(null);
     setIsLoggedIn(false);
     localStorage.removeItem('user');
+    setUserBookings([]);
     toast("Logged out successfully");
   };
 
@@ -114,10 +174,13 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       user, 
       isLoggedIn, 
       bookmarkedActivities, 
+      userBookings,
+      isLoadingBookings,
       login, 
       logout, 
       toggleBookmark, 
-      isBookmarked
+      isBookmarked,
+      refreshBookings
     }}>
       {children}
     </UserContext.Provider>
