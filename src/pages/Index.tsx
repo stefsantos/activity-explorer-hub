@@ -14,6 +14,7 @@ import { Palette, Users, Mountain, BookOpen, Music, Utensils, HeartPulse, FlaskC
 import { fetchFeaturedActivities, fetchPopularActivities, fetchActivities } from '@/services';
 import { useQuery } from '@tanstack/react-query';
 import ActivityFooter from '@/components/activity/ActivityFooter';
+import MapDialog from '@/components/MapDialog';
 
 const Index = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -23,6 +24,7 @@ const Index = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
+  const [isMapDialogOpen, setIsMapDialogOpen] = useState(false);
   
   // Get unique cities from locations
   const cities = [...new Set(locations.map(loc => loc.city))]
@@ -225,6 +227,24 @@ const Index = () => {
           </div>
         </section>
       </main>
+      {/* Floating Map Button */}
+      <Button 
+        variant="ghost" 
+        size="lg" 
+        className="fixed bottom-12 left-1/2 transform -translate-x-1/2 bg-kids-orange hover:bg-kids-orange/90 text-white shadow-lg rounded-full px-6 py-4 z-50 flex items-center gap-2" 
+        onClick={() => setIsMapDialogOpen(true)}
+        aria-label="View map"
+      >
+        <span className="text-lg font-medium">Show Map</span>
+        <i className="bx bx-map-alt text-2xl"></i>
+      </Button>
+
+      {/* Map Dialog */}
+      <MapDialog 
+        isOpen={isMapDialogOpen} 
+        onClose={() => setIsMapDialogOpen(false)} 
+        activities={filteredActivities} 
+      />
       <ActivityFooter />
     </div>;
 };
