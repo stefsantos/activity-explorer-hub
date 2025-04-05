@@ -33,6 +33,7 @@ import { useQuery } from '@tanstack/react-query';
 import { 
   fetchActivities 
 } from '@/services';
+import LocationSelector from '@/components/LocationSelector';
 
 const ActivityList = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
@@ -58,6 +59,7 @@ const ActivityList = () => {
     multiDay: false
   });
   const [ratingFilter, setRatingFilter] = useState(0);
+  const [isLocationDropdownOpen, setIsLocationDropdownOpen] = useState(false);
 
   const { data: activities = [], isLoading } = useQuery({
     queryKey: ['activities'],
@@ -83,9 +85,14 @@ const ActivityList = () => {
     }
     
     if (locationFilter !== 'all' && locationFilter !== '') {
-      filtered = filtered.filter(activity => 
-        activity.location && activity.location.name.toLowerCase() === locationFilter.toLowerCase()
-      );
+      filtered = filtered.filter(activity => {
+        if (!activity.location || typeof activity.location === 'string') {
+          return false;
+        }
+        
+        // Use the location ID for filtering
+        return activity.location.id === locationFilter;
+      });
     }
     
     filtered = filtered.filter(activity => {
@@ -169,6 +176,33 @@ const ActivityList = () => {
     };
     
     return categoryColors[category] || "bg-gray-500";
+  };
+
+  // Extract unique locations from activities for the filter
+  const getLocationOptions = () => {
+    const locationSet = new Set<string>();
+    const locationOptions = [];
+    
+    // Add the default Philippine locations
+    locationOptions.push(...locations);
+    
+    // Add any additional locations from activities that aren't in our predefined list
+    activities.forEach(activity => {
+      if (activity.location && typeof activity.location !== 'string') {
+        const locationId = activity.location.id;
+        if (!locationSet.has(locationId) && !locationOptions.find(loc => loc.id === locationId)) {
+          locationSet.add(locationId);
+          locationOptions.push({
+            id: activity.location.id,
+            name: activity.location.name,
+            latitude: activity.location.latitude,
+            longitude: activity.location.longitude
+          });
+        }
+      }
+    });
+    
+    return locationOptions;
   };
 
   return (
@@ -279,21 +313,20 @@ const ActivityList = () => {
                 </div>
               </div>
               
-              <Collapsible className="mb-6">
+              <Collapsible className="mb-6" open={isLocationDropdownOpen} onOpenChange={setIsLocationDropdownOpen}>
                 <CollapsibleTrigger className="flex w-full justify-between items-center">
                   <h3 className="text-md font-semibold flex items-center">
                     <MapPin size={16} className="mr-1" />
-                    Location
+                    Location in Philippines
                   </h3>
                   <ChevronDown size={16} />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-3">
-                  <div className="mb-2">
-                    <Input 
-                      placeholder="Select Location" 
-                      className="w-full"
-                    />
-                  </div>
+                  <LocationSelector 
+                    activities={activities} 
+                    selectedLocation={locationFilter}
+                    onLocationChange={setLocationFilter}
+                  />
                 </CollapsibleContent>
               </Collapsible>
               

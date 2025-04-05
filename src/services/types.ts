@@ -1,26 +1,36 @@
+export interface ActivityLocation {
+  id: string;
+  name: string;
+  address?: string;
+  latitude?: number;
+  longitude?: number;
+}
 
 export interface Activity {
   id: string;
   title: string;
   description: string;
   image: string;
-  images?: Array<{
-    id: string;
-    image_url: string;
-    alt_text: string | null;
-  }>;
   category: string;
-  location: {
+  duration?: string;
+  group_size?: string;
+  location: ActivityLocation;
+  min_age?: number;
+  max_age?: number;
+  price: number;
+  rating?: number;
+  featured?: boolean;
+  status?: string;
+  created_at?: string;
+  updated_at?: string;
+  organizer_id?: string;
+  organizer?: {
     id: string;
     name: string;
-  } | null;
-  min_age: number | null;
-  max_age: number | null;
-  price: number;
-  featured: boolean;
-  popular: boolean;
-  created_at: string;
-  updated_at: string;
+    bio?: string;
+    logo?: string;
+  };
+  [key: string]: any;
 }
 
 export interface Review {

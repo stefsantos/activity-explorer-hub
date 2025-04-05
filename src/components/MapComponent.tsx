@@ -131,12 +131,13 @@ const MapComponent: React.FC<MapComponentProps> = ({
       document.head.appendChild(style);
       
       activities.forEach(activity => {
-        if (activity.location && activity.location.latitude && activity.location.longitude) {
+        if (activity.location && typeof activity.location !== 'string' && 
+            activity.location.latitude !== undefined && activity.location.longitude !== undefined) {
           // Create a popup with activity details
           const popupHtml = `
             <div class="activity-popup">
               <strong>${activity.title}</strong>
-              <p>${activity.location.address}</p>
+              <p>${activity.location.address || activity.location.name}</p>
               <p class="price">₱${activity.price}</p>
               <button class="view-btn" data-activity-id="${activity.id}">View Activity</button>
             </div>

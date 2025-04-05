@@ -1,4 +1,3 @@
-
 export type Activity = {
   id: string;
   title: string;
@@ -22,6 +21,9 @@ export type Category = {
 export type Location = {
   id: string;
   name: string;
+  address?: string;
+  latitude: number;
+  longitude: number;
 };
 
 export type AgeRange = {
@@ -42,15 +44,15 @@ export const categories: Category[] = [
 ];
 
 export const locations: Location[] = [
-  { id: "nyc", name: "New York" },
-  { id: "la", name: "Los Angeles" },
-  { id: "chicago", name: "Chicago" },
-  { id: "miami", name: "Miami" },
-  { id: "seattle", name: "Seattle" },
-  { id: "austin", name: "Austin" },
-  { id: "denver", name: "Denver" },
-  { id: "portland", name: "Portland" },
-  { id: "boston", name: "Boston" },
+  { id: "manila", name: "Manila", latitude: 14.5995, longitude: 120.9842 },
+  { id: "cebu", name: "Cebu", latitude: 10.3157, longitude: 123.8854 },
+  { id: "davao", name: "Davao", latitude: 7.1907, longitude: 125.4553 },
+  { id: "quezon", name: "Quezon City", latitude: 14.6760, longitude: 121.0437 },
+  { id: "makati", name: "Makati", latitude: 14.5547, longitude: 121.0244 },
+  { id: "pasig", name: "Pasig", latitude: 14.5764, longitude: 121.0851 },
+  { id: "taguig", name: "Taguig", latitude: 14.5176, longitude: 121.0509 },
+  { id: "baguio", name: "Baguio", latitude: 16.4023, longitude: 120.5960 },
+  { id: "iloilo", name: "Iloilo", latitude: 10.7202, longitude: 122.5621 },
 ];
 
 export const ageRanges: AgeRange[] = [
@@ -230,9 +232,31 @@ export const filterActivities = (
   }
 
   if (locationFilter && locationFilter !== "all") {
-    filtered = filtered.filter(
-      activity => activity.location.toLowerCase() === locationFilter.toLowerCase()
-    );
+    const targetLocation = locations.find(loc => loc.id === locationFilter);
+    
+    if (targetLocation) {
+      // Filter activities by proximity to the selected location (within ~5km radius)
+      const maxDistanceKm = 5;
+      
+      filtered = filtered.filter(activity => {
+        // Simple distance check based on coordinates
+        // This is a simplified version for demonstration purposes
+        const activityLoc = typeof activity.location === 'string' 
+          ? locations.find(l => l.name === activity.location)
+          : null;
+          
+        if (!activityLoc) return false;
+        
+        const distance = calculateDistance(
+          targetLocation.latitude, 
+          targetLocation.longitude,
+          activityLoc.latitude,
+          activityLoc.longitude
+        );
+        
+        return distance <= maxDistanceKm;
+      });
+    }
   }
 
   if (ageRangeFilter && ageRangeFilter !== "all") {
@@ -250,3 +274,17 @@ export const filterActivities = (
     totalPages
   };
 };
+
+// Helper function to calculate distance between two points using Haversine formula
+export function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Radius of the Earth in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const distance = R * c; // Distance in km
+  return distance;
+}
