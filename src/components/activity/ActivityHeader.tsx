@@ -28,8 +28,8 @@ const ActivityHeader = ({ id, image, images = [], title, category, featured }: A
   
   // Use images array if available, otherwise fall back to the single image
   const imageArray = images && images.length > 0 
-    ? images.map(img => ({ url: img.image_url, alt: img.alt_text || title }))
-    : [{ url: image, alt: title }];
+    ? images.map(img => ({ url: img.image_url || '', alt: img.alt_text || title }))
+    : [{ url: image || '', alt: title }];
 
   return (
     <div className="mb-6 relative">
