@@ -67,7 +67,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-1">
             
             {/* Map button */}
-            <Button 
+            {/* <Button 
               variant="ghost" 
               size="icon" 
               className="mr-2 text-gray-600 hover:text-kids-blue hover:bg-kids-blue/10" 
@@ -75,7 +75,7 @@ const Navbar = () => {
               aria-label="View map"
             >
               <Map size={20} />
-            </Button>
+            </Button> */}
             
             {isLoggedIn ? <DropdownMenu>
                 <DropdownMenuTrigger asChild>
