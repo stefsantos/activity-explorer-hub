@@ -69,7 +69,7 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
                   Featured
                 </span>
                 <h2 className="text-3xl md:text-4xl font-bold mb-2">{activity.title}</h2>
-                <p className="mb-4 max-w-2xl text-sm md:text-base opacity-90">{activity.description}</p>
+                
                 
                 <div className="flex flex-wrap gap-3 mb-4">
                   <div className="flex items-center bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs">
