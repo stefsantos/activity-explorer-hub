@@ -26,7 +26,7 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
   selectedOption,
   onChange,
   isAgeFilter = false,
-  ageRange = [1, 16],
+  ageRange = [0, 16],
   onAgeRangeChange
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
