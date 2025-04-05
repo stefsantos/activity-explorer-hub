@@ -31,5 +31,35 @@ export interface Review {
   comment: string;
   created_at: string;
   review_date: string;
-  user_id?: string; // Added user_id as optional to fix TypeScript errors
+  user_id?: string;
+}
+
+export interface ActivityDetailType extends Activity {
+  duration: string;
+  group_size: string;
+  location_id: string;
+  price_includes: string[];
+  requirements: string[];
+  expectations: string[];
+  organizer: {
+    id: string;
+    name: string;
+    bio: string;
+    logo: string;
+  };
+}
+
+export interface OrganizerDetailType {
+  id: string;
+  name: string;
+  bio: string;
+  logo: string;
+  contact_email: string;
+  contact_phone: string;
+  website: string;
+  social_media: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+  };
 }

@@ -11,6 +11,7 @@ import ActivityList from "./pages/ActivityList";
 import ActivityDetail from "./pages/ActivityDetail";
 import SavedActivities from "./pages/SavedActivities";
 import OrganizerDetail from "./pages/OrganizerDetail";
+import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import NotFound from "./pages/NotFound";
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/activities/:id" element={<ActivityDetail />} />
               <Route path="/organizer/:id" element={<OrganizerDetail />} />
               <Route path="/saved" element={<SavedActivities />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/auth/callback" element={<AuthCallback />} />
               <Route path="*" element={<NotFound />} />

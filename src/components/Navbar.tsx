@@ -1,10 +1,19 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, User } from 'lucide-react';
+import { Menu, X, User, LogOut, Bookmark, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useUser } from "@/contexts/UserContext";
 import SearchBox from './SearchBox';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const Navbar = () => {
   const { isLoggedIn, user, logout } = useUser();
@@ -18,6 +27,16 @@ const Navbar = () => {
 
   const handleLoginClick = () => {
     navigate('/auth');
+  };
+
+  const getInitials = () => {
+    if (!user?.name) return 'U';
+    
+    const nameParts = user.name.split(' ');
+    if (nameParts.length >= 2) {
+      return `${nameParts[0][0]}${nameParts[1][0]}`;
+    }
+    return user.name.substring(0, 2);
   };
 
   return (
@@ -55,15 +74,41 @@ const Navbar = () => {
               </Link>
             )}
             {isLoggedIn ? (
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">
-                  <User className="h-4 w-4 inline mr-1 text-kids-blue" />
-                  {user?.name}
-                </span>
-                <Button onClick={logout} variant="outline" className="ml-2">
-                  Logout
-                </Button>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full" aria-label="User menu">
+                    <Avatar className="h-9 w-9 bg-kids-blue/10">
+                      <AvatarFallback className="text-xs font-medium text-kids-blue">
+                        {getInitials()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuLabel>
+                    <div className="font-normal">
+                      <div className="font-medium">{user?.name}</div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {user?.email}
+                      </div>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate('/profile')}>
+                    <User className="mr-2 h-4 w-4" />
+                    My Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/saved')}>
+                    <Bookmark className="mr-2 h-4 w-4" />
+                    Saved Activities
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Button onClick={handleLoginClick} className="ml-2 bg-kids-blue hover:bg-kids-blue/90">
                 Login
@@ -111,38 +156,43 @@ const Navbar = () => {
                 Activities
               </Link>
               {isLoggedIn && (
-                <Link 
-                  to="/saved" 
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/saved') ? 'text-kids-blue bg-kids-blue/5' : 'text-gray-700 hover:bg-gray-50'}`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Saved
-                </Link>
+                <>
+                  <Link 
+                    to="/saved" 
+                    className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/saved') ? 'text-kids-blue bg-kids-blue/5' : 'text-gray-700 hover:bg-gray-50'}`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Saved
+                  </Link>
+                  <Link 
+                    to="/profile" 
+                    className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/profile') ? 'text-kids-blue bg-kids-blue/5' : 'text-gray-700 hover:bg-gray-50'}`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    My Profile
+                  </Link>
+                </>
               )}
               {isLoggedIn ? (
-                <>
-                  <div className="block px-3 py-2 text-base font-medium text-gray-700">
-                    <User className="h-4 w-4 inline mr-1 text-kids-blue" />
-                    {user?.name}
-                  </div>
-                  <button
-                    onClick={() => {
-                      logout();
-                      setIsMenuOpen(false);
-                    }}
-                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    Logout
-                  </button>
-                </>
+                <button
+                  onClick={() => {
+                    logout();
+                    setIsMenuOpen(false);
+                  }}
+                  className="flex w-full items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  <LogOut className="h-5 w-5 mr-2 text-kids-blue" />
+                  Log Out
+                </button>
               ) : (
                 <button
                   onClick={() => {
                     navigate('/auth');
                     setIsMenuOpen(false);
                   }}
-                  className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-kids-blue hover:bg-kids-blue/5"
+                  className="flex w-full items-center px-3 py-2 rounded-md text-base font-medium text-kids-blue hover:bg-kids-blue/5"
                 >
+                  <User className="h-5 w-5 mr-2" />
                   Login
                 </button>
               )}
