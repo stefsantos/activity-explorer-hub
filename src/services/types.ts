@@ -1,4 +1,3 @@
-
 export interface ActivityLocation {
   id: string;
   name: string;
@@ -39,12 +38,12 @@ export interface Activity {
 export interface Review {
   id: string;
   activity_id: string;
+  user_id?: string;
   reviewer_name: string;
   rating: number;
-  comment: string;
-  created_at: string;
+  comment: string | null;
   review_date: string;
-  user_id?: string;
+  created_at: string;
 }
 
 export interface ActivityDetailType extends Activity {
