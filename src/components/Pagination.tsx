@@ -82,7 +82,7 @@ const Pagination: React.FC<PaginationProps> = ({
           ) : (
             <Button
               variant={currentPage === page ? 'default' : 'outline'}
-              className={currentPage === page ? 'bg-brand-500' : ''}
+              className={currentPage === page ? 'bg-brand-500 bg-kids-orange hover:bg-kids-orange/90' : ''}
               onClick={() => typeof page === 'number' && onPageChange(page)}
             >
               {page}
