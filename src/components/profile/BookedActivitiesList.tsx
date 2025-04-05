@@ -36,6 +36,8 @@ interface BookedActivitiesListProps {
 
 const BookedActivitiesList = ({ bookings, isLoading }: BookedActivitiesListProps) => {
   const navigate = useNavigate();
+  
+  console.log('Rendering BookedActivitiesList with bookings:', bookings);
 
   if (isLoading) {
     return (
@@ -85,11 +87,11 @@ const BookedActivitiesList = ({ bookings, isLoading }: BookedActivitiesListProps
               <div 
                 className="w-full sm:w-36 h-36 bg-cover bg-center"
                 style={{
-                  backgroundImage: `url(${booking.activity.image})`
+                  backgroundImage: `url(${booking.activity?.image || '/placeholder.svg'})`
                 }}
               ></div>
               <div className="p-4 flex-1">
-                <h3 className="font-semibold text-lg mb-1">{booking.activity.title}</h3>
+                <h3 className="font-semibold text-lg mb-1">{booking.activity?.title || 'Activity'}</h3>
                 
                 <div className="space-y-2 mb-3">
                   <div className="flex items-center text-sm text-gray-600">
@@ -119,7 +121,7 @@ const BookedActivitiesList = ({ bookings, isLoading }: BookedActivitiesListProps
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => navigate(`/activity/${booking.activity.id}`)}
+                    onClick={() => navigate(`/activity/${booking.activity?.id}`)}
                   >
                     View Details
                   </Button>

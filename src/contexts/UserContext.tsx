@@ -110,6 +110,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       );
       
       if (success && data) {
+        console.log('Setting user bookings:', data);
         setUserBookings(data as Booking[]);
       } else if (error) {
         console.error('Error fetching bookings:', error);

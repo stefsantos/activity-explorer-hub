@@ -34,13 +34,15 @@ export async function createBooking(bookingData: BookingData) {
 
 export async function fetchUserBookings(userId: string | null, email: string | null) {
   try {
+    console.log('Fetching bookings for user:', userId || email);
+    
     let query = supabase
       .from('activity_bookings')
       .select(`
         *,
-        activity:activity_id(*),
-        variant:variant_id(*),
-        package:package_id(*)
+        activity:activities(id, title, image, category),
+        variant:activity_variants(id, name),
+        package:activity_packages(id, name, price)
       `)
       .order('booking_date', { ascending: false });
     
@@ -59,6 +61,7 @@ export async function fetchUserBookings(userId: string | null, email: string | n
       return { success: false, error };
     }
     
+    console.log('Bookings fetched:', data?.length || 0, data);
     return { success: true, data };
   } catch (error) {
     console.error('Error in fetchUserBookings:', error);
