@@ -4,6 +4,8 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Activity } from '@/services/types';
 import { useNavigate } from 'react-router-dom';
+import { Button } from './ui/button';
+import { Locate } from 'lucide-react';
 
 interface MapComponentProps {
   latitude?: number;
@@ -34,6 +36,36 @@ const MapComponent: React.FC<MapComponentProps> = ({
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
   const activityMarkers = useRef<mapboxgl.Marker[]>([]);
   const navigate = useNavigate();
+
+  // Center map on user location
+  const centerOnUserLocation = () => {
+    if (userLocation && map.current) {
+      map.current.flyTo({
+        center: [userLocation.lng, userLocation.lat] as [number, number],
+        zoom: zoom,
+        essential: true
+      });
+    } else if (showUserLocation) {
+      // If user location isn't set yet, try to get it
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUserLocation({ lat: latitude, lng: longitude });
+          
+          if (map.current) {
+            map.current.flyTo({
+              center: [longitude, latitude] as [number, number],
+              zoom: zoom,
+              essential: true
+            });
+          }
+        },
+        (error) => {
+          console.error('Error getting user location:', error);
+        }
+      );
+    }
+  };
 
   // Initialize map
   useEffect(() => {
@@ -246,6 +278,21 @@ const MapComponent: React.FC<MapComponentProps> = ({
   return (
     <div className={`relative rounded-lg overflow-hidden ${className}`}>
       <div ref={mapContainer} className="absolute inset-0" />
+      
+      {/* Locate Me button */}
+      {showUserLocation && (
+        <div className="absolute bottom-4 right-4 z-10">
+          <Button 
+            onClick={centerOnUserLocation}
+            size="sm"
+            className="bg-white text-gray-700 hover:bg-gray-100 shadow-md"
+            aria-label="Center on my location"
+          >
+            <Locate className="mr-1 h-4 w-4" />
+            My Location
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
