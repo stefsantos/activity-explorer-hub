@@ -81,8 +81,8 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ activities }) => {
               alt={activity.title}
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
-              <div className="absolute bottom-0 left-0 p-6 text-white w-full">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent shadow-[inset_0_-50px_50px_rgba(0,0,0,0.6)]">
+              <div className="absolute bottom-0 left-0 p-6 text-white w-full text-left">
                 <span className="inline-block mb-2 bg-kids-green px-3 py-1 rounded-full text-xs font-medium">
                   Featured
                 </span>
@@ -132,7 +132,7 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ activities }) => {
       </button>
 
       {/* Indicators */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-2">
+      <div className="absolute bottom-6 left-6 flex space-x-2">
         {activities.map((_, index) => (
           <button
             key={index}
