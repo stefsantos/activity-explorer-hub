@@ -11,7 +11,6 @@ import { categories, locations, ageRanges } from '@/data/activities';
 import { Palette, Users, Mountain, BookOpen, Music, Utensils, HeartPulse, FlaskConical } from 'lucide-react';
 import { fetchFeaturedActivities, fetchPopularActivities, fetchActivities } from '@/services';
 import { useQuery } from '@tanstack/react-query';
-
 const Index = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
@@ -19,7 +18,6 @@ const Index = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
-
   const {
     data: allActivities = []
   } = useQuery({
@@ -38,7 +36,6 @@ const Index = () => {
     queryKey: ['popularActivities'],
     queryFn: () => fetchPopularActivities(4)
   });
-
   useEffect(() => {
     let filtered = [...allActivities];
     if (categoryFilter !== 'all') {
@@ -47,7 +44,6 @@ const Index = () => {
     if (locationFilter !== 'all' && locationFilter !== '') {
       filtered = filtered.filter(activity => activity.location && activity.location.name.toLowerCase() === locationFilter.toLowerCase());
     }
-
     if (ageRangeFilter !== 'all' && ageRangeFilter !== '') {
       filtered = filtered.filter(activity => {
         if (ageRangeFilter === 'toddler') return activity.min_age === 0 && activity.max_age === 3;
@@ -60,7 +56,6 @@ const Index = () => {
         return true;
       });
     }
-
     const itemsPerPage = 6;
     const totalPages = Math.ceil(filtered.length / itemsPerPage);
     setTotalPages(totalPages);
@@ -68,7 +63,6 @@ const Index = () => {
     const paginatedActivities = filtered.slice(startIndex, startIndex + itemsPerPage);
     setFilteredActivities(paginatedActivities);
   }, [allActivities, categoryFilter, locationFilter, ageRangeFilter, currentPage]);
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({
@@ -76,7 +70,6 @@ const Index = () => {
       behavior: 'smooth'
     });
   };
-
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'Arts & Crafts':
@@ -97,7 +90,6 @@ const Index = () => {
         return <Users size={24} />;
     }
   };
-
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'Arts & Crafts':
@@ -118,7 +110,6 @@ const Index = () => {
         return 'bg-kids-pink';
     }
   };
-
   return <div className="min-h-screen bg-gray-50">
       <Navbar />
       
@@ -151,16 +142,10 @@ const Index = () => {
           </div>
         </section>
         
-        <CategoryFilter 
-          categories={categories}
-          selectedCategory={categoryFilter}
-          onChange={(id) => {
-            setCategoryFilter(id);
-            setCurrentPage(1);
-          }}
-          getCategoryIcon={getCategoryIcon}
-          getCategoryColor={getCategoryColor}
-        />
+        <CategoryFilter categories={categories} selectedCategory={categoryFilter} onChange={id => {
+        setCategoryFilter(id);
+        setCurrentPage(1);
+      }} getCategoryIcon={getCategoryIcon} getCategoryColor={getCategoryColor} />
         
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Find the Perfect Activity</h2>
@@ -227,7 +212,7 @@ const Index = () => {
             <div>
               <h3 className="text-lg font-bold mb-4">Contact</h3>
               <p className="text-white/80">support@activityhub.com</p>
-              <p className="text-white/80">123-456-7890</p>
+              <p className="text-white/80">+63-9173728852</p>
               <div className="flex space-x-3 mt-4">
                 <a href="#" className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-colors">
                   <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -254,5 +239,4 @@ const Index = () => {
       </footer>
     </div>;
 };
-
 export default Index;
