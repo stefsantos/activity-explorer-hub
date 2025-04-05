@@ -1,135 +1,34 @@
-
-export interface ActivityDetailType {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  image: string;
-  featured: boolean;
-  min_age: number | null;
-  max_age: number | null;
-  duration: string | null;
-  group_size: string | null;
-  schedule: string | null;
-  rating: number | null;
-  review_count: number | null;
-  price: number;
-  location: {
-    id: string;
-    name: string;
-    address: string;
-    latitude: number;
-    longitude: number;
-  } | null;
-  organizer: {
-    id: string;
-    name: string;
-    description: string | null;
-  } | null;
-  variants: {
-    id: string;
-    name: string;
-    description: string | null;
-    price_adjustment: number;
-    location: {
-      id: string;
-      name: string;
-      address: string;
-      latitude: number;
-      longitude: number;
-    } | null;
-  }[];
-  packages: {
-    id: string;
-    name: string;
-    description: string | null;
-    price: number;
-    max_participants: number | null;
-  }[];
-  images: {
-    id: string;
-    activity_id: string;
-    image_url: string;
-    alt_text: string | null;
-    display_order: number;
-    created_at: string;
-  }[];
-  reviews: {
-    id: string;
-    reviewer_name: string;
-    rating: number;
-    comment: string | null;
-    review_date: string;
-  }[];
-  requirements: {
-    id: string;
-    description: string;
-  }[];
-  expectations: {
-    id: string;
-    description: string;
-  }[];
-  userReview?: {
-    id: string;
-    rating: number;
-    comment: string | null;
-    review_date: string;
-  } | null;
-}
-
-export interface UserReviewType {
-  id: string;
-  rating: number;
-  comment?: string | null;
-  activity_id: string;
-}
-
-export interface OrganizerDetailType {
-  id: string;
-  name: string;
-  description: string | null;
-  created_at: string;
-  activities: {
-    id: string;
-    title: string;
-    description: string;
-    category: string;
-    image: string;
-    price: number;
-    min_age: number | null;
-    max_age: number | null;
-    rating: number | null;
-    review_count: number | null;
-  }[];
-}
-
 export interface Activity {
   id: string;
   title: string;
   description: string;
-  category: string;
   image: string;
-  price: number;
-  min_age: number | null;
-  max_age: number | null;
-  duration: string | null;
-  rating: number | null;
-  review_count: number | null;
+  images?: Array<{
+    id: string;
+    image_url: string;
+    alt_text: string | null;
+  }>;
+  category: string;
   location: {
     id: string;
     name: string;
-    address: string;
-    latitude: number;
-    longitude: number;
   } | null;
+  min_age: number | null;
+  max_age: number | null;
+  price: number;
+  featured: boolean;
+  popular: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Review {
   id: string;
   activity_id: string;
-  user_id?: string;
   reviewer_name: string;
   rating: number;
-  comment: string | null;
+  comment: string;
+  created_at: string;
   review_date: string;
+  user_id?: string; // Make user_id optional
 }
