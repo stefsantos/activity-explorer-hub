@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Facebook, Mail } from 'lucide-react';
+import Navbar from '@/components/Navbar';
 
 const signInFormSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -115,7 +116,8 @@ const Auth = () => {
     }
   };
 
-  return (
+  return (<>
+    <Navbar />
     <div className="grid h-screen place-items-center bg-gray-100">
       <Card className="w-[350px] md:w-[500px] shadow-lg">
         <CardHeader className="space-y-1">
@@ -158,7 +160,7 @@ const Auth = () => {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-kids-orange hover:bg-kids-orange/90" disabled={isLoading}>
                     {isLoading ? 'Signing In...' : 'Sign In with Email'}
                   </Button>
                 </form>
@@ -285,7 +287,7 @@ const Auth = () => {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full" disabled={isLoading}>
+                  <Button type="submit" className="w-full bg-kids-orange hover:bg-kids-orange/90" disabled={isLoading}>
                     {isLoading ? 'Creating Account...' : 'Create Account'}
                   </Button>
                 </form>
@@ -332,7 +334,7 @@ const Auth = () => {
         </CardContent>
       </Card>
     </div>
-  );
+    </>);
 };
 
 export default Auth;
