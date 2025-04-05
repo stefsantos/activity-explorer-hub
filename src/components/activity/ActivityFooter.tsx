@@ -9,14 +9,11 @@ const ActivityFooter = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <h3 className="text-xl font-bold mb-4 flex items-center">
-              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center mr-2">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M7 5C7 3.89543 7.89543 3 9 3H15C16.1046 3 17 3.89543 17 5V19C17 19.5523 16.5523 20 16 20H8C7.44772 20 7 19.5523 7 19V5Z" fill="#5B8CD7"/>
-                  <path d="M5 8C5 7.44772 5.44772 7 6 7C6.55228 7 7 7.44772 7 8V16C7 16.5523 6.55228 17 6 17C5.44772 17 5 16.5523 5 16V8Z" fill="#5B8CD7"/>
-                  <path d="M17 8C17 7.44772 17.4477 7 18 7C18.5523 7 19 7.44772 19 8V16C19 16.5523 18.5523 17 18 17C17.4477 17 17 16.5523 17 16V8Z" fill="#5B8CD7"/>
-                </svg>
-              </div>
-              ActivityHub
+              <img 
+                src="/lovable-uploads/ce631b21-c618-4f9b-b6fb-0becf93b620b.png" 
+                alt="LittleBranch Logo" 
+                className="h-8 mr-2"
+              />
             </h3>
             <p className="text-white/80">
               Your one-stop platform for booking amazing activities for kids of all ages in the Philippines.
@@ -54,7 +51,7 @@ const ActivityFooter = () => {
           </div>
         </div>
         <div className="border-t border-white/20 mt-8 pt-6 text-center text-white/60">
-          <p>&copy; {new Date().getFullYear()} ActivityHub. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} LittleBranch. All rights reserved.</p>
         </div>
       </div>
     </footer>

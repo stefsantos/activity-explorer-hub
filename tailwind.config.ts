@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -74,23 +75,15 @@ export default {
 					800: '#00324d',
 					900: '#00161a',
 				},
-				// New littlebranch theme colors
-				'lb-orange': '#d58c3d',
-				'lb-blue': '#425e9c',
-				'lb-red': '#f06f5d',
-				'lb-purple': '#ad59b0',
-				'lb-yellow': '#f3ee16',
-				'lb-teal': '#41dbbe',
-				'lb-green': '#26902a',
-				// Keep original kids theme colors but update them to match new palette
-				'kids-blue': '#425e9c',
-				'kids-green': '#26902a',
-				'kids-yellow': '#f3ee16',
-				'kids-orange': '#d58c3d',
-				'kids-pink': '#f06f5d',
-				'kids-purple': '#ad59b0',
-				'kids-teal': '#41dbbe',
-				'kids-lime': '#41dbbe',
+				// Kids theme colors
+				'kids-blue': '#5B8CD7',
+				'kids-green': '#75C25B',
+				'kids-yellow': '#F2DF30',
+				'kids-orange': '#F29830',
+				'kids-pink': '#F56C98',
+				'kids-purple': '#9974BC',
+				'kids-teal': '#36D0C4',
+				'kids-lime': '#C9D841',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
