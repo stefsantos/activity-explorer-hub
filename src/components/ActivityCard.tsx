@@ -74,9 +74,9 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
           
           {/* Description - single line truncated */}
           <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow">
+            {/* TODO: FIX */}
             A week-long camp full of exciting experiments and scientific discoveries.
           </p>
-          
           {/* Price and Book Now button */}
           <div className="mt-auto flex items-center justify-between">
             <span className="text-lg font-bold">₱{activity.price}</span>

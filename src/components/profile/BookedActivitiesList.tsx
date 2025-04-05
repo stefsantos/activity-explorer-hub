@@ -117,7 +117,7 @@ const BookedActivitiesList = ({ bookings, isLoading }: BookedActivitiesListProps
                 </div>
                 
                 <div className="flex justify-between items-center">
-                  <span className="font-semibold text-kids-teal">${booking.price}</span>
+                  <span className="font-semibold text-kids-teal">₱{booking.price}</span>
                   <Button 
                     variant="outline" 
                     size="sm"

@@ -97,7 +97,7 @@ const BookingCard = ({
                       <p className="text-xs text-gray-500">Up to {pkg.max_participants} participants</p>
                     )}
                   </div>
-                  <div className="text-kids-teal font-semibold">${pkg.price}</div>
+                  <div className="text-kids-teal font-semibold">₱{pkg.price}</div>
                 </div>
               </div>
             ))}

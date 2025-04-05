@@ -89,7 +89,7 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
                     {getAgeRangeText(activity)}
                   </div>
                   <div className="flex items-center bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
-                    ${activity.price}
+                    ₱{activity.price}
                   </div>
                 </div>
                 
