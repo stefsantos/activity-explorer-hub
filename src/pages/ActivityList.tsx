@@ -143,7 +143,7 @@ const ActivityList = () => {
   const resetFilters = () => {
     setCategoryFilter('all');
     setLocationFilter('all');
-    setAgeRange([1, 16]);
+    setAgeRange([0, 16]);
     setPriceRange([0, 5000]);
     setRatingFilter(0);
     setAvailabilityFilters({
