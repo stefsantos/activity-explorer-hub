@@ -1,18 +1,22 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from "@/contexts/UserContext";
 import { MapPin, Star, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-
 interface ActivityCardProps {
   activity: any;
   size?: 'regular' | 'large';
 }
-
-const ActivityCard: React.FC<ActivityCardProps> = ({ activity, size = 'regular' }) => {
-  const { isLoggedIn, toggleBookmark, isBookmarked } = useUser();
+const ActivityCard: React.FC<ActivityCardProps> = ({
+  activity,
+  size = 'regular'
+}) => {
+  const {
+    isLoggedIn,
+    toggleBookmark,
+    isBookmarked
+  } = useUser();
   const bookmarked = isBookmarked(activity.id);
 
   // Format age range text
@@ -26,17 +30,11 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, size = 'regular' 
     }
     return "All ages";
   };
-
-  return (
-    <Link to={`/activity/${activity.id}`} className="activity-card h-full block">
+  return <Link to={`/activity/${activity.id}`} className="activity-card h-full block">
       <div className="bg-white rounded-lg shadow-sm overflow-hidden h-full flex flex-col hover:shadow-md transition-shadow duration-300">
         {/* Activity Image */}
         <div className="relative">
-          <img 
-            src={activity.image} 
-            alt={activity.title} 
-            className="w-full h-48 object-cover"
-          />
+          <img src={activity.image} alt={activity.title} className="w-full h-48 object-cover" />
           
           {/* Category tag */}
           <div className="absolute top-3 left-3">
@@ -58,12 +56,10 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, size = 'regular' 
           <h3 className="font-bold text-gray-800 text-lg truncate mb-1">{activity.title}</h3>
           
           {/* Location with MapPin icon */}
-          {activity.location && (
-            <div className="flex items-center text-gray-500 mb-2 text-xs">
+          {activity.location && <div className="flex items-center text-gray-500 mb-2 text-xs">
               <MapPin size={12} className="mr-1 text-gray-500" />
               <span className="truncate">{activity.location.name || "Various locations"}</span>
-            </div>
-          )}
+            </div>}
           
           {/* Rating Stars */}
           <div className="flex items-center mb-2">
@@ -74,9 +70,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, size = 'regular' 
           </div>
           
           {/* Ages line */}
-          <div className="text-xs text-gray-500 mb-1">
-            Ages {activity.min_age || 0}-{activity.max_age || 16} Years
-          </div>
+          
           
           {/* Description - single line truncated */}
           <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow">
@@ -86,18 +80,16 @@ const ActivityCard: React.FC<ActivityCardProps> = ({ activity, size = 'regular' 
           {/* Price and Book Now button */}
           <div className="mt-auto flex items-center justify-between">
             <span className="text-lg font-bold">₱{activity.price}</span>
-            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white rounded-full" onClick={(e) => {
-              e.preventDefault(); // Stop link navigation
-              // Additional booking button functionality could go here
-            }}>
+            <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white rounded-full" onClick={e => {
+            e.preventDefault(); // Stop link navigation
+            // Additional booking button functionality could go here
+          }}>
               <Calendar size={14} className="mr-1" />
               Book Now
             </Button>
           </div>
         </div>
       </div>
-    </Link>
-  );
+    </Link>;
 };
-
 export default ActivityCard;
