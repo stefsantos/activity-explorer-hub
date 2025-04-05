@@ -1,17 +1,21 @@
+
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, MapPin, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+
 interface FeaturedCarouselProps {
   activities: any[];
 }
+
 const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
   activities
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const totalSlides = activities.length;
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isAutoPlaying && totalSlides > 0) {
@@ -23,14 +27,17 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
       if (interval) clearInterval(interval);
     };
   }, [isAutoPlaying, totalSlides]);
+
   const goToNext = () => {
     setIsAutoPlaying(false);
     setCurrentIndex(prevIndex => (prevIndex + 1) % totalSlides);
   };
+
   const goToPrevious = () => {
     setIsAutoPlaying(false);
     setCurrentIndex(prevIndex => (prevIndex - 1 + totalSlides) % totalSlides);
   };
+
   const goToSlide = (index: number) => {
     setIsAutoPlaying(false);
     setCurrentIndex(index);
@@ -47,11 +54,13 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
     }
     return "All ages";
   };
+
   if (activities.length === 0) {
     return <div className="w-full h-[450px] bg-gray-100 rounded-2xl flex items-center justify-center">
         <p className="text-gray-500">No featured activities available</p>
       </div>;
   }
+
   return <div className="relative w-full h-[450px] overflow-hidden rounded-2xl shadow-xl">
       {/* Decorative blobs */}
       <div className="bg-blob bg-kids-pink w-64 h-64 top-[-100px] left-[-50px]"></div>
@@ -101,8 +110,19 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
 
       {/* Indicators */}
       <div className="absolute bottom-6 left-6 flex space-x-2 z-10">
-        {activities.map((_, index) => {})}
+        {activities.map((_, index) => (
+          <button
+            key={index}
+            className={cn(
+              "w-2 h-2 rounded-full bg-white/50 transition-all",
+              currentIndex === index && "w-6 bg-white"
+            )}
+            onClick={() => goToSlide(index)}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
       </div>
     </div>;
 };
+
 export default FeaturedCarousel;

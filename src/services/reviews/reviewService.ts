@@ -25,12 +25,9 @@ export const getUserReview = async (userId: string, activityId: string): Promise
       .select('*')
       .eq('activity_id', activityId)
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     if (error) {
-      if (error.code === 'PGRST116') { // No rows returned
-        return null;
-      }
       throw error;
     }
 
@@ -58,11 +55,10 @@ export const submitReview = async (
           comment,
         },
       ])
-      .select()
-      .single();
+      .select();
 
     if (error) throw error;
-    return data as Review;
+    return data?.[0] as Review;
   } catch (error) {
     console.error('Error submitting review:', error);
     return null;
@@ -88,13 +84,12 @@ export const submitReviewDirect = async (
           user_id: userId
         },
       ])
-      .select()
-      .single();
+      .select();
 
     if (error) throw error;
     return { 
       success: true, 
-      data: data as Review
+      data: data?.[0] as Review
     };
   } catch (error: any) {
     console.error('Error submitting review:', error);
@@ -123,7 +118,7 @@ export const getReviewById = async (reviewId: string): Promise<Review | null> =>
       .from('activity_reviews')
       .select('*')
       .eq('id', reviewId)
-      .single();
+      .maybeSingle();
 
     if (error) throw error;
     return data as Review;

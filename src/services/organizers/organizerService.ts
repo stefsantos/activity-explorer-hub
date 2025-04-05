@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { OrganizerDetailType } from "../types";
+import { OrganizerDetailType, Activity } from "../types";
 
 export async function fetchOrganizerById(id: string): Promise<OrganizerDetailType | null> {
   const { data: organizer, error: organizerError } = await supabase
@@ -26,7 +26,9 @@ export async function fetchOrganizerById(id: string): Promise<OrganizerDetailTyp
       min_age,
       max_age,
       rating,
-      review_count
+      review_count,
+      location_id,
+      location:activity_locations(id, name, address, latitude, longitude, city)
     `)
     .eq('organizer_id', id);
 
@@ -34,12 +36,39 @@ export async function fetchOrganizerById(id: string): Promise<OrganizerDetailTyp
     console.error('Error fetching organizer activities:', activitiesError);
     return {
       ...organizer,
+      bio: organizer.description || '',
+      logo: '',
+      contact_email: '',
+      contact_phone: '',
+      website: '',
+      social_media: {},
       activities: []
     };
   }
 
+  // Format activities to match the Activity type
+  const formattedActivities: Activity[] = activities?.map(activity => ({
+    ...activity,
+    location: activity.location || {
+      id: '',
+      name: 'Unknown location',
+      address: '',
+      latitude: 0,
+      longitude: 0,
+    },
+    duration: '',
+    group_size: '',
+    organizer_id: id
+  })) || [];
+
   return {
     ...organizer,
-    activities: activities || []
+    bio: organizer.description || '',
+    logo: '',
+    contact_email: '',
+    contact_phone: '',
+    website: '',
+    social_media: {},
+    activities: formattedActivities
   };
 }
