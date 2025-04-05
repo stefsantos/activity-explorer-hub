@@ -83,6 +83,7 @@ const OrganizerDetail = () => {
       
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div></div>
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center">
@@ -94,8 +95,8 @@ const OrganizerDetail = () => {
               </p>
             </CardContent>
           </Card>
-
-          <Card>
+          <br />
+          {/* <Card>
             <CardContent className="pt-6">
               <div className="flex items-center">
                 <Mail className="h-5 w-5 text-blue-500 mr-2" />
@@ -112,9 +113,9 @@ const OrganizerDetail = () => {
                 </p>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
-          <Card>
+          {/* <Card>
             <CardContent className="pt-6">
               <div className="flex items-center">
                 <Calendar className="h-5 w-5 text-blue-500 mr-2" />
@@ -126,7 +127,7 @@ const OrganizerDetail = () => {
                 <p>Sunday: Closed</p>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
 
         <div className="mb-4">

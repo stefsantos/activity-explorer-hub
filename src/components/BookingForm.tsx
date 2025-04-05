@@ -15,7 +15,8 @@ const bookingFormSchema = z.object({
   first_name: z.string().min(2, "First name must be at least 2 characters"),
   last_name: z.string().min(2, "Last name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits")
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  notes: z.string().optional()
 });
 
 type BookingFormValues = z.infer<typeof bookingFormSchema>;
@@ -48,13 +49,13 @@ const BookingForm = ({
       first_name: user?.name ? user.name.split(' ')[0] : "",
       last_name: user?.name ? user.name.split(' ').slice(1).join(' ') : "",
       email: user?.email || "",
-      phone: ""
+      phone: "",
+      notes: ""
     }
   });
 
   const onSubmit = async (data: BookingFormValues) => {
     try {
-      // Create booking using the service function
       const { success, error } = await createBooking({
         activity_id: activityId,
         variant_id: variantId,
@@ -64,7 +65,8 @@ const BookingForm = ({
         last_name: data.last_name,
         email: data.email,
         phone: data.phone,
-        price: price
+        price: price,
+        notes: data.notes
       });
 
       if (!success) {
@@ -73,7 +75,6 @@ const BookingForm = ({
         return;
       }
 
-      // Refresh user bookings if the user is logged in
       if (isLoggedIn) {
         await refreshBookings();
       }
@@ -88,7 +89,7 @@ const BookingForm = ({
 
   const handleLoginRedirect = () => {
     navigate('/auth', { state: { returnUrl: window.location.pathname } });
-    onLogin(); // Close modal if needed
+    onLogin();
   };
 
   return (
@@ -166,6 +167,25 @@ const BookingForm = ({
                     <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                     <Input placeholder="Phone" className="pl-10" {...field} />
                   </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="notes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Notes</FormLabel>
+                <FormControl>
+                  <textarea
+                    rows={4}
+                    className="w-full rounded-md border border-gray-300 p-3 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-kids-orange"
+                    placeholder="Leave a note or message for the seller..."
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
