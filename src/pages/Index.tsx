@@ -162,9 +162,9 @@ const Index = () => {
             </div>
             <Link to="/activities">
               <button
-                className="bg-kids-orange hover:bg-kids-orange/90 text-white py-2 px-6 rounded text-lg font-medium"
+                className="rounded-full bg-kids-orange hover:bg-kids-orange/90 text-white py-2 px-6 rounded text-lg font-medium"
               >
-                Explore Activities
+                Explore Activities <i className='bx bx-right-arrow-alt'></i>
               </button>
             </Link>
           </div>
