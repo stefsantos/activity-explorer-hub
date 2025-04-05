@@ -235,19 +235,42 @@ const BookingForm = ({
 
       {step === 2 && (
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 mb-2">Upload GCash Receipt</h3>
-          <p className="text-sm text-gray-600 mb-4">Please upload your GCash payment receipt to confirm your booking.</p>
+  <h3 className="text-lg font-semibold text-gray-800 mb-2">Upload GCash Receipt</h3>
+  <p className="text-sm text-gray-600 mb-4">
+    Please upload your GCash payment receipt to confirm your booking.
+  </p>
+  <img src={"/GCASH.png"} alt={"09173728852"} className="w-full mb-4" />
 
-          <div className="space-y-4">
-            <div className="relative">
-              <Upload className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input type="file" accept="image/*" className="pl-10" onChange={handleReceiptChange} />
-            </div>
-            <Button onClick={handleReceiptSubmit} className="bg-kids-orange hover:bg-kids-orange/90 text-white">
-              Submit Receipt
-            </Button>
-          </div>
-        </div>
+  {/* Section for copying GCash number */}
+  <div className="flex items-center justify-between bg-gray-100 p-3 rounded mb-4">
+    <span className="text-gray-800 font-medium">GCash Number: 09173728852</span>
+    <button
+      onClick={() => navigator.clipboard.writeText("09173728852")}
+      className="text-sm bg-kids-orange hover:bg-kids-orange/90 text-white py-1 px-3 rounded"
+    >
+      Copy Number
+    </button>
+  </div>
+
+  <div className="space-y-4">
+    <div className="relative">
+      <Upload className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+      <Input
+        type="file"
+        accept="image/*"
+        className="pl-10"
+        onChange={handleReceiptChange}
+      />
+    </div>
+    <Button
+      onClick={handleReceiptSubmit}
+      className="bg-kids-orange hover:bg-kids-orange/90 text-white"
+    >
+      Submit Receipt
+    </Button>
+  </div>
+</div>
+
       )}
     </div>
   );
