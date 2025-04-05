@@ -119,7 +119,7 @@ const Navbar = () => {
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             {/* Map button for mobile */}
-            <Button 
+            {/* <Button 
               variant="ghost" 
               size="icon" 
               className="mr-2 text-gray-600 hover:text-kids-blue hover:bg-kids-blue/10" 
@@ -127,7 +127,7 @@ const Navbar = () => {
               aria-label="View map"
             >
               <Map size={20} />
-            </Button>
+            </Button> */}
             
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-600 hover:text-gray-900 focus:outline-none" aria-label={isMenuOpen ? "Close menu" : "Open menu"}>
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

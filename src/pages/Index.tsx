@@ -274,7 +274,7 @@ const Index = () => {
       <MapDialog 
         isOpen={isMapDialogOpen} 
         onClose={() => setIsMapDialogOpen(false)} 
-        activities={filteredActivities} 
+        activities={allActivities}
       />
       <ActivityFooter />
     </div>;
