@@ -10,6 +10,7 @@ import { useUser } from "@/contexts/UserContext";
 import { Mail, Phone, User, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createBooking } from "@/services/bookingService";
+import { supabase } from '@/integrations/supabase/client';
 
 const bookingFormSchema = z.object({
   first_name: z.string().min(2, "First name must be at least 2 characters"),
@@ -76,7 +77,6 @@ const BookingForm = ({
         phone: data.phone,
         price: price,
         notes: data.notes
-        // receipt not sent here, assumed handled separately if needed
       });
 
       if (!success) {
@@ -110,13 +110,64 @@ const BookingForm = ({
     }
   };
 
-  const handleReceiptSubmit = () => {
+  const handleReceiptSubmit = async () => {
     if (!receipt) {
       toast.error('Please upload a GCash receipt.');
       return;
     }
-    setStep(3);
+
+    const fileExt = receipt.name.split(".").pop();
+    const timestamp = Date.now();
+    const random = Math.floor(Math.random() * 10000);
+    const fileName = `receipt-${timestamp}-${random}.${fileExt}`;
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from("receipts")
+      .upload(fileName, receipt);
+
+    if (uploadError) {
+      console.error("Upload error:", uploadError);
+      toast.error("Failed to upload receipt. Please try again.");
+      return;
+    }
+
+    const { data: urlData } = supabase.storage.from("receipts").getPublicUrl(fileName);
+    const receiptUrl = urlData?.publicUrl;
+
+    try {
+      const values = form.getValues();
+      const { success, error } = await createBooking({
+        activity_id: activityId,
+        variant_id: variantId,
+        package_id: packageId,
+        user_id: isLoggedIn ? user?.id : null,
+        first_name: values.first_name,
+        last_name: values.last_name,
+        email: values.email,
+        phone: values.phone,
+        price: price,
+        notes: values.notes,
+        receipt: receiptUrl
+      });
+
+      if (!success) {
+        console.error("Error creating booking:", error);
+        toast.error("Failed to create booking. Please try again.");
+        return;
+      }
+
+      if (isLoggedIn) {
+        await refreshBookings();
+      }
+
+      toast.success("Booking successfully created!");
+      setStep(3);
+    } catch (error) {
+      console.error("Booking error:", error);
+      toast.error("Something went wrong. Please try again.");
+    }
   };
+
 
   if (step === 3) {
     return (
