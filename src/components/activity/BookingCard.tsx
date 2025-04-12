@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Package, GitBranch } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ActivityDetailType } from '@/services/types';
+import { formatPrice } from '@/lib/utils';
 
 interface BookingCardProps {
   activity: ActivityDetailType;
@@ -28,7 +29,7 @@ const BookingCard = ({
       <h1 className="text-2xl font-bold text-gray-800 mb-2">{activity.title}</h1>
       
       <div className="flex items-center mb-4">
-        <span className="text-2xl font-bold text-kids-teal">₱{getCalculatedPrice()}</span>
+        <span className="text-2xl font-bold text-kids-teal">₱{formatPrice(getCalculatedPrice())}</span>
         {selectedPackage && (
           <span className="ml-2 text-sm text-gray-500">per package</span>
         )}
@@ -62,7 +63,7 @@ const BookingCard = ({
                   </div>
                   <div className="text-kids-teal font-semibold">
                     {variant.price_adjustment > 0 && '+'}
-                    {variant.price_adjustment !== 0 && `$${variant.price_adjustment}`}
+                    {variant.price_adjustment !== 0 && `₱${formatPrice(variant.price_adjustment)}`}
                   </div>
                 </div>
               </div>
@@ -97,7 +98,7 @@ const BookingCard = ({
                       <p className="text-xs text-gray-500">Up to {pkg.max_participants} participants</p>
                     )}
                   </div>
-                  <div className="text-kids-teal font-semibold">₱{pkg.price}</div>
+                  <div className="text-kids-teal font-semibold">₱{formatPrice(pkg.price)}</div>
                 </div>
               </div>
             ))}
