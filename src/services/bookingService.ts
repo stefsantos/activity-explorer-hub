@@ -11,6 +11,8 @@ export interface BookingData {
   email: string;
   phone: string;
   price: number;
+  notes?: string;
+  receipt?: string;
 }
 
 export async function createBooking(bookingData: BookingData) {
