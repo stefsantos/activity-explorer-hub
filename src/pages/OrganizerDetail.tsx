@@ -6,7 +6,7 @@ import { Mail, Phone, MapPin, Activity, Calendar, Info, Building } from 'lucide-
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent } from '@/components/ui/card';
 import Navbar from '@/components/Navbar';
-import { fetchOrganizerById } from '@/services';
+import { fetchOrganizerById, OrganizerDetailType } from '@/services';
 import { useToast } from "@/hooks/use-toast";
 import ActivityCard from '@/components/ActivityCard';
 

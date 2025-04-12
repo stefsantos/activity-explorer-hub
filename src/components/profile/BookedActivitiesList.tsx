@@ -5,7 +5,6 @@ import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useNavigate } from 'react-router-dom';
-import { formatPrice } from '@/lib/formatters';
 
 interface BookingType {
   id: string;
@@ -128,7 +127,7 @@ const BookedActivitiesList = ({ bookings, isLoading }: BookedActivitiesListProps
             </div>
             
             <div className="flex justify-between items-center">
-              <span className="font-semibold text-kids-teal">₱{formatPrice(booking.price)}</span>
+              <span className="font-semibold text-kids-teal">₱{booking.price}</span>
               <Button 
                 variant="outline" 
                 size="sm"

@@ -1,178 +1,282 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { fetchActivities, fetchCities } from '@/services';
+import { Button } from '@/components/ui/button';
 import ActivityCard from '@/components/ActivityCard';
 import FeaturedCarousel from '@/components/FeaturedCarousel';
+import FilterCarousel from '@/components/FilterCarousel';
+import CityFilterCarousel from '@/components/CityFilterCarousel';
+import CategoryFilter from '@/components/CategoryFilter';
+import Pagination from '@/components/Pagination';
 import Navbar from '@/components/Navbar';
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { Search, MapPin } from 'lucide-react';
+import { categories, locations, ageRanges } from '@/data/activities';
+import { Palette, Users, Mountain, BookOpen, Music, Utensils, HeartPulse, FlaskConical, Monitor, Popcorn, Gamepad2 } from 'lucide-react';
+import { fetchFeaturedActivities, fetchPopularActivities, fetchActivities } from '@/services';
+import { useQuery } from '@tanstack/react-query';
+import ActivityFooter from '@/components/activity/ActivityFooter';
 import MapDialog from '@/components/MapDialog';
 
 const Index = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [cityQuery, setCityQuery] = useState('');
-  const [filteredCities, setFilteredCities] = useState<string[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [locationFilter, setLocationFilter] = useState('all');
+  const [ageRangeFilter, setAgeRangeFilter] = useState('all');
+  const [ageRange, setAgeRange] = useState<[number, number]>([1, 16]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
   const [isMapDialogOpen, setIsMapDialogOpen] = useState(false);
   
-  const { data: activities = [], isLoading, error } = useQuery({
-    queryKey: ['activities', searchQuery, cityQuery],
-    queryFn: () => fetchActivities({ search: searchQuery, city: cityQuery }),
-    staleTime: 1000 * 60 * 5, // 5 minutes
+  // Get unique cities from locations
+  const cities = [...new Set(locations.map(loc => loc.city))]
+    .filter(Boolean)
+    .map(city => ({ id: city?.toLowerCase() || '', name: city || '' }));
+  
+  const {
+    data: allActivities = []
+  } = useQuery({
+    queryKey: ['activities'],
+    queryFn: fetchActivities
   });
   
-  const { data: cities = [] } = useQuery({
-    queryKey: ['cities'],
-    queryFn: fetchCities,
-    staleTime: Infinity, // Cities don't change often
-  });
-  
-  const { data: featuredActivities = [] } = useQuery({
+  const {
+    data: featuredActivities = []
+  } = useQuery({
     queryKey: ['featuredActivities'],
-    queryFn: () => fetchActivities({ featured: true }),
-    staleTime: 1000 * 60 * 10, // 10 minutes
+    queryFn: fetchFeaturedActivities
   });
-
+  
+  const {
+    data: popularActivities = []
+  } = useQuery({
+    queryKey: ['popularActivities'],
+    queryFn: () => fetchPopularActivities(4)
+  });
+  
   useEffect(() => {
-    if (cities) {
-      setFilteredCities(cities);
+    let filtered = [...allActivities];
+    
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(activity => activity.category && activity.category.toLowerCase && activity.category.toLowerCase() === categoryFilter.toLowerCase());
     }
-  }, [cities]);
-
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    if (typeof cityQuery === 'string' && cityQuery) {
-      setFilteredCities(cities.filter(city =>
-        city.toLowerCase().includes(cityQuery.toLowerCase())
-      ));
-    } else {
-      setFilteredCities(cities);
+    
+    if (locationFilter !== 'all') {
+      if (locationFilter.startsWith('city-')) {
+        // Filter by city
+        const city = locationFilter.replace('city-', '');
+        filtered = filtered.filter(activity => activity.city === city);
+      } else {
+        // Filter by specific location
+        filtered = filtered.filter(activity => 
+          activity.location && 
+          typeof activity.location === 'string' && 
+          activity.location.toLowerCase() === locationFilter.toLowerCase()
+        );
+      }
     }
+    
+    // Filter by age range slider
+    filtered = filtered.filter(activity => {
+      const minAge = activity.min_age || 0;
+      const maxAge = activity.max_age || 18;
+      return minAge <= ageRange[1] && maxAge >= ageRange[0];
+    });
+    
+    const itemsPerPage = 6;
+    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    setTotalPages(totalPages);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedActivities = filtered.slice(startIndex, startIndex + itemsPerPage);
+    setFilteredActivities(paginatedActivities);
+  }, [allActivities, categoryFilter, locationFilter, ageRange, currentPage]);
+  
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({
+      top: document.getElementById('activity-list')?.offsetTop ?? 0,
+      behavior: 'smooth'
+    });
   };
-
-  const handleCityChange = (value: string) => {
-    setCityQuery(value);
-    setFilteredCities(
-      cities.filter((city) => city.toLowerCase().includes(value.toLowerCase()))
-    );
-  };
-
-  return (
-    <>
+  
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'Arts & Crafts':
+        return <Palette size={24} />;
+      case 'Sports':
+        return <HeartPulse size={24} />;
+      case 'Outdoors':
+        return <Mountain size={24} />;
+      case 'Education':
+        return <BookOpen size={24} />;
+      case 'Gaming':
+        return <Gamepad2 size={24} />;
+      case 'Entertainment':
+        return <Popcorn size={24} />;
+      case 'Monitor':
+        return <Monitor size={24} />;
+      case 'Music':
+        return <Music size={24} />;
+      case 'Cooking':
+        return <Utensils size={24} />;
+      case 'Science':
+        return <FlaskConical size={24} />;
+      default:
+        return <Users size={24} />;
+    }
+  };  
+  
+  const getCategoryColor = (category: string) => {
+    switch (category) {
+      case 'Arts & Crafts':
+        return 'bg-[#F3EE16]'; // Bright yellow
+      case 'Sports':
+        return 'bg-[#41DBBE]'; // Vibrant teal
+      case 'Outdoors':
+        return 'bg-[#26902A]'; // Bold green
+      case 'Education':
+        return 'bg-[#425E9C]'; // Deep blue
+      case 'Music':
+        return 'bg-[#AD59B0]'; // Rich purple
+      case 'Cooking':
+        return 'bg-[#F06F5D]'; // Soft red-orange
+      case 'Science':
+        return 'bg-[#BDC939]'; // Lime green
+      case 'Gaming':
+        return 'bg-[#FF4B4B]'; // Bright red
+      case 'Entertainment':
+        return 'bg-[#F38B9A]'; // Playful pink
+      case 'Monitor':
+        return 'bg-[#D58C3D]'; // Earthy orange-brown
+      default:
+        return 'bg-gray-300'; // Neutral fallback color
+    }
+  };  
+  
+  return <div className="min-h-screen bg-gray-50">
       <Navbar />
-      <header className="relative h-[400px] md:h-[500px] lg:h-[600px] bg-gradient-to-r from-kids-blue to-kids-teal overflow-hidden">
-        {/* Decorative Blobs */}
-        <div className="absolute bg-blob bg-kids-pink w-64 h-64 top-[-50px] left-[-50px]"></div>
-        <div className="absolute bg-blob bg-kids-yellow w-72 h-72 bottom-[-80px] right-[-80px]"></div>
-        <div className="absolute bg-blob bg-kids-orange w-56 h-56 top-1/2 left-[20%]"></div>
-
-        <div className="container mx-auto px-4 relative z-10 flex items-center h-full">
-          <div className="text-white text-center md:text-left">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-              Discover Fun Activities for Your Kids
+      
+      <main className="container mx-auto px-4 py-8">
+      <section className="mb-10 relative">
+        <div className="flex flex-col lg:flex-row items-center lg:items-center lg:gap-8">
+          {/* Text Section */}
+          <div className="lg:w-1/3 text-center lg:text-left flex flex-col justify-center">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">
+              <span className="text-gray-800"><b>The Largest Kids Activity Platform</b></span>
             </h1>
-            <p className="text-lg md:text-xl mb-8 opacity-80">
-              Explore a wide range of activities and experiences designed to
-              entertain, educate, and inspire children of all ages.
-            </p>
-            <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start">
-              <Link to="/activities">
-                <Button size="lg" className="bg-kids-orange hover:bg-kids-orange/90">
-                  Explore Activities
-                </Button>
-              </Link>
-              {/* <Button variant="outline" size="lg">
-                Learn More
-              </Button> */}
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
+              <span className="text-gray-800"><b>in the </b></span>
+              <span className="text-kids-orange"><b>Philippines</b></span>
+              <span className="text-gray-800"><b>.</b></span>
+            </h2>
+            <div className="text-center lg:text-left py-10">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                More than 1000+ Activities around the Philippines all in one place!
+              </h2>
             </div>
-          </div>
-        </div>
-      </header>
-
-      <section className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Search Box */}
-          <div className="mb-6">
-            <Label htmlFor="search" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">
-              What are you looking for?
-            </Label>
-            <div className="relative">
-              <Input
-                id="search"
-                type="search"
-                placeholder="Search for activities"
-                value={searchQuery}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="pl-10"
-              />
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
-            </div>
+            <Link to="/activities">
+              <button
+                className="rounded-full bg-kids-orange hover:bg-kids-orange/90 text-white py-2 px-6 rounded text-lg font-medium"
+              >
+                Explore Activities <i className='bx bx-right-arrow-alt'></i>
+              </button>
+            </Link>
           </div>
 
-          {/* City Filter */}
-          <div className="mb-6">
-            <Label htmlFor="city" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed">
-              City
-            </Label>
-            <div className="relative">
-              <Input
-                id="city"
-                type="search"
-                placeholder="Enter a city"
-                value={cityQuery}
-                onChange={(e) => handleCityChange(e.target.value)}
-                className="pl-10"
-                list="cityOptions"
-              />
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
-              <datalist id="cityOptions">
-                {filteredCities.map((city) => (
-                  <option key={city} value={city} />
-                ))}
-              </datalist>
-            </div>
+          {/* Featured Carousel */}
+          <div className="lg:w-2/3">
+            <FeaturedCarousel activities={featuredActivities} />
           </div>
         </div>
       </section>
 
-      <section className="container mx-auto px-4 mb-12">
-        <FeaturedCarousel activities={featuredActivities} />
-      </section>
-
-      <section className="container mx-auto px-4 py-8">
-        <h2 className="text-3xl font-bold mb-6 text-center md:text-left">
-          Explore All Activities
-        </h2>
-        {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="animate-pulse bg-gray-100 rounded-lg h-48"></div>
-            ))}
+        {/* <section className="mb-12">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-800">Our Most Popular Activities</h2>
+            <Link to="/activities" className="text-kids-teal font-medium text-sm hover:underline flex items-center">
+              View All
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
+                <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </Link>
           </div>
-        ) : error ? (
-          <p className="text-red-500">Error loading activities.</p>
-        ) : activities.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {activities.map((activity) => (
-              <ActivityCard key={activity.id} activity={activity} />
-            ))}
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {popularActivities.map(activity => <ActivityCard key={activity.id} activity={activity} />)}
           </div>
-        ) : (
-          <p>No activities found.</p>
-        )}
-      </section>
+        </section> */}
         
-        {/* Map Dialog */}
-        <MapDialog 
-          isOpen={isMapDialogOpen} 
-          onClose={() => setIsMapDialogOpen(false)} 
-          activities={activities} 
-        />
-    </>
-  );
-};
+        <CategoryFilter categories={categories} selectedCategory={categoryFilter} onChange={id => {
+        setCategoryFilter(id);
+        setCurrentPage(1);
+      }} getCategoryIcon={getCategoryIcon} getCategoryColor={getCategoryColor} />
+        
+        <section className="mb-8">
+          <CityFilterCarousel 
+            title="Cities in the Philippines" 
+            cities={cities} 
+            selectedCity={locationFilter} 
+            onChange={id => {
+              setLocationFilter(id);
+              setCurrentPage(1);
+            }} 
+          />
+          
+          <FilterCarousel 
+            title="Age Ranges" 
+            options={ageRanges} 
+            selectedOption={ageRangeFilter} 
+            onChange={id => {
+              setAgeRangeFilter(id);
+              setCurrentPage(1);
+            }}
+            isAgeFilter={true}
+            ageRange={ageRange}
+            onAgeRangeChange={(value) => {
+              setAgeRange(value);
+              setCurrentPage(1);
+            }}
+          />
+        </section>
+        
+        <section id="activity-list" className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Activities Just For You</h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredActivities.length > 0 ? filteredActivities.map(activity => <ActivityCard key={activity.id} activity={activity} />) : <div className="col-span-full text-center py-12">
+                <h3 className="text-xl font-medium text-gray-700 mb-2">No activities found</h3>
+                <p className="text-gray-500">Try adjusting your filters or browse all activities</p>
+              </div>}
+          </div>
+          
+          <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+          
+          <div className="text-center mt-10">
+            <Link to="/activities">
+              <Button className="bg-kids-orange hover:bg-kids-orange/90 text-white rounded-full px-8 py-6 text-lg font-medium">
+                See All Activities
+              </Button>
+            </Link>
+          </div>
+        </section>
+      </main>
+      {/* Floating Map Button */}
+      <Button 
+        variant="ghost" 
+        size="lg" 
+        className="fixed bottom-12 left-1/2 transform -translate-x-1/2 bg-orange-500 hover:bg-orange-600 text-white shadow-lg rounded-full px-6 py-4 z-50 flex items-center gap-2"
+        onClick={() => setIsMapDialogOpen(true)}
+        aria-label="View map"
+      >
+        <span className="text-lg font-medium">Show Map</span>
+        <i className="bx bx-map-alt text-2xl"></i>
+      </Button>
 
+      {/* Map Dialog */}
+      <MapDialog 
+        isOpen={isMapDialogOpen} 
+        onClose={() => setIsMapDialogOpen(false)} 
+        activities={allActivities}
+      />
+      <ActivityFooter />
+    </div>;
+};
 export default Index;
