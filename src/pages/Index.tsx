@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,13 @@ import { useQuery } from '@tanstack/react-query';
 import ActivityFooter from '@/components/activity/ActivityFooter';
 import MapDialog from '@/components/MapDialog';
 
+const safeToLowerCase = (str: any): string => {
+  if (typeof str === 'string') {
+    return str.toLowerCase();
+  }
+  return '';
+};
+
 const Index = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
@@ -26,7 +32,6 @@ const Index = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [isMapDialogOpen, setIsMapDialogOpen] = useState(false);
   
-  // Get unique cities from locations
   const cities = [...new Set(locations.map(loc => loc.city))]
     .filter(Boolean)
     .map(city => ({ id: city?.toLowerCase() || '', name: city || '' }));
@@ -56,25 +61,22 @@ const Index = () => {
     let filtered = [...allActivities];
     
     if (categoryFilter !== 'all') {
-      filtered = filtered.filter(activity => activity.category && activity.category.toLowerCase && activity.category.toLowerCase() === categoryFilter.toLowerCase());
+      filtered = filtered.filter(activity => activity.category && safeToLowerCase(activity.category) === categoryFilter.toLowerCase());
     }
     
     if (locationFilter !== 'all') {
       if (locationFilter.startsWith('city-')) {
-        // Filter by city
         const city = locationFilter.replace('city-', '');
         filtered = filtered.filter(activity => activity.city === city);
       } else {
-        // Filter by specific location
         filtered = filtered.filter(activity => 
           activity.location && 
           typeof activity.location === 'string' && 
-          activity.location.toLowerCase() === locationFilter.toLowerCase()
+          safeToLowerCase(activity.location) === locationFilter.toLowerCase()
         );
       }
     }
     
-    // Filter by age range slider
     filtered = filtered.filter(activity => {
       const minAge = activity.min_age || 0;
       const maxAge = activity.max_age || 18;
@@ -157,7 +159,6 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8">
       <section className="mb-10 relative">
         <div className="flex flex-col lg:flex-row items-center lg:items-center lg:gap-8">
-          {/* Text Section */}
           <div className="lg:w-1/3 text-center lg:text-left flex flex-col justify-center">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3">
               <span className="text-gray-800"><b>The Largest Kids Activity Platform</b></span>
@@ -181,29 +182,12 @@ const Index = () => {
             </Link>
           </div>
 
-          {/* Featured Carousel */}
           <div className="lg:w-2/3">
             <FeaturedCarousel activities={featuredActivities} />
           </div>
         </div>
       </section>
 
-        {/* <section className="mb-12">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Our Most Popular Activities</h2>
-            <Link to="/activities" className="text-kids-teal font-medium text-sm hover:underline flex items-center">
-              View All
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
-                <path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {popularActivities.map(activity => <ActivityCard key={activity.id} activity={activity} />)}
-          </div>
-        </section> */}
-        
         <CategoryFilter categories={categories} selectedCategory={categoryFilter} onChange={id => {
         setCategoryFilter(id);
         setCurrentPage(1);
@@ -258,7 +242,7 @@ const Index = () => {
           </div>
         </section>
       </main>
-      {/* Floating Map Button */}
+      
       <Button 
         variant="ghost" 
         size="lg" 
@@ -270,7 +254,6 @@ const Index = () => {
         <i className="bx bx-map-alt text-2xl"></i>
       </Button>
 
-      {/* Map Dialog */}
       <MapDialog 
         isOpen={isMapDialogOpen} 
         onClose={() => setIsMapDialogOpen(false)} 

@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Baby, User, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Slider } from '@/components/ui/slider';
 
@@ -43,6 +43,15 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
     }
   };
 
+  // Common age ranges
+  const ageRangePresets = [
+    { label: "0-3", range: [0, 3], icon: <Baby size={16} /> },
+    { label: "4-7", range: [4, 7], icon: <User size={16} /> },
+    { label: "8-12", range: [8, 12], icon: <User size={16} /> },
+    { label: "13+", range: [13, 16], icon: <Users size={16} /> },
+    { label: "All Ages", range: [0, 16], icon: <Users size={16} /> }
+  ];
+
   return (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-2">
@@ -69,6 +78,27 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
       
       {isAgeFilter && onAgeRangeChange ? (
         <div className="px-4 py-2">
+          {/* Age range preset buttons */}
+          <div className="flex flex-wrap gap-2 mb-4 justify-center">
+            {ageRangePresets.map((preset) => (
+              <Button
+                key={preset.label}
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "rounded-full border-kids-teal text-kids-teal hover:bg-kids-teal hover:text-white flex items-center gap-1",
+                  ageRange[0] === preset.range[0] && ageRange[1] === preset.range[1] 
+                    ? 'bg-kids-teal text-white' 
+                    : ''
+                )}
+                onClick={() => onAgeRangeChange(preset.range as [number, number])}
+              >
+                {preset.icon}
+                {preset.label}
+              </Button>
+            ))}
+          </div>
+          
           <Slider 
             value={ageRange}
             min={0} 
