@@ -4,10 +4,12 @@ import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Baby, User, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Slider } from '@/components/ui/slider';
+
 interface FilterOption {
   id: string;
   name: string;
 }
+
 interface FilterCarouselProps {
   title: string;
   options: FilterOption[];
@@ -17,6 +19,7 @@ interface FilterCarouselProps {
   ageRange?: [number, number];
   onAgeRangeChange?: (value: [number, number]) => void;
 }
+
 const FilterCarousel: React.FC<FilterCarouselProps> = ({
   title,
   options,
@@ -27,12 +30,32 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
   onAgeRangeChange
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const ageButtonsRef = useRef<HTMLDivElement>(null);
+
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const {
         current
       } = scrollRef;
       const scrollAmount = 200;
+      if (direction === 'left') {
+        current.scrollBy({
+          left: -scrollAmount,
+          behavior: 'smooth'
+        });
+      } else {
+        current.scrollBy({
+          left: scrollAmount,
+          behavior: 'smooth'
+        });
+      }
+    }
+  };
+
+  const scrollAgeButtons = (direction: 'left' | 'right') => {
+    if (ageButtonsRef.current) {
+      const { current } = ageButtonsRef;
+      const scrollAmount = 100;
       if (direction === 'left') {
         current.scrollBy({
           left: -scrollAmount,
@@ -69,6 +92,7 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
     range: [13, 16],
     icon: <Users size={16} />
   }];
+
   return <div className="mb-6">
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-lg font-bold text-gray-800">{title}</h3>
@@ -83,12 +107,43 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
       </div>
       
       {isAgeFilter && onAgeRangeChange ? <div className="py-2 px-0">
-          {/* Age range preset buttons */}
-          <div className="flex flex-wrap gap-2 mb-4 justify-start">
-            {ageRangePresets.map(preset => <Button key={preset.label} variant="outline" size="sm" className={cn("rounded-full border-kids-teal text-kids-teal hover:bg-kids-teal hover:text-white flex items-center gap-1", ageRange[0] === preset.range[0] && ageRange[1] === preset.range[1] ? 'bg-kids-teal text-white' : '')} onClick={() => onAgeRangeChange(preset.range as [number, number])}>
-                {preset.icon}
-                {preset.label}
-              </Button>)}
+          {/* Age range preset buttons - scrollable on mobile */}
+          <div className="mb-4 relative">
+            <div className="overflow-x-auto hide-scrollbar" ref={ageButtonsRef}>
+              <div className="flex gap-2 min-w-max">
+                {ageRangePresets.map(preset => <Button 
+                  key={preset.label} 
+                  variant="outline" 
+                  size="sm" 
+                  className={cn(
+                    "rounded-full border-kids-teal text-kids-teal hover:bg-kids-teal hover:text-white flex items-center gap-1 whitespace-nowrap", 
+                    ageRange[0] === preset.range[0] && ageRange[1] === preset.range[1] ? 'bg-kids-teal text-white' : ''
+                  )} 
+                  onClick={() => onAgeRangeChange(preset.range as [number, number])}
+                >
+                  {preset.icon}
+                  {preset.label}
+                </Button>)}
+              </div>
+            </div>
+            <div className="absolute top-1/2 right-0 -translate-y-1/2 flex gap-1 md:hidden">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-6 w-6 rounded-full bg-white/80 backdrop-blur-sm border-kids-teal text-kids-teal hover:bg-kids-teal hover:text-white" 
+                onClick={() => scrollAgeButtons('left')}
+              >
+                <ChevronLeft className="h-3 w-3" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="h-6 w-6 rounded-full bg-white/80 backdrop-blur-sm border-kids-teal text-kids-teal hover:bg-kids-teal hover:text-white" 
+                onClick={() => scrollAgeButtons('right')}
+              >
+                <ChevronRight className="h-3 w-3" />
+              </Button>
+            </div>
           </div>
           
           <Slider 
@@ -118,4 +173,5 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
         </div>}
     </div>;
 };
+
 export default FilterCarousel;
