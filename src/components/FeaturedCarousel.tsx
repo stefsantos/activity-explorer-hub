@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, MapPin, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
@@ -89,7 +90,7 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({
                     {getAgeRangeText(activity)}
                   </div>
                   <div className="flex items-center bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
-                    ₱{activity.price}
+                    ₱{formatPrice(activity.price)}
                   </div>
                 </div>
                 

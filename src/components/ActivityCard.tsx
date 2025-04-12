@@ -1,13 +1,17 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from "@/contexts/UserContext";
 import { MapPin, Star, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { formatPrice } from "@/lib/formatters";
 import { Button } from "@/components/ui/button";
+
 interface ActivityCardProps {
   activity: any;
   size?: 'regular' | 'large';
 }
+
 const ActivityCard: React.FC<ActivityCardProps> = ({
   activity,
   size = 'regular'
@@ -30,6 +34,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
     }
     return "All ages";
   };
+  
   return <Link to={`/activity/${activity.id}`} className="activity-card h-full block">
       <div className="bg-white rounded-lg shadow-sm overflow-hidden h-full flex flex-col hover:shadow-md transition-shadow duration-300">
         {/* Activity Image */}
@@ -69,27 +74,19 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
             </div>
           </div>
           
-          {/* Ages line */}
-          
-          
           {/* Description - single line truncated */}
           <p className="text-gray-600 text-sm mb-4 line-clamp-2 flex-grow">
            {activity.description}
           </p>
+          
           {/* Price and Book Now button */}
           <div className="mt-auto flex items-center justify-between">
-            <span className="text-lg font-bold">₱{activity.price}</span>
-            {/* <Button size="sm" className="bg-amber-500 hover:bg-amber-600 text-white rounded-full" onClick={e => {
-            e.preventDefault(); // Stop link navigation
-            // Additional booking button functionality could go here
-          }}>
-              <Calendar size={14} className="mr-1" />
-              Book Now
-            </Button> */}
+            <span className="text-lg font-bold">₱{formatPrice(activity.price)}</span>
             <div></div>
           </div>
         </div>
       </div>
     </Link>;
 };
+
 export default ActivityCard;
