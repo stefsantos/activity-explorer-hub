@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQueryClient } from '@tanstack/react-query';
@@ -7,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Form, FormField, FormItem, FormControl, FormMessage } from '@/components/ui/form';
 import { toast } from 'sonner';
-import { submitReviewDirect, deleteReviewDirect } from '@/services/reviews/reviewService';
+import { submitReview, deleteReview } from '@/services/reviews/reviewService';
 import { useUser } from '@/contexts/UserContext';
 
 type ReviewFormValues = {
@@ -58,21 +57,19 @@ const ReviewForm = ({ activityId, userReview, onSuccess }: ReviewFormProps) => {
     
     try {
       const userName = user.name || 'Anonymous User';
-      const result = await submitReviewDirect(
-        activityId,
-        user.id,
-        userName,
-        rating,
-        values.comment || undefined
-      );
+      const reviewData = {
+        activity_id: activityId,
+        user_id: user.id,
+        reviewer_name: userName,
+        rating: rating,
+        comment: values.comment || null
+      };
       
-      if (result.success) {
-        toast.success(userReview ? "Review updated successfully" : "Review submitted successfully");
-        queryClient.invalidateQueries({ queryKey: ['activity', activityId] });
-        if (onSuccess) onSuccess();
-      } else {
-        toast.error(result.error || "Error submitting review");
-      }
+      const result = await submitReview(reviewData);
+      
+      toast.success(userReview ? "Review updated successfully" : "Review submitted successfully");
+      queryClient.invalidateQueries({ queryKey: ['activity', activityId] });
+      if (onSuccess) onSuccess();
     } catch (error) {
       console.error('Error submitting review:', error);
       toast.error("An unexpected error occurred");
@@ -88,17 +85,13 @@ const ReviewForm = ({ activityId, userReview, onSuccess }: ReviewFormProps) => {
       setIsDeleting(true);
       
       try {
-        const result = await deleteReviewDirect(userReview.id);
+        await deleteReview(userReview.id);
         
-        if (result.success) {
-          toast.success("Review deleted successfully");
-          queryClient.invalidateQueries({ queryKey: ['activity', activityId] });
-          setRating(0);
-          form.reset({ comment: '' });
-          if (onSuccess) onSuccess();
-        } else {
-          toast.error(result.error || "Error deleting review");
-        }
+        toast.success("Review deleted successfully");
+        queryClient.invalidateQueries({ queryKey: ['activity', activityId] });
+        setRating(0);
+        form.reset({ comment: '' });
+        if (onSuccess) onSuccess();
       } catch (error) {
         console.error('Error deleting review:', error);
         toast.error("An unexpected error occurred");

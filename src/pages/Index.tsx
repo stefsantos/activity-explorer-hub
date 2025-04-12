@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -15,17 +16,20 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [cityQuery, setCityQuery] = useState('');
   const [filteredCities, setFilteredCities] = useState<string[]>([]);
-    const [isMapDialogOpen, setIsMapDialogOpen] = useState(false);
+  const [isMapDialogOpen, setIsMapDialogOpen] = useState(false);
+  
   const { data: activities = [], isLoading, error } = useQuery({
     queryKey: ['activities', searchQuery, cityQuery],
     queryFn: () => fetchActivities({ search: searchQuery, city: cityQuery }),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
+  
   const { data: cities = [] } = useQuery({
     queryKey: ['cities'],
     queryFn: fetchCities,
     staleTime: Infinity, // Cities don't change often
   });
+  
   const { data: featuredActivities = [] } = useQuery({
     queryKey: ['featuredActivities'],
     queryFn: () => fetchActivities({ featured: true }),
