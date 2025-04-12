@@ -45,11 +45,11 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
 
   // Common age ranges
   const ageRangePresets = [
+    { label: "All Ages", range: [0, 16], icon: <Users size={16} /> },
     { label: "0-3", range: [0, 3], icon: <Baby size={16} /> },
     { label: "4-7", range: [4, 7], icon: <User size={16} /> },
     { label: "8-12", range: [8, 12], icon: <User size={16} /> },
-    { label: "13+", range: [13, 16], icon: <Users size={16} /> },
-    { label: "All Ages", range: [0, 16], icon: <Users size={16} /> }
+    { label: "13+", range: [13, 16], icon: <Users size={16} /> }
   ];
 
   return (
@@ -79,7 +79,7 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
       {isAgeFilter && onAgeRangeChange ? (
         <div className="px-4 py-2">
           {/* Age range preset buttons */}
-          <div className="flex flex-wrap gap-2 mb-4 justify-center">
+          <div className="flex flex-wrap gap-2 mb-4 justify-start">
             {ageRangePresets.map((preset) => (
               <Button
                 key={preset.label}
