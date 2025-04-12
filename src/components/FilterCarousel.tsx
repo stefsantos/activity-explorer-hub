@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Baby, User, Users } from 'lucide-react';
@@ -90,7 +91,14 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
               </Button>)}
           </div>
           
-          <Slider value={ageRange} min={0} max={16} step={1} onValueChange={value => onAgeRangeChange(value as [number, number])} className="mb-2" />
+          <Slider 
+            value={ageRange} 
+            min={0} 
+            max={16} 
+            step={1} 
+            onValueChange={value => onAgeRangeChange(value as [number, number])} 
+            className="mb-2 [&>.relative>.absolute]:bg-kids-teal" 
+          />
           <div className="flex justify-between text-sm text-gray-600 mt-1">
             <span>{ageRange[0]} years</span>
             <span>{ageRange[1]} years</span>
