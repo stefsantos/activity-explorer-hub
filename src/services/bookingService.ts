@@ -18,7 +18,7 @@ export interface BookingData {
 export async function createBooking(bookingData: BookingData) {
   try {
     const { data, error } = await supabase
-      .from('activity_bookings')
+      .from('registered_activities')
       .insert(bookingData)
       .select();
     
@@ -39,7 +39,7 @@ export async function fetchUserBookings(userId: string | null, email: string | n
     console.log('Fetching bookings for user:', userId || email);
     
     let query = supabase
-      .from('activity_bookings')
+      .from('registered_activities')
       .select(`
         *,
         activity:activities(id, title, image, category),
