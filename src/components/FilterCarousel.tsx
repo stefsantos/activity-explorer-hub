@@ -71,7 +71,7 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
         <div className="px-4 py-2">
           <Slider 
             value={ageRange}
-            min={1} 
+            min={0} 
             max={16}
             step={1}
             onValueChange={(value) => onAgeRangeChange(value as [number, number])}

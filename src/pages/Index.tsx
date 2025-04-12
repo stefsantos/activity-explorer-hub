@@ -20,7 +20,7 @@ const Index = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
   const [ageRangeFilter, setAgeRangeFilter] = useState('all');
-  const [ageRange, setAgeRange] = useState<[number, number]>([1, 16]);
+  const [ageRange, setAgeRange] = useState<[number, number]>([0, 16]);
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
