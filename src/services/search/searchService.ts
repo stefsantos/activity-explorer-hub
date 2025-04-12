@@ -23,3 +23,34 @@ export const fetchCities = async (): Promise<string[]> => {
     return [];
   }
 };
+
+// Add the searchActivities function to search for activities by query string
+export const searchActivities = async (query: string) => {
+  try {
+    if (!query || query.trim() === '') {
+      return [];
+    }
+    
+    const { data, error } = await supabase
+      .from('activities')
+      .select(`
+        id,
+        title,
+        image,
+        category,
+        location:activity_locations(name)
+      `)
+      .or(`title.ilike.%${query}%,description.ilike.%${query}%,category.ilike.%${query}%`)
+      .limit(10);
+    
+    if (error) {
+      console.error('Error searching activities:', error);
+      throw error;
+    }
+    
+    return data || [];
+  } catch (error) {
+    console.error('Error in searchActivities:', error);
+    return [];
+  }
+};
