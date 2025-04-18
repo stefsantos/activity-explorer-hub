@@ -38,6 +38,8 @@ import LocationSelector from '@/components/LocationSelector';
 import ActivityFooter from '@/components/activity/ActivityFooter';
 
 const ActivityList = () => {
+  const maximum_price = 20000;
+
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [locationFilter, setLocationFilter] = useState('all');
   const [ageRangeFilter, setAgeRangeFilter] = useState('all');
@@ -45,7 +47,7 @@ const ActivityList = () => {
   const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [ageRange, setAgeRange] = useState<[number, number]>([0, 16]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, maximum_price]);
   const [searchQuery, setSearchQuery] = useState('');
   const [availabilityFilters, setAvailabilityFilters] = useState({
     today: false,
@@ -145,7 +147,7 @@ const ActivityList = () => {
     setCategoryFilter('all');
     setLocationFilter('all');
     setAgeRange([0, 16]);
-    setPriceRange([0, 5000]);
+    setPriceRange([0, maximum_price]);
     setRatingFilter(0);
     setAvailabilityFilters({
       today: false,
@@ -237,7 +239,7 @@ const ActivityList = () => {
                   ageRange[0] !== 0 || 
                   ageRange[1] !== 16 || 
                   priceRange[0] !== 0 || 
-                  priceRange[1] !== 5000 ||
+                  priceRange[1] !== maximum_price ||
                   ratingFilter !== 0) && (
                   <Button 
                     variant="ghost" 
@@ -300,10 +302,10 @@ const ActivityList = () => {
                 <h3 className="text-md font-semibold mb-3">Price Range</h3>
                 <div className="px-2">
                   <Slider 
-                    defaultValue={[0, 5000]} 
+                    defaultValue={[0, maximum_price]} 
                     value={priceRange}
                     min={0} 
-                    max={5000}
+                    max={maximum_price}
                     step={100}
                     onValueChange={(value) => setPriceRange(value as [number, number])}
                     className="mb-2"
