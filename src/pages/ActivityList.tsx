@@ -44,7 +44,7 @@ const ActivityList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredActivities, setFilteredActivities] = useState<any[]>([]);
   const [totalPages, setTotalPages] = useState(1);
-  const [ageRange, setAgeRange] = useState<[number, number]>([1, 16]);
+  const [ageRange, setAgeRange] = useState<[number, number]>([0, 16]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
   const [searchQuery, setSearchQuery] = useState('');
   const [availabilityFilters, setAvailabilityFilters] = useState({
@@ -234,7 +234,7 @@ const ActivityList = () => {
                 </h2>
                 {(categoryFilter !== 'all' || 
                   locationFilter !== 'all' || 
-                  ageRange[0] !== 1 || 
+                  ageRange[0] !== 0 || 
                   ageRange[1] !== 16 || 
                   priceRange[0] !== 0 || 
                   priceRange[1] !== 5000 ||
@@ -281,9 +281,9 @@ const ActivityList = () => {
                 <h3 className="text-md font-semibold mb-3">Age Range</h3>
                 <div className="px-2">
                   <Slider 
-                    defaultValue={[1, 16]} 
+                    defaultValue={[0, 16]} 
                     value={ageRange}
-                    min={1} 
+                    min={0} 
                     max={16}
                     step={1}
                     onValueChange={(value) => setAgeRange(value as [number, number])}
