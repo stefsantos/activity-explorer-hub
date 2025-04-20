@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight, Baby, User, Users } from 'lucide-react';
@@ -109,7 +108,7 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
       {isAgeFilter && onAgeRangeChange ? <div className="py-2 px-0">
           {/* Age range preset buttons - scrollable on mobile */}
           <div className="mb-4 relative">
-            <div className="overflow-x-auto hide-scrollbar" ref={ageButtonsRef}>
+            <div ref={scrollRef} className="relative flex overflow-x-auto pb-1 filter-scroll w-full">
               <div className="flex gap-2 min-w-max">
                 {ageRangePresets.map(preset => <Button 
                   key={preset.label} 
@@ -126,24 +125,7 @@ const FilterCarousel: React.FC<FilterCarouselProps> = ({
                 </Button>)}
               </div>
             </div>
-            <div className="absolute top-1/2 right-0 -translate-y-1/2 flex gap-1 md:hidden">
-              <Button 
-                variant="outline" 
-                size="icon" 
-                className="h-6 w-6 rounded-full bg-white/80 backdrop-blur-sm border-kids-teal text-kids-teal hover:bg-kids-teal hover:text-white" 
-                onClick={() => scrollAgeButtons('left')}
-              >
-                <ChevronLeft className="h-3 w-3" />
-              </Button>
-              <Button 
-                variant="outline" 
-                size="icon" 
-                className="h-6 w-6 rounded-full bg-white/80 backdrop-blur-sm border-kids-teal text-kids-teal hover:bg-kids-teal hover:text-white" 
-                onClick={() => scrollAgeButtons('right')}
-              >
-                <ChevronRight className="h-3 w-3" />
-              </Button>
-            </div>
+           
           </div>
           
           <Slider 
